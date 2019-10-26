@@ -1,0 +1,457 @@
+<!doctype html>
+<html lang="zh-cn">
+<head>
+
+    <meta charset="utf-8">
+    <meta name="generator" content="Hugo 0.54.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Hugo搭建个人博客 | Mr.耗子</title>
+    <meta property="og:title" content="Hugo搭建个人博客 - Mr.耗子">
+    <meta property="og:type" content="article">
+        
+    <meta property="article:published_time" content="2019-03-11T09:02:42&#43;08:00">
+        
+        
+    <meta property="article:modified_time" content="2019-03-11T09:02:42&#43;08:00">
+        
+    <meta name="Keywords" content="">
+    <meta name="description" content="Hugo搭建个人博客">
+        
+    <meta name="author" content="Mr.耗子">
+    <meta property="og:url" content="http://blog.k-8s.com/posts/Hugo-%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/">
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+
+    <link rel="stylesheet" href="/css/normalize.css">
+    
+        <link rel="stylesheet" href="/css/prism.css">
+    
+    <link rel="stylesheet" href="/css/style.css">
+    <script type="text/javascript" src="//cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+
+    
+
+
+    
+    
+</head>
+
+<body>
+<header id="header" class="clearfix">
+    <div class="container">
+        <div class="col-group">
+            <div class="site-name ">
+                
+                    <a id="logo" href="http://blog.k-8s.com/">
+                        Mr.耗子
+                    </a>
+                
+                <p class="description">Linux Docker Kubernetes Golang Python</p>
+            </div>
+            <div>
+                <nav id="nav-menu" class="clearfix">
+                    <a class="" href="http://blog.k-8s.com/">首页</a>
+                    
+                    <a  href="http://blog.k-8s.com/archives/" title="归档">归档</a>
+                    
+                    <a  href="http://blog.k-8s.com/about/" title="关于">关于</a>
+                    
+                </nav>
+            </div>
+        </div>
+    </div>
+</header>
+
+
+<div id="body">
+    <div class="container">
+        <div class="col-group">
+
+            <div class="col-8" id="main">
+                <div class="res-cons">
+                    <article class="post">
+                        <header>
+                            <h1 class="post-title">Hugo搭建个人博客</h1>
+                        </header>
+                        <date class="post-meta meta-date">
+                            2019年3月11日
+                        </date>
+                        
+                        
+                        <div class="post-meta">
+                            <span id="busuanzi_container_page_pv">|<span id="busuanzi_value_page_pv"></span><span> 阅读</span></span>
+                        </div>
+                        
+                        <div class="post-content">
+                            <h3 id="0x01-前言">0x01 前言</h3>
+
+<p>作为技术圈的一名初生小白, 在技术的道路上不可避免的要踩一些坑. 在采坑这个事情上, 有的人踩完就过去了, 不带走一片云彩, 不留下一点经验. 作为小白我呢, 在这里建议大家, 踩完坑一定要记得拿出&rdquo;小本本&rdquo;记录一下, 然后给记录的文字取一个显眼的大标题, 最后把记录放在坑边最显眼的地方, 给后来的采坑的人一个提醒, 也给自己涨点记性, 同样的坑不要老踩, 这样才能前进的更快 ^_^</p>
+
+<h3 id="0x02-博客简介">0x02 博客简介</h3>
+
+<p>好了, 言归正传. 上面提到的&rdquo;小本本&rdquo;便是这里要说的<strong>博客</strong>了, 在<a href="https://zh.wikipedia.org">维基百科</a>上, <a href="https://zh.wikipedia.org/wiki/%E7%B6%B2%E8%AA%8C">博客</a>有着如下定义:
+&gt; 博客（英语：Blog）是一种由个人管理、张贴新的文章、图片或影片的网站或在线日记，用来纪录、抒发情感或分享信息。博客上的文章通常根据张贴时间，以倒序方式由新到旧排列。</p>
+
+<p>从定义可以看出, 博客有着一下三个特点:
+- 内容由个人管理
+- 用来记录或分享信息
+- 文章通常根据张贴时间, 以倒叙方式排列</p>
+
+<h3 id="0x03-常见几种博客软件">0x03 常见几种博客软件</h3>
+
+<p>这里先解释一下什么是动态类和静态类博客.</p>
+
+<p><strong>动态类:</strong> 网页内容是通过访问时, 页面向Web服务后端发起请求, 通过查询相关数据库取得数据, 浏览器拿到返回的内容数据和模板, 根据一定规则渲染出页面.</p>
+
+<p><strong>静态类:</strong> 网页内容被博客软件所编译生成静态页面, 所有的内容都以静态资源的方式存在, 如果对文章内容有改动, 则需要对该文章进行编译, 生成相关的Html文件后才可观察到修改后的内容.</p>
+
+<p>对以上内容不清楚的, 还请<a href="https://www.google.com">Google</a>或者<a href="https://www.baidu.com">百度一下</a>, 此处不再过多解释.</p>
+
+<ul>
+<li>动态类博客软件或工具:
+
+<ul>
+<li>WordPress</li>
+<li>Django</li>
+<li>Ghost</li>
+</ul></li>
+<li>静态类博客软件或工具:
+
+<ul>
+<li>jekyll</li>
+<li>Hexo</li>
+<li>Hugo</li>
+</ul></li>
+</ul>
+
+<p><strong>动态类和静态类的优缺点:</strong></p>
+
+<ul>
+<li>动态类优点:
+
+<ul>
+<li>文章修改后, 刷新页面即可展示, 即&rdquo;修改便有效果&rdquo;</li>
+<li>数据方便导出(因为数据大多以数据库为媒介存放)</li>
+<li>一般具有管理后台, 发布文章简单, 对新手友好</li>
+</ul></li>
+<li>动态类缺点:
+
+<ul>
+<li>因为一般带有数据库, 页面响应时间比较长</li>
+<li>占用资源较多</li>
+<li>相对静态博客, 遭受Web攻击的可能更高</li>
+</ul></li>
+<li>静态类优点:
+
+<ul>
+<li>占用资源少,以网页响应快, CDN加速方便</li>
+<li>可以和gitlab, github等平台配合, 小体量博客可无需购买服务器即可搭建</li>
+</ul></li>
+<li>静态类缺点:
+
+<ul>
+<li>一般不具有管理后台, 发布文章比较繁琐</li>
+<li>配置相对复杂, 定制化操作多</li>
+</ul></li>
+</ul>
+
+<h3 id="0x04-hugo简介">0x04 Hugo简介</h3>
+
+<p>Hugo的<a href="https://gohugo.io/">官网</a>对其的描述如下:
+&gt; The world’s fastest framework for building websites
+&gt; 世界上最快的网站构建框架</p>
+
+<blockquote>
+<p>Hugo is one of the most popular open-source static site generators. With its amazing speed and flexibility, Hugo makes building websites fun again.
+Hugo是最受欢迎的开源静态站点生成器之一。凭借其惊人的速度和灵活性，Hugo使建筑网站再次变得有趣。</p>
+</blockquote>
+
+<p>为什么说Hugo是一个网站构建框架呢? 是因为Hugo支持markdown语法, 能够将写完的markdown文章按照语法规则构建生成对应的html文件, 并且页面内容可以适配相应的主题.</p>
+
+<p>Hugo本身也可以做服务器, 但官方不建议在生产环境中直接使用Hugo server作为服务器端, 而是建议在测试页面时使用.</p>
+
+<p><strong>为什么选择使用Hugo:</strong> 配置简单, 网页生成速度快, 大量模板可满足各种需求.</p>
+
+<h3 id="0x05-hugo-的部署方式">0x05 Hugo 的部署方式</h3>
+
+<p>Hugo 是一个静态网页生成工具, 故部署的方式多种多样, 这里介绍两种常见的部署方式, 分别是Hugo+Nginx和Hugo+Github pages, 也各有优缺点.</p>
+
+<ul>
+<li><p><strong>Nginx:</strong> 通过Hugo将编写好的文章, 生成静态文件后, 直接通过Nginx部署到自己的服务器上, 具有响应快, Nginx可配置(SSL, Log分析, 无限制访问等)优点</p></li>
+
+<li><p><strong>Github pages:</strong> 和Nginx部署方式类似, 都需要先生成静态网页. 不同的是此方法则利用了<a href="https://pages.github.com">Github pages</a>功能, 关于它的使用帮助可以看这里<a href="https://help.github.com/en/categories/github-pages-basics">Github pages帮助</a>. 用Github pages部署有个好处是可以不用自己购买服务器, 无需配置各种复杂的Web Server. 缺点是Github pages 有空间限制和访问次数限制:</p></li>
+</ul>
+
+<blockquote>
+<p><a href="https://help.github.com/en/articles/what-is-github-pages"><strong>Usage limits</strong></a>
+<strong>使用限制</strong></p>
+
+<p>GitHub Pages sites are subject to the following usage limits:
+<br>GitHub Pages站点</p>
+
+<p>GitHub Pages source repositories have a recommended limit of 1GB.
+<br>GitHub Pages源存储库建议限制为1GB</p>
+
+<p>Published GitHub Pages sites may be no larger than 1 GB.
+<br>发布的GitHub Pages网站大小不能超过1GB</p>
+
+<p>GitHub Pages sites have a soft bandwidth limit of 100GB per month.
+<br>GitHub Pages站点的软带宽流量不能超过每月100GB</p>
+
+<p>GitHub Pages sites have a soft limit of 10 builds per hour.
+<br>GitHub Pages站点每小时构建次数超过10次</p>
+</blockquote>
+
+<p>具体怎么部署可以看读者的实际情况, 访问量达, 内容多的博客, 建议还是Hugo+Nginx的方式; 访问量小, 喜欢配置简洁的博主, 建议选择Hugo+Github pages的方式.</p>
+
+<h3 id="0x06-开始安装并使用hugo">0x06 开始安装并使用Hugo</h3>
+
+<p>首先, 当然是参照官方文档来安装和使用最正确了. 不过官方文档我只找到英语, 感觉对英语不太好的同学会觉得有些吃力. 当然了, 现在浏览器的翻译功能也非常好用(理解能力强的人可以直接看翻译, 这里写文章只是为了记录一下部署心得)</p>
+
+<p>附上官方文档地址: <a href="https://gohugo.io/getting-started/installing/">官方文档</a></p>
+
+<p>我们平时使用的操作系统不外乎是Windows, Linux, MacOS. 我这就写一个通用的安装方式, 该安装方式有以下3个步骤:</p>
+
+<pre><code>1. 下载对应操作系统的Hugo二进制软件包
+2. 放到系统某个目录下
+3. 配置环境变量
+</code></pre>
+
+<p>首先放出下载地址: <a href="https://github.com/gohugoio/hugo/releases">下载地址</a>
+在该页面可以找到类似于&rdquo;<strong>hugo_0.54.0_Linux-64bit.tar.gz</strong>&ldquo;字段的名称, 简单介绍下命名结构:</p>
+
+<table>
+<thead>
+<tr>
+<th>hugo</th>
+<th>0.54.0</th>
+<th>Linux</th>
+<th>64bit</th>
+<th>tar.gz</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>软件名</td>
+<td>版本号</td>
+<td>系统类型</td>
+<td>CPU架构</td>
+<td>打包方式</td>
+</tr>
+</tbody>
+</table>
+
+<p>由于我用树莓派当做我的编译服务器, 所以我下载的是<em>hugo_0.54.0_Linux-ARM.tar.gz</em></p>
+
+<hr />
+
+<p>第二步, 将下载好的软件包放到系统里, 然后执行<code>tar -zxvf hugo_0.54.0_Linux-ARM.tar.gz</code> 来解压, 可以得到<em>LICENSE</em>, <em>README.md</em>, <em>hugo</em> 三个文件, 它们分别是:</p>
+
+<ul>
+<li><em>LICENSE:</em> 软件的开源协议说明, 使用者需要自觉遵守协议</li>
+<li><em>README.md:</em> 软件的相关介绍, 使用说明等</li>
+<li><em>hugo:</em> 可执行文件, 软件本体</li>
+</ul>
+
+<hr />
+
+<p>第三步, 将改目录添加到系统的PATH里即可, 我这里为了简单, 直接使用<code>mv hugo /usr/local/bin/</code>下, 省去了配置环境变量的步骤</p>
+
+<p>安装到此就结束了, 最后可以执行下<code>hugo version</code>, 看到有类似 <em>Hugo Static Site Generator v0.54.0-B1A82C61 linux/arm BuildDate: 2019-02-01T09:40:34Z</em> 的输出即是安装成功了.</p>
+
+<h3 id="0x07-开始使用hugo并配置主题">0x07 开始使用Hugo并配置主题</h3>
+
+<p>首先我们要创建一个目录, 用以存放生成博客的相关资源(模板, 主题, 静态文件等), 不过我们不用手动创建该目录, hugo帮我们做了这一步:</p>
+
+<pre><code class="language-bash">hugo new site github_blog  # 生成一个站点资源目录
+</code></pre>
+
+<p>但是现在博客还没有配置主题, 所以即使运行起来也是一片空白. 官方安装主题的文档是<a href="https://gohugo.io/themes/installing-and-using-themes/">主题配置文档</a>, 官网也提供了一些相当不错的网站模板, 模板地址: <a href="https://themes.gohugo.io/">Hugo 模板</a></p>
+
+<p>我这里从网上找到一个我认为比较好看的模板主题, 就是<a href="https://www.flysnow.org">飞雪无情的博客</a>, 他也写了一篇<a href="https://www.flysnow.org/2018/07/29/from-hexo-to-hugo.html">从Hexo迁移到Hugo</a>, 讲非常详细. 我这里基本是参考他的步骤来写.</p>
+
+<pre><code class="language-bash">cd blog  # 进入到hugo生成的站点目录中
+
+# 然后下载主题到thems文件夹
+git clone https://github.com/rujews/maupassant-hugo themes/maupassant
+</code></pre>
+
+<p>编辑config.toml(在博客站点目录中), 增加主题相关的配置
+这部分是站点的基本配置</p>
+
+<pre><code class="language-toml">    baseURL = &quot;blog.k-8s.com&quot;  #站点Url
+    languageCode = &quot;zh-CN&quot;     # 语言格式
+    title = &quot;Mr.耗子&quot;           # 站点名称
+    theme = &quot;maupassant&quot;
+
+    disablePathToLower = true  # 禁止url路径转小写
+
+    [author]
+      name = &quot;Your name&quot;
+    
+    [params]
+      author = &quot;Your&quot;
+      subtitle = &quot;&quot;
+      keywords = &quot;&quot;  # 可以写技能关键字, 博客关键字等等
+      description = &quot;&quot;  # 注释, 不解释 
+</code></pre>
+
+<h4 id="主题-maupassant-自定义菜单">主题 maupassant 自定义菜单</h4>
+
+<p>原作者的菜单是基于Content Type实现的，扩展性很差。Hugo本身有菜单的支持，扩展性更好，所以<a href="https://www.flysnow.org">飞雪无情</a>改为基于Hugo原生菜单的方式实现，可以无限级扩展、支持菜单排序。</p>
+
+<pre><code class="language-toml">  [menu]
+    [[menu.main]]
+        identifier = &quot;archives&quot;
+        name = &quot;归档&quot;
+        url = &quot;/archives/&quot;
+        weight = 3
+    [[menu.main]]
+        identifier = &quot;about&quot;
+        name = &quot;关于&quot;
+        url = &quot;/about/&quot;
+        weight = 4
+</code></pre>
+
+<p>关于主题如何使用归档, 还请参考原博客, 这里我后续会陆续补上相关内容</p>
+
+<h3 id="0x08-结语">0x08 结语</h3>
+
+<p>最后, 我也是最近才开始使用hugo, 配置当中的一些坑还没有遇到, 遇到后再继续更新吧. 也希望hugo作为一个开源项目, 能有更多的优秀人参与进去, 贡献代码, 使hugo更强大, 更优秀!</p>
+
+<h2 id="参考文章">参考文章</h2>
+
+<p><strong>Hugo 官方文档:</strong> <a href="https://gohugo.io/documentation/">https://gohugo.io/documentation/</a></p>
+
+<p><strong>飞雪无情的博客:</strong> <a href="https://www.flysnow.org/2018/07/29/from-hexo-to-hugo.html">https://www.flysnow.org/2018/07/29/from-hexo-to-hugo.html</a></p>
+
+<p><strong>Github pages:</strong> <a href="https://pages.github.com">https://pages.github.com</a></p>
+                        </div>
+
+                        
+
+<div class="post-archive">
+    <h2>See Also</h2>
+    <ul class="listing">
+        
+        <li><a href="/about/">About me</a></li>
+        
+        <li><a href="/archives/">归档</a></li>
+        
+    </ul>
+</div>
+
+
+                        <div class="post-meta meta-tags">
+                            
+                            没有标签
+                            
+                        </div>
+                    </article>
+                    
+    
+
+    
+    
+                </div>
+            </div>
+            <div id="secondary">
+    <section class="widget">
+        <form id="search" action="//www.google.com/search" method="get" accept-charset="utf-8" target="_blank" _lpchecked="1">
+      
+      <input type="text" name="q" maxlength="20" placeholder="Search">
+      <input type="hidden" name="sitesearch" value="http://blog.k-8s.com/">
+      <button type="submit" class="submit icon-search"></button>
+</form>
+    </section>
+    
+    <section class="widget">
+        <h3 class="widget-title">最近文章</h3>
+<ul class="widget-list">
+    
+    <li>
+        <a href="http://blog.k-8s.com/posts/Hugo-%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/" title="Hugo搭建个人博客">Hugo搭建个人博客</a>
+    </li>
+    
+</ul>
+    </section>
+
+    
+
+    <section class="widget">
+        <h3 class="widget-title">分类</h3>
+<ul class="widget-list">
+    
+</ul>
+    </section>
+
+    <section class="widget">
+        <h3 class="widget-title">标签</h3>
+<div class="tagcloud">
+    
+</div>
+    </section>
+
+    
+<section class="widget">
+    <h3 class="widget-title">友情链接</h3>
+    <ul class="widget-list">
+        
+        <li>
+            <a target="_blank" href="http://www.jxhs.me" title="jame_xhs">jame_xhs</a>
+        </li>
+        
+    </ul>
+</section>
+
+
+    <section class="widget">
+        <h3 class="widget-title">其它</h3>
+        <ul class="widget-list">
+            <li><a href="http://blog.k-8s.com/index.xml">文章 RSS</a></li>
+        </ul>
+    </section>
+</div>
+        </div>
+    </div>
+</div>
+<footer id="footer">
+    <div class="container">
+        &copy; 2018 <a href="http://blog.k-8s.com/">Mr.耗子 By Mr.耗子</a>.
+        Powered by <a rel="nofollow noreferer noopener" href="https://gohugo.io" target="_blank">Hugo</a>.
+        <a href="https://www.flysnow.org/" target="_blank">Theme</a> based on <a href="https://github.com/rujews/maupassant-hugo" target="_blank">maupassant</a>.
+        
+    </div>
+</footer>
+
+
+    <script type="text/javascript">
+    
+    (function(){
+        $("pre code").parent().addClass("line-numbers")
+    }())
+
+    window.MathJax = {
+        tex2jax: {
+            inlineMath: [ ['$','$'] ],
+            processEscapes: true
+        }
+    };
+    </script>
+    <script type="text/javascript" src="/js/prism.js" async="true"></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
+
+<a id="rocket" href="#top"></a>
+<script type="text/javascript" src="/js/totop.js?v=0.0.0" async=""></script>
+
+
+
+<script type="text/javascript" src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" async></script>
+
+
+
+
+</body>
+</html>
