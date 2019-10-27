@@ -6,10 +6,37 @@
     <description>Recent content in Posts on Mr.耗子</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    <lastBuildDate>Mon, 11 Mar 2019 09:02:42 +0800</lastBuildDate>
+    <lastBuildDate>Fri, 03 May 2019 21:36:22 +0800</lastBuildDate>
     
 	<atom:link href="http://blog.k-8s.com/posts/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Kubernetes 基本概念和术语</title>
+      <link>http://blog.k-8s.com/posts/Kubernetes-%E7%AC%94%E8%AE%B0/Kubernetes-%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5/</link>
+      <pubDate>Fri, 03 May 2019 21:36:22 +0800</pubDate>
+      
+      <guid>http://blog.k-8s.com/posts/Kubernetes-%E7%AC%94%E8%AE%B0/Kubernetes-%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5/</guid>
+      <description>&lt;h2 id=&#34;基本概念和术语&#34;&gt;基本概念和术语&lt;/h2&gt;
+
+&lt;p&gt;Kubernetes 中, 大部分的概念都是一种资源对象, 几乎所有的资源都可以通过 &lt;strong&gt;&lt;em&gt;kubectl&lt;/em&gt;&lt;/strong&gt; 或 &lt;strong&gt;&lt;em&gt;API&lt;/em&gt;&lt;/strong&gt; 来执行 &lt;strong&gt;&lt;em&gt;增, 删, 改, 查&lt;/em&gt;&lt;/strong&gt; 等操作. 所有的修改都将被保存在 &lt;strong&gt;&lt;em&gt;etcd&lt;/em&gt;&lt;/strong&gt; (etcd 是一个分布式键值对数据库, 这里暂时不讨论) 中持久化存储.&lt;/p&gt;
+
+&lt;p&gt;在 Kubernetes 中, 可以采用 &lt;strong&gt;&lt;em&gt;YAML&lt;/em&gt;&lt;/strong&gt; 或 &lt;strong&gt;&lt;em&gt;JSON&lt;/em&gt;&lt;/strong&gt; 格式声明一个 Kubernetes 资源对象&lt;/p&gt;
+
+&lt;h3 id=&#34;master&#34;&gt;Master&lt;/h3&gt;
+
+&lt;p&gt;Master 是集群中的控制节点, 每个 Kubernetes 集群中都需要一个 Master 来负责.&lt;/p&gt;
+
+&lt;p&gt;在 Master 上, 运行着一下几个关键进程:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Kubernetes API Server&lt;/strong&gt; :提供HTTP Rest 接口&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Kubernetes Controller Manager&lt;/strong&gt;: 所有对象的管理者&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Kubernetes Scheduler&lt;/strong&gt;: 负责资源调度&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;通常来说, Master 上还需要部署 &lt;strong&gt;&lt;em&gt;etcd&lt;/em&gt;&lt;/strong&gt; 服务, 用于保存所有资源对象的数据. (etcd 也可不部署在 Master 节点上)&lt;/p&gt;</description>
+    </item>
     
     <item>
       <title>Hugo搭建个人博客</title>

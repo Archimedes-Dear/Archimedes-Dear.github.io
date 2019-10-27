@@ -3,6 +3,11 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
+    <loc>http://blog.k-8s.com/posts/Kubernetes-%E7%AC%94%E8%AE%B0/Kubernetes-%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5/</loc>
+    <lastmod>2019-05-03T21:36:22+08:00</lastmod>
+  </url>
+  
+  <url>
     <loc>http://blog.k-8s.com/posts/Hugo-%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/</loc>
     <lastmod>2019-03-11T09:02:42+08:00</lastmod>
   </url>
@@ -19,13 +24,13 @@
   
   <url>
     <loc>http://blog.k-8s.com/</loc>
-    <lastmod>2019-03-11T09:02:42+08:00</lastmod>
+    <lastmod>2019-05-03T21:36:22+08:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
     <loc>http://blog.k-8s.com/posts/</loc>
-    <lastmod>2019-03-11T09:02:42+08:00</lastmod>
+    <lastmod>2019-05-03T21:36:22+08:00</lastmod>
     <priority>0</priority>
   </url>
   
