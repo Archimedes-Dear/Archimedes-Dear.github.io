@@ -6,17 +6,73 @@
     <description>Recent content on Mr.耗子</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    <lastBuildDate>Fri, 03 May 2019 21:36:22 +0800</lastBuildDate>
+    <lastBuildDate>Sat, 04 May 2019 10:13:32 +0800</lastBuildDate>
     
 	<atom:link href="http://blog.k-8s.com/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
+      <title>Kubernetes Deployment</title>
+      <link>http://blog.k-8s.com/posts/Kubernetes-Note/Kubernetes-Deployment/</link>
+      <pubDate>Sat, 04 May 2019 10:13:32 +0800</pubDate>
+      
+      <guid>http://blog.k-8s.com/posts/Kubernetes-Note/Kubernetes-Deployment/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Kubernetes Pod 详解</title>
+      <link>http://blog.k-8s.com/posts/Kubernetes-Note/Kubernetes-Pod/</link>
+      <pubDate>Fri, 03 May 2019 22:36:22 +0800</pubDate>
+      
+      <guid>http://blog.k-8s.com/posts/Kubernetes-Note/Kubernetes-Pod/</guid>
+      <description>&lt;h3 id=&#34;创建-pod&#34;&gt;创建 Pod&lt;/h3&gt;
+
+&lt;p&gt;我们先来通过命令的方式, 来创建一个简单的 Pod&lt;/p&gt;
+
+&lt;p&gt;需要注意的一点是, 如果只想创建一个 Pod, 而不是创建一个 Deployment, 则需要指定参数 &lt;strong&gt;&lt;em&gt;&lt;code&gt;--generator=run-pod/v1&lt;/code&gt;&lt;/em&gt;&lt;/strong&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-shell&#34;&gt;root@K8sMaster-1:~# kubectl run my-nginx --image=nginx:1.14.1 --replicas=2 --port=80 --generator=run-pod/v1
+pod/my-nginx created
+
+root@K8sMaster-1:~# kubectl get pods
+NAME       READY   STATUS    RESTARTS   AGE
+my-nginx   1/1     Running   0          8s
+
+# 查看pod 详情
+root@K8sMaster-1:~# kubectl describe pod my-nginx
+Name:               my-nginx
+Namespace:          default
+Priority:           0
+PriorityClassName:  &amp;lt;none&amp;gt;
+Node:               k8snode-1/192.168.206.151
+Start Time:         Sun, 27 Oct 2019 14:29:22 +0800
+Labels:             run=my-nginx
+Annotations:        &amp;lt;none&amp;gt;
+Status:             Running
+IP:                 10.244.1.11
+Containers:
+  my-nginx:
+    Container ID:   docker://9edea905f888a0a10d9e7859f995ce0e4e43e388b42b8d9c7a20f880915307c8
+    Image:          nginx:1.14.1
+    Image ID:       docker-pullable://nginx@sha256:32fdf92b4e986e109e4db0865758020cb0c3b70d6ba80d02fe87bad5cc3dc228
+    Port:           80/TCP
+    Host Port:      0/TCP
+    State:          Running
+      Started:      Sun, 27 Oct 2019 14:29:23 +0800
+    Ready:          True
+    ...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;通过以上方式, 我们就能创建一个名为 &lt;strong&gt;my-nginx&lt;/strong&gt; 的 Pod, 使用的是 &lt;strong&gt;nginx:1.14.1&lt;/strong&gt; 的镜像, 并且指定开放的端口为 &lt;strong&gt;80&lt;/strong&gt;&lt;/p&gt;</description>
+    </item>
+    
+    <item>
       <title>Kubernetes 基本概念和术语</title>
-      <link>http://blog.k-8s.com/posts/Kubernetes-%E7%AC%94%E8%AE%B0/Kubernetes-%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5/</link>
+      <link>http://blog.k-8s.com/posts/Kubernetes-Note/Kubernetes-basic-concept/</link>
       <pubDate>Fri, 03 May 2019 21:36:22 +0800</pubDate>
       
-      <guid>http://blog.k-8s.com/posts/Kubernetes-%E7%AC%94%E8%AE%B0/Kubernetes-%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5/</guid>
+      <guid>http://blog.k-8s.com/posts/Kubernetes-Note/Kubernetes-basic-concept/</guid>
       <description>&lt;h2 id=&#34;基本概念和术语&#34;&gt;基本概念和术语&lt;/h2&gt;
 
 &lt;p&gt;Kubernetes 中, 大部分的概念都是一种资源对象, 几乎所有的资源都可以通过 &lt;strong&gt;&lt;em&gt;kubectl&lt;/em&gt;&lt;/strong&gt; 或 &lt;strong&gt;&lt;em&gt;API&lt;/em&gt;&lt;/strong&gt; 来执行 &lt;strong&gt;&lt;em&gt;增, 删, 改, 查&lt;/em&gt;&lt;/strong&gt; 等操作. 所有的修改都将被保存在 &lt;strong&gt;&lt;em&gt;etcd&lt;/em&gt;&lt;/strong&gt; (etcd 是一个分布式键值对数据库, 这里暂时不讨论) 中持久化存储.&lt;/p&gt;
@@ -40,10 +96,10 @@
     
     <item>
       <title>Hugo搭建个人博客</title>
-      <link>http://blog.k-8s.com/posts/Hugo-%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/</link>
+      <link>http://blog.k-8s.com/posts/Hugo-build-a-person-blog/</link>
       <pubDate>Mon, 11 Mar 2019 09:02:42 +0800</pubDate>
       
-      <guid>http://blog.k-8s.com/posts/Hugo-%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/</guid>
+      <guid>http://blog.k-8s.com/posts/Hugo-build-a-person-blog/</guid>
       <description>&lt;h3 id=&#34;0x01-前言&#34;&gt;0x01 前言&lt;/h3&gt;
 
 &lt;p&gt;作为技术圈的一名初生小白, 在技术的道路上不可避免的要踩一些坑. 在采坑这个事情上, 有的人踩完就过去了, 不带走一片云彩, 不留下一点经验. 作为小白我呢, 在这里建议大家, 踩完坑一定要记得拿出&amp;rdquo;小本本&amp;rdquo;记录一下, 然后给记录的文字取一个显眼的大标题, 最后把记录放在坑边最显眼的地方, 给后来的采坑的人一个提醒, 也给自己涨点记性, 同样的坑不要老踩, 这样才能前进的更快 ^_^&lt;/p&gt;</description>

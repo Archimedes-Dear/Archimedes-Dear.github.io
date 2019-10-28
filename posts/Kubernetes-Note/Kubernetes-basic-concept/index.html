@@ -1,0 +1,696 @@
+<!doctype html>
+<html lang="zh-cn">
+<head>
+
+    <meta charset="utf-8">
+    <meta name="generator" content="Hugo 0.54.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Kubernetes 基本概念和术语 | Mr.耗子</title>
+    <meta property="og:title" content="Kubernetes 基本概念和术语 - Mr.耗子">
+    <meta property="og:type" content="article">
+        
+    <meta property="article:published_time" content="2019-05-03T21:36:22&#43;08:00">
+        
+        
+    <meta property="article:modified_time" content="2019-05-03T21:36:22&#43;08:00">
+        
+    <meta name="Keywords" content="耗子,Mr.耗子,Docker,容器,k8s,kubernetes,golang,go,devops">
+    <meta name="description" content="Kubernetes 基本概念和术语">
+        
+    <meta name="author" content="Mr.耗子">
+    <meta property="og:url" content="http://blog.k-8s.com/posts/Kubernetes-Note/Kubernetes-basic-concept/">
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+
+    <link rel="stylesheet" href="/css/normalize.css">
+    
+        <link rel="stylesheet" href="/css/prism.css">
+    
+    <link rel="stylesheet" href="/css/style.css">
+    <script type="text/javascript" src="//cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+
+    
+
+
+    
+    
+</head>
+
+<body>
+<header id="header" class="clearfix">
+    <div class="container">
+        <div class="col-group">
+            <div class="site-name ">
+                
+                    <a id="logo" href="http://blog.k-8s.com/">
+                        Mr.耗子
+                    </a>
+                
+                <p class="description">Linux Docker Kubernetes Golang Python</p>
+            </div>
+            <div>
+                <nav id="nav-menu" class="clearfix">
+                    <a class="" href="http://blog.k-8s.com/">首页</a>
+                    
+                    <a  href="http://blog.k-8s.com/archives/" title="归档">归档</a>
+                    
+                    <a  href="http://blog.k-8s.com/about/" title="关于">关于</a>
+                    
+                </nav>
+            </div>
+        </div>
+    </div>
+</header>
+
+
+<div id="body">
+    <div class="container">
+        <div class="col-group">
+
+            <div class="col-8" id="main">
+                <div class="res-cons">
+                    <article class="post">
+                        <header>
+                            <h1 class="post-title">Kubernetes 基本概念和术语</h1>
+                        </header>
+                        <date class="post-meta meta-date">
+                            2019年5月3日
+                        </date>
+                        
+                        
+                        <div class="post-meta">
+                            <span id="busuanzi_container_page_pv">|<span id="busuanzi_value_page_pv"></span><span> 阅读</span></span>
+                        </div>
+                        
+                        <div class="post-content">
+                            <h2 id="基本概念和术语">基本概念和术语</h2>
+
+<p>Kubernetes 中, 大部分的概念都是一种资源对象, 几乎所有的资源都可以通过 <strong><em>kubectl</em></strong> 或 <strong><em>API</em></strong> 来执行 <strong><em>增, 删, 改, 查</em></strong> 等操作. 所有的修改都将被保存在 <strong><em>etcd</em></strong> (etcd 是一个分布式键值对数据库, 这里暂时不讨论) 中持久化存储.</p>
+
+<p>在 Kubernetes 中, 可以采用 <strong><em>YAML</em></strong> 或 <strong><em>JSON</em></strong> 格式声明一个 Kubernetes 资源对象</p>
+
+<h3 id="master">Master</h3>
+
+<p>Master 是集群中的控制节点, 每个 Kubernetes 集群中都需要一个 Master 来负责.</p>
+
+<p>在 Master 上, 运行着一下几个关键进程:</p>
+
+<ul>
+<li><strong>Kubernetes API Server</strong> :提供HTTP Rest 接口</li>
+<li><strong>Kubernetes Controller Manager</strong>: 所有对象的管理者</li>
+<li><strong>Kubernetes Scheduler</strong>: 负责资源调度</li>
+</ul>
+
+<p>通常来说, Master 上还需要部署 <strong><em>etcd</em></strong> 服务, 用于保存所有资源对象的数据. (etcd 也可不部署在 Master 节点上)</p>
+
+<h3 id="node">Node</h3>
+
+<p>除了 Master, Kubernetes 集群中的其他机器被称为 Node, Node 是 Kubernetes 集群中工作负载节点.</p>
+
+<p>每个 Node 上, 运行着以下关键进程:</p>
+
+<ul>
+<li><strong>Kubelet</strong>: 负责资源对应 Pod 的创建, 启停等任务</li>
+<li><strong>Kube-proxy</strong>: 实现 Kubernetes Service 的通信与负载运行机制</li>
+<li><strong>Container Engine</strong>: 容器引擎, 目前 Kubernetes 支持多种容器引擎, 最常见的还是 Docker</li>
+</ul>
+
+<pre><code class="language-shell"># Kubernetes version: 1.14.1
+
+# 查看集群中有多少个 Node:
+root@K8sMaster-1:~# kubectl get nodes
+NAME          STATUS   ROLES    AGE   VERSION
+k8smaster-1   Ready    master   93d   v1.14.1
+k8snode-1     Ready    &lt;none&gt;   93d   v1.14.1
+k8snode-2     Ready    &lt;none&gt;   93d   v1.14.1
+
+# 查看 Node 详细信息:
+root@K8sMaster-1:~# Kubectl describe node k8s-node-1
+Name:               k8snode-1
+Roles:              &lt;none&gt;
+Labels:             beta.kubernetes.io/arch=amd64
+                    beta.kubernetes.io/os=linux
+                    kubernetes.io/arch=amd64
+                    kubernetes.io/hostname=k8snode-1
+                    kubernetes.io/os=linux
+Annotations:        flannel.alpha.coreos.com/backend-data: 
+  ...
+
+</code></pre>
+
+<p>Node 详情展示了如下关键信息:</p>
+
+<ul>
+<li>Node的基本信息：名称、标签、创建时间等。</li>
+<li>Node当前的运行状态：Node启动后会做一系列的自检工作，比如磁盘空间是否不足（DiskPressure）、内存是否不足（MemoryPressure）、网络是否正常（NetworkUnavailable）、PID资源是否充足（PIDPressure）。在一切正常时设置Node为Ready状态（Ready=True），该状态表示Node处于健康状态，Master将可以在其上调度新的任务了（如启动Pod）。</li>
+<li>Node的主机地址与主机名。</li>
+<li>Node上的资源数量：描述Node可用的系统资源，包括CPU、内存数量、最大可调度Pod数量等。</li>
+<li>Node可分配的资源量：描述Node当前可用于分配的资源量。</li>
+<li>主机系统信息：包括主机ID、系统UUID、Linux kernel版本
+号、操作系统类型与版本、Docker版本号、kubelet与kube-proxy的版本号等。</li>
+<li>当前运行的Pod列表概要信息。</li>
+<li>已分配的资源使用概要信息，例如资源申请的最低、最大允许
+使用量占系统总量的百分比。</li>
+<li>Node相关的Event信息。</li>
+</ul>
+
+<h3 id="pod">Pod</h3>
+
+<p>在介绍 Pod 之前, 我想先说明容器基本概念:</p>
+
+<p><strong>容器: 是一个视图隔离, 资源可限制, 独立文件系统的进程集合</strong></p>
+
+<p><strong>镜像: 运行容器所需要的所有文件集合</strong></p>
+
+<p><strong>容器的生命周期 = 容器内Init 进程的生命周期</strong></p>
+
+<p>接着我们来说 Pod 是什么:</p>
+
+<p>Pod 是 Kubernetes 中, 最小的可调度的资源单元.它由一个或多个容器组成, 提供了容器共享的运行环境.</p>
+
+<p>为什么会有 Pod?</p>
+
+<p>前面所说, 一个容器内的 Init 进程, 就是当前运行的应用本身, 那么管理容器就等于是管理应用本身.</p>
+
+<p>但往往一个应用本身不止一个进程, 可能会由多个进程或线程来完成, 那容器内如何管理这些<strong><em>子进程</em></strong> 或 <strong><em>线程</em></strong> 呢?</p>
+
+<p>答案是用 Pod.</p>
+
+<p>在每个 Pod 中, 都存在着一个特殊的 &ldquo;根容器&rdquo;, 称为 Pause 容器.</p>
+
+<p>通过查看 Pause 容器的状态, 可以管理整个 Pod 内其他容器的状态. 即 Pod = &ldquo;进程组&rdquo;</p>
+
+<p>Pod 内还会存在其他的业务容器, 与 Pause 容器共享资源(网络, 文件系统等)</p>
+
+<p>Pod 也分为两种类型:</p>
+
+<ul>
+<li>静态 Pod: 存放在某个具体 Node 上的一个文件中, 并只在该 Node 上启动和运行</li>
+<li>普通 Pod: 被 ctl 或 api 创建, 存放在 etcd 中, 然后被 Scheduler 调度到某个 Node 上绑定并被 Kubelet 进程实例化成一组容器运行起来</li>
+</ul>
+
+<p><img src="https://raw.githubusercontent.com/Archimedes-Dear/image_bed/master/images/Pod%E4%B8%8ENode%20%E5%85%B3%E7%B3%BB.png" alt="Pod与Node关系" /></p>
+
+<p>为什么 Pod 是最小原子调度单位?</p>
+
+<ul>
+<li>Pod 内的容器存在直接的文件交换</li>
+<li>Pod 内容器需要直接本地通信</li>
+<li>Pod 内容器共享某个 Linux Namespace</li>
+</ul>
+
+<p>Pod 解决了什么问题?</p>
+
+<ul>
+<li>共享网络</li>
+<li>共享存储</li>
+</ul>
+
+<h3 id="label">Label</h3>
+
+<p>Label 是一个 key=value 键值对. 可以被附加到各种资源上, 以实现资源的分配, 调度, 配置, 部署等管理功能</p>
+
+<p>一旦一个资源被 Label 标记, 便可通过 Label Selector (标签选择器) 查询和筛选拥有某些 Label 的资源对象</p>
+
+<p>Label 使用场景如下:</p>
+
+<ul>
+<li>Kube-controller 使用 Label Selector 来控制 Pod 副本数量</li>
+<li>Kube-proxy 使用 Label Selector 选择对应的 Pod, 实现 Service 到对应 Pod 的路由转发和负载均衡</li>
+<li>Kube-scheduler 使用 NodeSelector 实现 Pod 定向调度</li>
+</ul>
+
+<p><img src="https://raw.githubusercontent.com/Archimedes-Dear/image_bed/master/images/Label%E4%BD%BF%E7%94%A8%E5%9C%BA%E6%99%AF%E5%92%8C%E6%95%88%E6%9E%9C-1.png" alt="Label使用场景和效果-1" /></p>
+
+<p><img src="https://raw.githubusercontent.com/Archimedes-Dear/image_bed/master/images/Label%E4%BD%BF%E7%94%A8%E5%9C%BA%E6%99%AF%E5%92%8C%E6%95%88%E6%9E%9C-2.png" alt="Label使用场景和效果-2" /></p>
+
+<h3 id="replicaset-下一代-replication-controller">ReplicaSet (下一代 Replication Controller)</h3>
+
+<p>RS 是用于保证任何时刻, Kubernetes 集群中某个 Pod 的副本数量都符合某个期望值.</p>
+
+<p>需要注意的是, 删除通过 Deployment 创建的 RS 若被删除, 则会自动新建一个&rdquo;全新&rdquo;(名字仍一致)的 RS, 并且由旧 RS 启动的 Pod 回全部关闭.</p>
+
+<pre><code class="language-shell"># 举个例子
+# 这里有一个 nginx 的部署文件
+root@K8sMaster-1:~/k8s-yaml# cat deployment.yaml 
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+spec:
+  selector:
+    matchLabels:
+      app: nginx
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.7.9
+        ports:
+        - containerPort: 80
+
+# 接着我们部署它
+root@K8sMaster-1:~/k8s-yaml# kubectl apply -f deployment.yaml 
+deployment.apps/nginx-deployment created
+
+# 查看由 Deployment 创建的 rs
+root@K8sMaster-1:~/k8s-yaml# kubectl get rs
+NAME                         DESIRED   CURRENT   READY   AGE
+nginx-deployment-6dd86d77d   2         2         2       7s
+
+# 通过该 rs 创建出了 2 个 Pod
+root@K8sMaster-1:~/k8s-yaml# kubectl get pods
+NAME                               READY   STATUS    RESTARTS   AGE
+nginx-deployment-6dd86d77d-dss2s   1/1     Running   0          11s
+nginx-deployment-6dd86d77d-rbn82   1/1     Running   0          11s
+
+# 现在删除该 rs
+root@K8sMaster-1:~/k8s-yaml# kubectl delete rs nginx-deployment-6dd86d77d 
+replicaset.extensions &quot;nginx-deployment-6dd86d77d&quot; deleted
+
+# 观察 pod 数量变化
+root@K8sMaster-1:~/k8s-yaml# kubectl get pods
+NAME                               READY   STATUS        RESTARTS   AGE
+nginx-deployment-6dd86d77d-8sjl2   1/1     Running       0          3s
+nginx-deployment-6dd86d77d-dss2s   0/1     Terminating   0          24s
+nginx-deployment-6dd86d77d-rbn82   0/1     Terminating   0          24s
+nginx-deployment-6dd86d77d-w5llg   1/1     Running       0          3s
+
+root@K8sMaster-1:~/k8s-yaml# kubectl get pods
+NAME                               READY   STATUS        RESTARTS   AGE
+nginx-deployment-6dd86d77d-8sjl2   1/1     Running       0          8s
+nginx-deployment-6dd86d77d-dss2s   0/1     Terminating   0          29s
+nginx-deployment-6dd86d77d-w5llg   1/1     Running       0          8s
+
+root@K8sMaster-1:~/k8s-yaml# kubectl get pods
+NAME                               READY   STATUS    RESTARTS   AGE
+nginx-deployment-6dd86d77d-8sjl2   1/1     Running   0          10s
+nginx-deployment-6dd86d77d-w5llg   1/1     Running   0          10s
+
+# 可以看到, rs名字未发生改变
+root@K8sMaster-1:~/k8s-yaml# kubectl get rs 
+NAME                         DESIRED   CURRENT   READY   AGE
+nginx-deployment-6dd86d77d   2         2         2       13s
+
+</code></pre>
+
+<p>RS 与 RC 目前唯一的区别是: RS 支持基于集合的 Label Selector, 而 RC 只支持基于等式的 Label Selector</p>
+
+<h3 id="deployment">Deployment</h3>
+
+<p>Deployment 在内部使用 ReplicaSet 来更好的解决 Pod 的编排问题.</p>
+
+<p>Deployment 的典型使用场景如下:</p>
+
+<ul>
+<li>创建一个 Deployment 对象来生成对应的 ReplicaSet 并完成 Pod 副本的创建</li>
+<li>检查 Deployment 的状态来看部署动作是否完成（Pod副本数量是否达到预期的值）</li>
+<li>更新 Deployment 以创建新的 Pod（比如镜像升级）</li>
+<li>如果当前 Deployment 不稳定，则回滚到一个早先的 Deployment 版本</li>
+<li>暂停 Deployment 以便于一次性修改多个 PodTemplateSpec 的配置项，之后再恢复Deployment，进行新的发布</li>
+<li>扩展 Deployment 以应对高负载</li>
+<li>查看 Deployment 的状态，以此作为发布是否成功的指标</li>
+<li>清理不再需要的旧版本 ReplicaSets</li>
+</ul>
+
+<pre><code class="language-shell"># 创建 Deployment
+root@K8sMaster-1:~# kubectl create -f nginx-deployment.yaml
+deployment.apps/nginx-deployment created
+
+# 查看 Deployment 信息
+root@K8sMaster-1:~# kubectl get deployments
+NAME               READY   UP-TO-DATE   AVAILABLE   AGE
+nginx-deployment   2/2     2            2           7s
+
+# UP-TO-DATE: 最新版本的副本数量
+# AVAILABLE:  当前可用的 Pod 副本数量
+</code></pre>
+
+<h3 id="horizontal-pod-autoscaler-hpa">Horizontal Pod Autoscaler (HPA)</h3>
+
+<p>Pod 横向扩容, 简称 HPA</p>
+
+<p>HPA也属于一种资源对象, 通过追踪分析指定 RS 控制的所有目标 Pod 的负载情况来调整目标 Pod 的副本数量</p>
+
+<p>HPA 有以下两种方式作为 Pod 负载的度量指标:</p>
+
+<ul>
+<li>CPUUtilizationPercentage</li>
+</ul>
+
+<p>CPUUtilizationPercentage 是一个算术平均值, 即目标 Pod 所有副本自身 CPU 利用率的平均值</p>
+
+<ul>
+<li>应用程序自定义的度量指标</li>
+</ul>
+
+<pre><code class="language-shell"># 创建一个 HPA
+root@K8sMaster-1:~# kubectl autoscale deployment nginx --cpu-percent=90 --min=1 --max=10
+</code></pre>
+
+<h3 id="statefulset">StatefulSet</h3>
+
+<p>为了达到有状态服务的容器化, 需要将对应的容器固定网络标识和连接某种共享存储.
+StatefulSet有如下特性:</p>
+
+<ul>
+<li>StatefulSet 里的每个 Pod 都有稳定, 唯一的网络标识, 可以用来发现集群内其他成员(默认的Pod命名是随机产生的)</li>
+<li>StatefulSet 控制的 Pod 副本的启停顺序是受控的, 操作第 n 个 Pod 时, 前 n-1 个 Pod 已经是运行且准备好的状态</li>
+<li>StatefulSet 里的 Pod 采用稳定的持久化存储卷, 通过 PV/PVC 来实现. 删除 Pod 时, 默认不会删除与 StatefulSet 相关的存储卷</li>
+</ul>
+
+<p>StatefulSet 除了要与 PV 卷捆绑使用以存储 Pod 的状态数据, 还要与 Headless Service 配合使用. Headless Service 没有Cluster IP, 会返回该 Service 对应的全部 Pod 的 Endpoint 列表. StatefulSet 在 Headless Service 的基础上为 StatefulSet 控制的每个 Pod 都创建了一个 DNS 域名, 域名格式为:</p>
+
+<pre><code class="language-shell">$(podname).$(headless service name)
+</code></pre>
+
+<h3 id="service">Service</h3>
+
+<p>可以简单的理解为每一个 Service 都是一个微服务.</p>
+
+<p>每个 Service 可以有多个 Pod 组成, 每个 Pod 都有独立的 Endpoint 方便客户端访问. 而每个 Node 上的 kube-proxy 就是一个智能的负载均衡器, 用于将对 Service 的请求转发到后端某个 Pod 实例上, 并在内部实现服务的负载均衡与会话保持机制.</p>
+
+<p><img src="https://raw.githubusercontent.com/Archimedes-Dear/image_bed/master/images/Pod-RC%E4%B8%8EService%E7%9A%84%E9%80%BB%E8%BE%91%E5%85%B3%E7%B3%BB.png" alt="Pod-RC与Service的逻辑关系" /></p>
+
+<p>在 Kubernetes 中, 若一个服务有多个端口, 需要对每个端口都定义一个名称来区分, 这是由 Kubernetes 的服务发现机制来决定的</p>
+
+<p><strong>Kubernetes 的服务发现机制:</strong>
+最初采用的是在容器中注入环境变量将服务名称和 IP 绑定, 后来通过 Add-On 增值包方式引入了 DNS 系统, 把服务名作为 DNS 域名.</p>
+
+<p>Kubernetes 里的三种 IP:</p>
+
+<ul>
+<li>Node IP: Node 节点的 IP 地址</li>
+<li>Pod  IP: Pod  的 IP 地址</li>
+<li>Cluster IP: Service 的 IP 地址
+
+<ul>
+<li>Cluster IP 仅仅作用于 Kubernetes Service 这个对象, 由 Kubernetes 管理和分配 IP 地址</li>
+<li>Cluster IP 无法被 Ping, 因为没有一个&rdquo;实体网络对象&rdquo;来响应</li>
+<li>Cluster IP 只能结合 Service Port 组成一个具体的通信端口, 只属于 Kubernetes 集群. 外部节点要访问这个通信端口需要一些额外的操作</li>
+<li>Kubernetes 集群内, Node IP 网, Pod IP 网与 Cluster IP 网之间的通信, 采用的是 Kubernetes 自己设计的一套特殊的路由规则, 不同于 IP 路由.</li>
+</ul></li>
+</ul>
+
+<p>在公有云上部署 Kubernetes 服务时, 需要将 Service 的 type 修改为对应的 LoadBalancer</p>
+
+<h3 id="job">Job</h3>
+
+<p>Job 通常用来做一些批量处理的任务或定时任务.</p>
+
+<p>Job 也控制一组容器, 但与 RS/RC 等控制器的工作机制有些差别:</p>
+
+<ul>
+<li>Job 所控制的 Pod 副本是短暂运行的, 所有 Pod 副本运行结束时, Job 也就结束了</li>
+<li>Job 可以使用重启策略(restartPolicy), 需要与重启次数限制一起使用(backoffLimit)</li>
+<li>CronJob 用于执行某些定时任务</li>
+<li>Job 所控制的副本支持并行计算</li>
+</ul>
+
+<h3 id="volume">Volume</h3>
+
+<p>Volume 是 Pod 中能够被多个容器访问的共享目录.</p>
+
+<p>与 Docker Volume 不同之处在于:</p>
+
+<ul>
+<li>Kubernetes Volume 定义再 Pod上, 然后被一个 Pod 里的多个容器挂载到具体的文件目录下</li>
+<li>Kubernetes 中的 Volume 与 Pod 生命周期相同, 但与容器生命周期不相关</li>
+<li>Kubernetes 支持多种类型的 Volume:
+
+<ul>
+<li><strong>emptyDir</strong>                # emptyDir 在 Pod 被分配到 Node 时创建的, 主要用于临时存放数据</li>
+<li><strong>hostPath</strong>                # 在 Pod 上挂载宿主机上的文件或目录</li>
+<li><strong>gcePersistentDisk</strong>          # 使用谷歌云提供的永久磁盘(Persistent Disk)存储数据</li>
+<li><strong>awsElasticBlockStore</strong>    # 使用亚马逊公有云提供的 EBS Volume 存储数据</li>
+<li><strong>NFS</strong>                     # 网络文件系统</li>
+<li><strong>iSCSI</strong>                   # iSCSI 存储设备</li>
+<li><strong>flocker</strong>               # 使用 Flocker 来管理存储卷</li>
+<li><strong>glusterfs</strong>           # 开源 GlusterFS 网络文件系统</li>
+<li><strong>rbd</strong>                     # Ceph 块设备共享存储(Rados Block Device)</li>
+<li><strong>gitRepo</strong>             # 挂载一个空目录并从git clone 一个仓库供 Pod 使用</li>
+<li><strong>secret</strong>                # 用于为 Pod 提供加密的信息, 通过 tmfs (内存文件系统)实现的, 无法持久化</li>
+</ul></li>
+</ul>
+
+<h3 id="persistent-volume-pv">Persistent Volume (PV)</h3>
+
+<p>PV(Persistent Volume) 和与之关联的 PVC(Persistent Volume Claim) 起到类似网络存储的功能.</p>
+
+<p>PV 与 Volume 的区别:</p>
+
+<ul>
+<li>PV 只能是网络存储, 不属于任何 Node, 但可以在每个 Node 上访问</li>
+<li>PV 不定义在 Pod 上</li>
+</ul>
+
+<p>PV 目前支持的类型:</p>
+
+<ul>
+<li>gcePersistentDisk</li>
+<li>AWSElasticBlockStore</li>
+<li>AzureFile</li>
+<li>AzureDisk</li>
+<li>FC(Fibre Channel)</li>
+<li>Flocker</li>
+<li>NFS</li>
+<li>iSCSI</li>
+<li>RBD</li>
+<li>CephFS</li>
+<li>Cinder</li>
+<li>GlusterFS</li>
+<li>Vsphere Volume</li>
+<li>Quobyte Volume</li>
+<li>VMware Photon</li>
+<li>Portworx Volume</li>
+<li>ScaleIO Volume</li>
+<li>HostPath (仅供单机测试)</li>
+</ul>
+
+<p>PV accessModes 属性:</p>
+
+<ul>
+<li><p>ReadWriteOnce: 读写权限, 并且只能被单个 Node 挂载</p></li>
+
+<li><p>ReadOnlyMany : 只读权限, 允许被多个 Node 挂载</p></li>
+
+<li><p>ReadWriteMany: 读写权限, 允许被多个 Node 挂载</p></li>
+</ul>
+
+<p>某个 Pod 要申请使用某种类型的 PV, 则需要先定义一个 PVC 对象, 然后在 Pod 的 Volume 定义中引用该 PVC 即可</p>
+
+<p>PV 的状态:</p>
+
+<ul>
+<li><p>Available: 空闲状态</p></li>
+
+<li><p>Bound: 已经绑定到某个 PVC 上</p></li>
+
+<li><p>Released: 对应的 PVC 已经删除, 但资源还没有被集群收回</p></li>
+
+<li><p>Failed: PV 自动回收失败</p></li>
+</ul>
+
+<h3 id="namespace">Namespace</h3>
+
+<p>Kubernetes 支持在相同物理集群上使用 Namespace 创建虚拟集群, 以此实现资源隔离.</p>
+
+<p>若不特别指明 Namespace, 则用户创建的资源对象都将属于默认名为 default 的 Namespace 中.</p>
+
+<pre><code class="language-shell"># 查看某个命名空间的资源:
+root@K8sMaster-1:~# kubectl get pods --namespace=&lt;namespace&gt;
+
+# 查看所有命名空间的资源:
+root@K8sMaster-1:~# kubectl get pods --all-namespaces
+NAMESPACE     NAME                                    READY   STATUS    RESTARTS   AGE
+default       nginx-deployment-6dd86d77d-vgmdq        1/1     Running   0          44m
+default       nginx-deployment-6dd86d77d-wqmkr        1/1     Running   0          44m
+kube-system   coredns-fb8b8dccf-dg2bc                 1/1     Running   0          93m
+kube-system   coredns-fb8b8dccf-pkz2h                 1/1     Running   0          93m
+kube-system   etcd-k8smaster-1                        1/1     Running   0          93m
+kube-system   kube-apiserver-k8smaster-1              1/1     Running   0          93m
+kube-system   kube-controller-manager-k8smaster-1     1/1     Running   0          93m
+kube-system   kube-flannel-ds-amd64-54cqr             1/1     Running   0          93m
+kube-system   kube-flannel-ds-amd64-8mlbd             1/1     Running   0          93m
+kube-system   kube-flannel-ds-amd64-jk7f9             1/1     Running   0          93m
+kube-system   kube-proxy-pdt8p                        1/1     Running   0          93m
+kube-system   kube-proxy-w6chx                        1/1     Running   0          93m
+kube-system   kube-proxy-xmkhw                        1/1     Running   0          93m
+kube-system   kube-scheduler-k8smaster-1              1/1     Running   0          93m
+kube-system   kubernetes-dashboard-5f7b999d65-8dp7r   1/1     Running   34         93m
+</code></pre>
+
+<h3 id="annotation">Annotation</h3>
+
+<p>Annotation (注解) 与 Label 类似, 使用 key/value 键值对的形式进行定义.</p>
+
+<p>通常来说, 用 Annotation 来记录如下信息:</p>
+
+<ul>
+<li>build, release 等</li>
+<li>日志库, 监控库等</li>
+<li>相关人员信息等</li>
+</ul>
+
+<h3 id="configmap">ConfigMap</h3>
+
+<p>ConfigMap 用于解决容器内经常变更的的配置问题</p>
+
+<p>原始的解决方法有两种:</p>
+
+<ul>
+<li>运行时通过环境变量来传递参数</li>
+<li>通过 Volume 将配置映射到容器内</li>
+</ul>
+
+<p>ConfigMap 则将所有的配置都当做 key-value 字符串, value 可以是来自某个文本文件等.</p>
+
+<p>所有配置项都被持久化存储在 Kubernetes 的 etcd 数据库中, 然后提供 API 来操作这些数据. ConfigMap 中的数据被修改, 则映射到 Pod 中的 &ldquo;配置文件&rdquo; 也会被自动更新</p>
+
+<p><img src="https://raw.githubusercontent.com/Archimedes-Dear/image_bed/master/images/ConfigMap%E4%BD%BF%E7%94%A8%E6%96%B9%E6%A1%88.png" alt="ConfigMap使用方案" /></p>
+                        </div>
+
+                        
+
+<div class="post-archive">
+    <h2>See Also</h2>
+    <ul class="listing">
+        
+        <li><a href="/posts/Hugo-build-a-person-blog/">Hugo搭建个人博客</a></li>
+        
+        <li><a href="/about/">About me</a></li>
+        
+        <li><a href="/archives/">归档</a></li>
+        
+    </ul>
+</div>
+
+
+                        <div class="post-meta meta-tags">
+                            
+                            没有标签
+                            
+                        </div>
+                    </article>
+                    
+    
+
+    
+    
+                </div>
+            </div>
+            <div id="secondary">
+    <section class="widget">
+        <form id="search" action="//www.google.com/search" method="get" accept-charset="utf-8" target="_blank" _lpchecked="1">
+      
+      <input type="text" name="q" maxlength="20" placeholder="Search">
+      <input type="hidden" name="sitesearch" value="http://blog.k-8s.com/">
+      <button type="submit" class="submit icon-search"></button>
+</form>
+    </section>
+    
+    <section class="widget">
+        <h3 class="widget-title">最近文章</h3>
+<ul class="widget-list">
+    
+    <li>
+        <a href="http://blog.k-8s.com/posts/Kubernetes-Note/Kubernetes-Deployment/" title="Kubernetes Deployment">Kubernetes Deployment</a>
+    </li>
+    
+    <li>
+        <a href="http://blog.k-8s.com/posts/Kubernetes-Note/Kubernetes-Pod/" title="Kubernetes Pod 详解">Kubernetes Pod 详解</a>
+    </li>
+    
+    <li>
+        <a href="http://blog.k-8s.com/posts/Kubernetes-Note/Kubernetes-basic-concept/" title="Kubernetes 基本概念和术语">Kubernetes 基本概念和术语</a>
+    </li>
+    
+    <li>
+        <a href="http://blog.k-8s.com/posts/Hugo-build-a-person-blog/" title="Hugo搭建个人博客">Hugo搭建个人博客</a>
+    </li>
+    
+</ul>
+    </section>
+
+    
+
+    <section class="widget">
+        <h3 class="widget-title">分类</h3>
+<ul class="widget-list">
+    
+</ul>
+    </section>
+
+    <section class="widget">
+        <h3 class="widget-title">标签</h3>
+<div class="tagcloud">
+    
+</div>
+    </section>
+
+    
+<section class="widget">
+    <h3 class="widget-title">友情链接</h3>
+    <ul class="widget-list">
+        
+        <li>
+            <a target="_blank" href="http://www.jxhs.me" title="jame_xhs">jame_xhs</a>
+        </li>
+        
+    </ul>
+</section>
+
+
+    <section class="widget">
+        <h3 class="widget-title">其它</h3>
+        <ul class="widget-list">
+            <li><a href="http://blog.k-8s.com/index.xml">文章 RSS</a></li>
+        </ul>
+    </section>
+</div>
+        </div>
+    </div>
+</div>
+<footer id="footer">
+    <div class="container">
+        &copy; 2018 <a href="http://blog.k-8s.com/">Mr.耗子 By Mr.耗子</a>.
+        Powered by <a rel="nofollow noreferer noopener" href="https://gohugo.io" target="_blank">Hugo</a>.
+        <a href="https://www.flysnow.org/" target="_blank">Theme</a> based on <a href="https://github.com/rujews/maupassant-hugo" target="_blank">maupassant</a>.
+        
+    </div>
+</footer>
+
+
+    <script type="text/javascript">
+    
+    (function(){
+        $("pre code").parent().addClass("line-numbers")
+    }())
+
+    window.MathJax = {
+        tex2jax: {
+            inlineMath: [ ['$','$'] ],
+            processEscapes: true
+        }
+    };
+    </script>
+    <script type="text/javascript" src="/js/prism.js" async="true"></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
+
+<a id="rocket" href="#top"></a>
+<script type="text/javascript" src="/js/totop.js?v=0.0.0" async=""></script>
+
+
+
+<script type="text/javascript" src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" async></script>
+
+
+
+
+</body>
+</html>

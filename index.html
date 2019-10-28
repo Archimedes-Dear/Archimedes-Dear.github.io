@@ -10,8 +10,8 @@
     <title>Mr.耗子 | Linux Docker Kubernetes Golang Python</title>
     <meta property="og:title" content="Mr.耗子 | Linux Docker Kubernetes Golang Python">
     <meta property="og:type" content="website">
-    <meta name="Keywords" content="">
-    <meta name="description" content="">
+    <meta name="Keywords" content="耗子,Mr.耗子,Docker,容器,k8s,kubernetes,golang,go,devops">
+    <meta name="description" content="Linux Docker Kubernetes Golang Python">
     <meta property="og:url" content="http://blog.k-8s.com/">
     <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
 
@@ -68,7 +68,77 @@
                         <article class="post">
                             <header>
                                 <h1 class="post-title">
-                                    <a href="http://blog.k-8s.com/posts/Kubernetes-%E7%AC%94%E8%AE%B0/Kubernetes-%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5/" title="Kubernetes 基本概念和术语" >Kubernetes 基本概念和术语</a>
+                                    <a href="http://blog.k-8s.com/posts/Kubernetes-Note/Kubernetes-Deployment/" title="Kubernetes Deployment" >Kubernetes Deployment</a>
+                                </h1>
+                            </header>
+                            <date class="post-meta meta-date">
+                                2019年5月4日
+                            </date>
+                            
+                            <div class="post-content">
+                                ……
+                            </div>
+                            <p class="readmore"><a href="http://blog.k-8s.com/posts/Kubernetes-Note/Kubernetes-Deployment/">阅读全文</a></p>
+                        </article>
+                    
+                        <article class="post">
+                            <header>
+                                <h1 class="post-title">
+                                    <a href="http://blog.k-8s.com/posts/Kubernetes-Note/Kubernetes-Pod/" title="Kubernetes Pod 详解" >Kubernetes Pod 详解</a>
+                                </h1>
+                            </header>
+                            <date class="post-meta meta-date">
+                                2019年5月3日
+                            </date>
+                            
+                            <div class="post-content">
+                                <h3 id="创建-pod">创建 Pod</h3>
+
+<p>我们先来通过命令的方式, 来创建一个简单的 Pod</p>
+
+<p>需要注意的一点是, 如果只想创建一个 Pod, 而不是创建一个 Deployment, 则需要指定参数 <strong><em><code>--generator=run-pod/v1</code></em></strong></p>
+
+<pre><code class="language-shell">root@K8sMaster-1:~# kubectl run my-nginx --image=nginx:1.14.1 --replicas=2 --port=80 --generator=run-pod/v1
+pod/my-nginx created
+
+root@K8sMaster-1:~# kubectl get pods
+NAME       READY   STATUS    RESTARTS   AGE
+my-nginx   1/1     Running   0          8s
+
+# 查看pod 详情
+root@K8sMaster-1:~# kubectl describe pod my-nginx
+Name:               my-nginx
+Namespace:          default
+Priority:           0
+PriorityClassName:  &lt;none&gt;
+Node:               k8snode-1/192.168.206.151
+Start Time:         Sun, 27 Oct 2019 14:29:22 +0800
+Labels:             run=my-nginx
+Annotations:        &lt;none&gt;
+Status:             Running
+IP:                 10.244.1.11
+Containers:
+  my-nginx:
+    Container ID:   docker://9edea905f888a0a10d9e7859f995ce0e4e43e388b42b8d9c7a20f880915307c8
+    Image:          nginx:1.14.1
+    Image ID:       docker-pullable://nginx@sha256:32fdf92b4e986e109e4db0865758020cb0c3b70d6ba80d02fe87bad5cc3dc228
+    Port:           80/TCP
+    Host Port:      0/TCP
+    State:          Running
+      Started:      Sun, 27 Oct 2019 14:29:23 +0800
+    Ready:          True
+    ...
+</code></pre>
+
+<p>通过以上方式, 我们就能创建一个名为 <strong>my-nginx</strong> 的 Pod, 使用的是 <strong>nginx:1.14.1</strong> 的镜像, 并且指定开放的端口为 <strong>80</strong></p>……
+                            </div>
+                            <p class="readmore"><a href="http://blog.k-8s.com/posts/Kubernetes-Note/Kubernetes-Pod/">阅读全文</a></p>
+                        </article>
+                    
+                        <article class="post">
+                            <header>
+                                <h1 class="post-title">
+                                    <a href="http://blog.k-8s.com/posts/Kubernetes-Note/Kubernetes-basic-concept/" title="Kubernetes 基本概念和术语" >Kubernetes 基本概念和术语</a>
                                 </h1>
                             </header>
                             <date class="post-meta meta-date">
@@ -96,13 +166,13 @@
 
 <p>通常来说, Master 上还需要部署 <strong><em>etcd</em></strong> 服务, 用于保存所有资源对象的数据. (etcd 也可不部署在 Master 节点上)</p>……
                             </div>
-                            <p class="readmore"><a href="http://blog.k-8s.com/posts/Kubernetes-%E7%AC%94%E8%AE%B0/Kubernetes-%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5/">阅读全文</a></p>
+                            <p class="readmore"><a href="http://blog.k-8s.com/posts/Kubernetes-Note/Kubernetes-basic-concept/">阅读全文</a></p>
                         </article>
                     
                         <article class="post">
                             <header>
                                 <h1 class="post-title">
-                                    <a href="http://blog.k-8s.com/posts/Hugo-%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/" title="Hugo搭建个人博客" >Hugo搭建个人博客</a>
+                                    <a href="http://blog.k-8s.com/posts/Hugo-build-a-person-blog/" title="Hugo搭建个人博客" >Hugo搭建个人博客</a>
                                 </h1>
                             </header>
                             <date class="post-meta meta-date">
@@ -114,7 +184,7 @@
 
 <p>作为技术圈的一名初生小白, 在技术的道路上不可避免的要踩一些坑. 在采坑这个事情上, 有的人踩完就过去了, 不带走一片云彩, 不留下一点经验. 作为小白我呢, 在这里建议大家, 踩完坑一定要记得拿出&rdquo;小本本&rdquo;记录一下, 然后给记录的文字取一个显眼的大标题, 最后把记录放在坑边最显眼的地方, 给后来的采坑的人一个提醒, 也给自己涨点记性, 同样的坑不要老踩, 这样才能前进的更快 ^_^</p>……
                             </div>
-                            <p class="readmore"><a href="http://blog.k-8s.com/posts/Hugo-%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/">阅读全文</a></p>
+                            <p class="readmore"><a href="http://blog.k-8s.com/posts/Hugo-build-a-person-blog/">阅读全文</a></p>
                         </article>
                     
 
@@ -141,11 +211,19 @@
 <ul class="widget-list">
     
     <li>
-        <a href="http://blog.k-8s.com/posts/Kubernetes-%E7%AC%94%E8%AE%B0/Kubernetes-%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5/" title="Kubernetes 基本概念和术语">Kubernetes 基本概念和术语</a>
+        <a href="http://blog.k-8s.com/posts/Kubernetes-Note/Kubernetes-Deployment/" title="Kubernetes Deployment">Kubernetes Deployment</a>
     </li>
     
     <li>
-        <a href="http://blog.k-8s.com/posts/Hugo-%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/" title="Hugo搭建个人博客">Hugo搭建个人博客</a>
+        <a href="http://blog.k-8s.com/posts/Kubernetes-Note/Kubernetes-Pod/" title="Kubernetes Pod 详解">Kubernetes Pod 详解</a>
+    </li>
+    
+    <li>
+        <a href="http://blog.k-8s.com/posts/Kubernetes-Note/Kubernetes-basic-concept/" title="Kubernetes 基本概念和术语">Kubernetes 基本概念和术语</a>
+    </li>
+    
+    <li>
+        <a href="http://blog.k-8s.com/posts/Hugo-build-a-person-blog/" title="Hugo搭建个人博客">Hugo搭建个人博客</a>
     </li>
     
 </ul>
