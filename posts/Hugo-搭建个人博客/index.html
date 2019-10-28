@@ -287,6 +287,7 @@ git clone https://github.com/rujews/maupassant-hugo themes/maupassant
     theme = &quot;maupassant&quot;
 
     disablePathToLower = true  # 禁止url路径转小写
+    preserveTaxonomyNames = true  # 分类名称保持原始字符, 默认会修改成小写
 
     [author]
       name = &quot;Your name&quot;
@@ -307,15 +308,117 @@ git clone https://github.com/rujews/maupassant-hugo themes/maupassant
         identifier = &quot;archives&quot;
         name = &quot;归档&quot;
         url = &quot;/archives/&quot;
-        weight = 3
+        weight = 2
     [[menu.main]]
         identifier = &quot;about&quot;
         name = &quot;关于&quot;
         url = &quot;/about/&quot;
-        weight = 4
+        weight = 3
 </code></pre>
 
-<p>关于主题如何使用归档, 还请参考原博客, 这里我后续会陆续补上相关内容</p>
+<h4 id="主题-maupassant-友链">主题 maupassant 友链</h4>
+
+<p>主题内已实现友链, 可用 Hugo 原生的配置</p>
+
+<pre><code class="language-toml"># 这里的举例用的是&quot;飞雪无情&quot;博客中的例子
+# 该配置需放在 config.toml 中的 params 组内
+# name 是链接显示的文本
+# title 是鼠标悬停在友链时显示的文本
+
+[[params.links]]
+  title = &quot;Android Gradle权威指南&quot;
+  name = &quot;Android Gradle权威指南&quot;
+  url = &quot;http://yuedu.baidu.com/ebook/14a722970740be1e640e9a3e&quot;
+[[params.links]]
+  title = &quot;常用开发工具CDN镜像&quot;
+  name = &quot;常用开发工具CDN镜像&quot;
+  url = &quot;http://mirrors.flysnow.org/&quot;
+</code></pre>
+
+<h4 id="主题-maupassant-文章归档支持">主题 maupassant 文章归档支持</h4>
+
+<p>Hugo 原生没有支持生成归档文件, 但该主题支持归档</p>
+
+<p>这里的配置和<a href="https://www.flysnow.org">飞雪无情的博客</a>中说的有所不同, 只需要在刚刚用 Hugo 创建的 site: <strong>github_blog</strong> 目录下的 <strong>content</strong> 目录中, 新建一个 <strong>archives.md</strong> 的文件, 并放上如下内容即可:</p>
+
+<pre><code class="language-markdown">---
+title: &quot;归档&quot;
+description: Linux Docker Kubernetes Golang Python
+type: archives
+---
+</code></pre>
+
+<p>其中的 title 和 description 可以换成你自己的, 但是 type 必须是 archives</p>
+
+<p>然后 Hugo 就会自动生成 <code>/archives/indes.html</code></p>
+
+<h4 id="增加文章">增加文章</h4>
+
+<p>增加文章可以直接再 <strong>github_blog</strong> 目录下的 <strong>content</strong> 目录中新建 markdown 文件的方式来添加, 这里推荐新增一个 <strong>posts</strong> 的目录, 然后 <strong>posts</strong> 目录存放文章, content 目录用于存放一些如 404, about 等页面</p>
+
+<p>文章的开头需要添加以下几行内容:</p>
+
+<p>其中 <strong><em>draft</em></strong> 是标识文章的一个未完成状态, 若为true, 则说明文章未完成, 在运行和生成时不会包含在生成好的页面中</p>
+
+<pre><code class="language-markdown">---
+title: &quot;Hugo搭建个人博客&quot;
+date: 2019-03-11T09:02:42+08:00
+draft: false  
+---
+</code></pre>
+
+<h4 id="本地运行查看效果">本地运行查看效果</h4>
+
+<pre><code class="language-shell"># 不包含 draft: true 的内容
+hugo server
+
+# 包含 draft: true 的内容
+hugo server -D
+
+# 指定绑定的 ip 或端口
+hugo server -b 192.168.1.1 -p 8080
+</code></pre>
+
+<p>如果不指定 ip 或端口的话,  hugo 就会默认和本地的 1313 端口绑定, 便可以通过浏览器访问 <code>http://localhost:1313</code> 来查看站点了</p>
+
+<h4 id="部署到-github-page">部署到 github page</h4>
+
+<p>部署到 github page 的方式其实很简单, 将 hugo 站点目录中的 <strong>public</strong> 目录内容提交到对应的项目中即可.</p>
+
+<p>这里给出一个部署脚本, 放在 hugo 站点目录中即可</p>
+
+<pre><code class="language-shell">#!/bin/bash
+
+echo -e &quot;\033[0;32mDeploying updates to GitHub...\033[0m&quot;
+
+# Build the project.
+hugo # if using a theme, replace with `hugo -t &lt;YOURTHEME&gt;`
+
+# Go To Public folder
+cd public
+# Add changes to git.
+git add .
+
+# Commit changes.
+msg=&quot;rebuilding site `date`&quot;
+if [ $# -eq 1 ]
+  then msg=&quot;$1&quot;
+fi
+git commit -m &quot;$msg&quot;
+
+# Push source and build repos.
+git push origin master
+
+# Come Back up to the Project Root
+cd ..
+</code></pre>
+
+<p>关于 Markdown 文章如何使用图床, 这里我推荐两个软件:</p>
+
+<ul>
+<li><strong>windows</strong>: picGo</li>
+<li><strong>mac OS X</strong>: ipic</li>
+</ul>
 
 <h3 id="0x08-结语">0x08 结语</h3>
 
