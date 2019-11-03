@@ -419,24 +419,25 @@ StatefulSet有如下特性:</p>
 <p>与 Docker Volume 不同之处在于:</p>
 
 <ul>
-<li>Kubernetes Volume 定义再 Pod上, 然后被一个 Pod 里的多个容器挂载到具体的文件目录下</li>
-<li>Kubernetes 中的 Volume 与 Pod 生命周期相同, 但与容器生命周期不相关</li>
-<li>Kubernetes 支持多种类型的 Volume:
+<li><p>Kubernetes Volume 定义再 Pod上, 然后被一个 Pod 里的多个容器挂载到具体的文件目录下</p></li>
 
-<ul>
-<li><strong>emptyDir</strong>                # emptyDir 在 Pod 被分配到 Node 时创建的, 主要用于临时存放数据</li>
-<li><strong>hostPath</strong>                # 在 Pod 上挂载宿主机上的文件或目录</li>
-<li><strong>gcePersistentDisk</strong>          # 使用谷歌云提供的永久磁盘(Persistent Disk)存储数据</li>
-<li><strong>awsElasticBlockStore</strong>    # 使用亚马逊公有云提供的 EBS Volume 存储数据</li>
-<li><strong>NFS</strong>                     # 网络文件系统</li>
-<li><strong>iSCSI</strong>                   # iSCSI 存储设备</li>
-<li><strong>flocker</strong>               # 使用 Flocker 来管理存储卷</li>
-<li><strong>glusterfs</strong>           # 开源 GlusterFS 网络文件系统</li>
-<li><strong>rbd</strong>                     # Ceph 块设备共享存储(Rados Block Device)</li>
-<li><strong>gitRepo</strong>             # 挂载一个空目录并从git clone 一个仓库供 Pod 使用</li>
-<li><strong>secret</strong>                # 用于为 Pod 提供加密的信息, 通过 tmfs (内存文件系统)实现的, 无法持久化</li>
-</ul></li>
+<li><p>Kubernetes 中的 Volume 与 Pod 生命周期相同, 但与容器生命周期不相关</p></li>
+
+<li><p>Kubernetes 支持多种类型的 Volume:</p></li>
 </ul>
+
+<pre><code>  emptyDir                # emptyDir 在 Pod 被分配到 Node 时创建的, 主要用于临时存放数据
+  hostPath                # 在 Pod 上挂载宿主机上的文件或目录
+  gcePersistentDisk       # 使用谷歌云提供的永久磁盘(Persistent Disk)存储数据
+  awsElasticBlockStore    # 使用亚马逊公有云提供的 EBS Volume 存储数据
+  NFS                     # 网络文件系统
+  iSCSI                   # iSCSI 存储设备
+  GlusterFS               # 开源 GlusterFS 网络文件系S统
+  rbd                     # Ceph 块设备共享存储(Rados Block Device)
+  gitRepo                 # 挂载一个空目录并从git clone 一个仓库供 Pod 使用
+  secret                  # 用于为 Pod 提供加密的信息, 通过 tmfs (内存文件系统)实现的, 无法持久化
+  FlexVolume              # 插件式存储机制
+</code></pre>
 
 <h3 id="persistent-volume-pv">Persistent Volume (PV)</h3>
 
@@ -447,29 +448,6 @@ StatefulSet有如下特性:</p>
 <ul>
 <li>PV 只能是网络存储, 不属于任何 Node, 但可以在每个 Node 上访问</li>
 <li>PV 不定义在 Pod 上</li>
-</ul>
-
-<p>PV 目前支持的类型:</p>
-
-<ul>
-<li>gcePersistentDisk</li>
-<li>AWSElasticBlockStore</li>
-<li>AzureFile</li>
-<li>AzureDisk</li>
-<li>FC(Fibre Channel)</li>
-<li>Flocker</li>
-<li>NFS</li>
-<li>iSCSI</li>
-<li>RBD</li>
-<li>CephFS</li>
-<li>Cinder</li>
-<li>GlusterFS</li>
-<li>Vsphere Volume</li>
-<li>Quobyte Volume</li>
-<li>VMware Photon</li>
-<li>Portworx Volume</li>
-<li>ScaleIO Volume</li>
-<li>HostPath (仅供单机测试)</li>
 </ul>
 
 <p>PV accessModes 属性:</p>
@@ -597,6 +575,10 @@ kube-system   kubernetes-dashboard-5f7b999d65-8dp7r   1/1     Running   34      
     <section class="widget">
         <h3 class="widget-title">最近文章</h3>
 <ul class="widget-list">
+    
+    <li>
+        <a href="http://blog.k-8s.com/posts/Kubernetes-Note/Kubernetes-Volumes/" title="Kubernetes 存储">Kubernetes 存储</a>
+    </li>
     
     <li>
         <a href="http://blog.k-8s.com/posts/Kubernetes-Note/Kubernetes-Pod-Scheduling/" title="Kubernetes Pod 调度">Kubernetes Pod 调度</a>

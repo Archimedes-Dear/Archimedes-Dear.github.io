@@ -1,0 +1,661 @@
+<!doctype html>
+<html lang="zh-cn">
+<head>
+
+    <meta charset="utf-8">
+    <meta name="generator" content="Hugo 0.54.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Kubernetes 存储 | Mr.耗子</title>
+    <meta property="og:title" content="Kubernetes 存储 - Mr.耗子">
+    <meta property="og:type" content="article">
+        
+    <meta property="article:published_time" content="2019-05-07T21:36:22&#43;08:00">
+        
+        
+    <meta property="article:modified_time" content="2019-05-07T21:36:22&#43;08:00">
+        
+    <meta name="Keywords" content="耗子,Mr.耗子,Docker,容器,k8s,kubernetes,golang,go,devops">
+    <meta name="description" content="Kubernetes 存储">
+        
+    <meta name="author" content="Mr.耗子">
+    <meta property="og:url" content="http://blog.k-8s.com/posts/Kubernetes-Note/Kubernetes-Volumes/">
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+
+    <link rel="stylesheet" href="/css/normalize.css">
+    
+        <link rel="stylesheet" href="/css/prism.css">
+    
+    <link rel="stylesheet" href="/css/style.css">
+    <script type="text/javascript" src="//cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+
+    
+
+
+    
+    
+</head>
+
+<body>
+<header id="header" class="clearfix">
+    <div class="container">
+        <div class="col-group">
+            <div class="site-name ">
+                
+                    <a id="logo" href="http://blog.k-8s.com/">
+                        Mr.耗子
+                    </a>
+                
+                <p class="description">Linux Docker Kubernetes Golang Python</p>
+            </div>
+            <div>
+                <nav id="nav-menu" class="clearfix">
+                    <a class="" href="http://blog.k-8s.com/">首页</a>
+                    
+                    <a  href="http://blog.k-8s.com/archives/" title="归档">归档</a>
+                    
+                    <a  href="http://blog.k-8s.com/about/" title="关于">关于</a>
+                    
+                </nav>
+            </div>
+        </div>
+    </div>
+</header>
+
+
+<div id="body">
+    <div class="container">
+        <div class="col-group">
+
+            <div class="col-8" id="main">
+                <div class="res-cons">
+                    <article class="post">
+                        <header>
+                            <h1 class="post-title">Kubernetes 存储</h1>
+                        </header>
+                        <date class="post-meta meta-date">
+                            2019年5月7日
+                        </date>
+                        
+                        
+                        <div class="post-meta">
+                            <span id="busuanzi_container_page_pv">|<span id="busuanzi_value_page_pv"></span><span> 阅读</span></span>
+                        </div>
+                        
+                        <div class="post-content">
+                            <h3 id="volume">Volume</h3>
+
+<p>Volume 是一种 Pod 级别的存储卷, 用于解决当 Pod 异常退出后, 被kubelet拉起时保证之前存储的数据不丢失</p>
+
+<p>volume的生命周期与 Pod 相同, 且 Pod 中多个容器可以共享 Volume</p>
+
+<p>volume类型:</p>
+
+<ul>
+<li>k8s内置的类型 (详细参见文章 &ldquo;<a href="https://blog.k-8s.com/posts/Kubernetes-Note/Kubernetes-basic-concept/#volume">Kubernetes 基础概念和术语</a>&rdquo;)</li>
+<li>第三方: flexvolume/csi等网络存储 volume plugins</li>
+</ul>
+
+<h3 id="volume-的创建和使用">Volume 的创建和使用</h3>
+
+<p>Volume 不需要提前创建即可被 Pod 使用</p>
+
+<h4 id="emptydir-类型的-volume">emptyDir 类型的 Volume</h4>
+
+<p>下面创建一个生产者-消费者的 Pod 示例, emptyDir 是 Node 上创建的临时目录, 不具备持久性.</p>
+
+<pre><code class="language-yaml">apiVersion: v1
+kind: Pod
+metadata:
+  name: producer-consumer
+spec:
+  containers:
+  - name: producer
+    image: busybox
+    volumeMounts:
+    - name: share-volume
+      mountPath: /producer_dir
+    args:
+    - /bin/sh
+    - -c
+    - echo &quot;hello, consumer&quot; &gt; /producer_dir/data.txt; sleep 30000
+  - name: consumer
+    image: busybox
+    volumeMounts:
+    - name: share-volume
+      mountPath: /consumer_dir
+    args:
+    - /bin/sh
+    - -c
+    - cat /consumer_dir/data.txt; sleep 30000
+  volumes:
+  - name: share-volume
+    emptyDir: {}
+</code></pre>
+
+<p>然后创建这个 Pod, 可以看到 consumer 容器读取到了 producer 容器的产生的内容, 因为它们使用了同一个 Volume</p>
+
+<pre><code class="language-shell">root@K8sMaster-1:~/k8s-yaml# kubectl create -f producer-consumer.yaml 
+pod/producer-consumer created
+
+root@K8sMaster-1:~/k8s-yaml# kubectl get pods
+NAME                READY   STATUS    RESTARTS   AGE
+producer-consumer   2/2     Running   0          37s
+
+# consumer 读取了 producer 产生的数据
+root@K8sMaster-1:~/k8s-yaml# kubectl logs producer-consumer consumer 
+hello, consumer
+</code></pre>
+
+<h4 id="hostpath-类型的-volume">hostPath 类型的 Volume</h4>
+
+<p>hostPath 由于绑定了 Node 上已存在的目录, 增加了 Pod 与 Node 的耦合性, 所以它经常使用在一些特殊作用的容器上</p>
+
+<p>下面是一个查看宿主机 CPU 核心数的 Pod 示例</p>
+
+<pre><code class="language-yaml">apiVersion: v1
+kind: Pod
+metadata:
+  name: cat-cpu-processor
+spec:
+  containers:
+  - name: cat-cpu
+    image: busybox
+    volumeMounts:
+    - name: proc-volume
+      mountPath: /proc_volume
+    args:
+    - /bin/sh
+    - -c
+    - cat /proc_volume/cpuinfo | grep processor; sleep 30000
+  volumes:
+  - name: proc-volume
+    hostPath:
+      path: /proc
+</code></pre>
+
+<pre><code class="language-shell">root@K8sMaster-1:~/k8s-yaml# kubectl create -f cat-cpu.yaml 
+pod/cat-cpu-processor created
+
+# 当前运行在 k8snode-1 节点上
+root@K8sMaster-1:~/k8s-yaml# kubectl get pods -o wide
+NAME                READY   STATUS    RESTARTS   AGE   IP            NODE        NOMINATED NODE   READINESS GATES
+cat-cpu-processor   1/1     Running   0          84s   10.244.1.46   k8snode-1   &lt;none&gt;           &lt;none&gt;
+
+# 容器内记录的 cpu 核心数为 1 个
+root@K8sMaster-1:~/k8s-yaml# kubectl logs cat-cpu-processor cat-cpu 
+processor	: 0
+
+# k8snode-1 节点的 cpu 核心数为 1 个
+root@K8sNode-1:~# cat /proc/cpuinfo | grep processor
+processor	: 0
+</code></pre>
+
+<p>由此可见, hostPath 用于挂载宿主机上的目录到容器内使用, 即使 Pod 销毁了, hostPath 对应的目录还是会保留.</p>
+
+<h3 id="pv-pvc">PV &amp; PVC</h3>
+
+<p><strong>Persistent Volumes</strong>: 持久卷</p>
+
+<p><strong>Persistent Volumes Claim</strong>: 持久卷声明</p>
+
+<p>hostPath 解决了数据持久性的问题, 却不能够在 Pod 迁移 或 Host 崩溃的情况下仍保证数据的可用性. 而且要使用 hostPath, 首先要知道 已经 Node 上已存在的目录, 在对接云服务提供商时, 往往会出现挂载错误等问题</p>
+
+<p>PV 的出现解决了以下问题:</p>
+
+<ul>
+<li>PV 中的数据可在 Pod 的迁移后仍然可用</li>
+<li>PV 屏蔽了底层存储实现细节, 让用户方便使用和管理</li>
+</ul>
+
+<p>为什么有了 PV 还要 PVC:</p>
+
+<ol>
+<li>职责分离, PVC 中只声明自己需要的存储size, access mode等业务真正关心的存储需求, PV 和其对应的后端存储信息则由交给cluster admin 统一运维和管控</li>
+<li>PVC 简化了 User 对存储的需求, PV 才是存储实际信息的承载体</li>
+<li>PVC 更像是面向对象中抽象出来的接口, 而 PV 负责接口实现</li>
+</ol>
+
+<h4 id="pv-的创建和使用">PV 的创建和使用</h4>
+
+<pre><code class="language-yaml">apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv1
+spec:
+  capacity:  # 存储能力
+    storage: 2Gi  
+  accessModes:  # 访问模式
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain  # 回收策略
+  hostPath:
+    path: /tmp
+</code></pre>
+
+<pre><code class="language-shell">root@K8sMaster-1:~/k8s-yaml# kubectl create -f pv.yaml 
+persistentvolume/pv1 created
+
+root@K8sMaster-1:~/k8s-yaml# kubectl get pv
+NAME   CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS      CLAIM   STORAGECLASS   REASON   AGE
+pv1    2Gi        RWO            Retain           Available
+</code></pre>
+
+<p>PV 中的 accessModes 有如下三种:</p>
+
+<ul>
+<li><strong>ReadWriteOnce (RWO)</strong>: 读写权限, 并且只能被单个 Node 挂载</li>
+<li><strong>ReadOnlyMany (ROX)</strong>: 只读权限, 允许被多个 Node 挂载</li>
+<li><strong>ReadWriteMany (RWX)</strong>: 读写权限, 允许被多个 Node 挂载</li>
+</ul>
+
+<p>部分PV 可以支持多种访问模式, 但 PV 挂载时只能选择一种访问模式</p>
+
+<p>PV 的 persistentVolumeReclaimPolicy 是回收策略, 当 Pod 被删除时, 系统对 PV 的处理方式, 有如下三种:</p>
+
+<ul>
+<li><strong>Delete</strong>: 删除 Pod 时删除 PV</li>
+<li><strong>Recycle</strong>: 删除 Pod 时 PV 中的数据会被删除, 可再次声明使用, 目前已被废弃</li>
+<li><strong>Retain</strong>: 删除 Pod 时保留 PV</li>
+</ul>
+
+<p>由于同一个Pod 中的不同容器可以共享一个 Volume 存储, 所以 PV 的使用还有一个参数 <code>subPath</code>, 可以使得不同的 container 在共享同一个 Volume 时, 隔离不同的存储路径</p>
+
+<pre><code class="language-yaml"># 该 Pod 使用 hostPath 作为 cache 目录
+# container-1 将 hostPath 中的 cahce1 挂载到 容器中的 /cache 目录
+# container-2 将 hostPath 中的 cahce2 挂载到 容器中的 /cache 目录
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-volume
+spec:
+  containers:
+  - name: container-1
+    image: busybox
+    args:
+    - /bin/sh
+    - -c
+    - sleep 30000
+    volumeMounts:
+    - name: hostpath-volume
+      mountPath: /cache
+      subPath: cache1  # 这里使用的是/cache/cache1
+  - name: container-2
+    image: busybox
+    args:
+    - /bin/sh
+    - -c
+    - sleep 30000
+    volumeMounts:
+    - name: hostpath-volume
+      mountPath: /cache
+      subPath: cache2  # 这里使用的是/cache/cache2
+  volumes:
+  - name: hostpath-volume
+    hostPath:
+      path: /tmp/data
+</code></pre>
+
+<pre><code class="language-shell">root@K8sMaster-1:~/k8s-yaml# kubectl create -f volumeSubPath.yaml 
+pod/pod-volume created
+
+root@K8sMaster-1:~/k8s-yaml# kubectl get pods 
+NAME         READY   STATUS    RESTARTS   AGE
+pod-volume   2/2     Running   0          31s
+
+# 在 container-1 容器中的 /cache 目录创建文件
+root@K8sMaster-1:~/k8s-yaml# kubectl exec pod-volume --container=container-1 touch /cache/hello-cache1
+
+# 在 container-2 容器中的 /cache 目录创建文件
+root@K8sMaster-1:~/k8s-yaml# kubectl exec pod-volume --container=container-2 touch /cache/hello-cache2
+
+
+# 在对应节点上的 /tmp/data 目录查看刚刚创建的文件
+# 可以看到 hello-cache1 存放在 cache1 目录, hello-cache2 存放在 cache2 目录
+root@K8sNode-1:# ls /tmp/data/
+cache1  cache2
+
+root@K8sNode-1:/tmp/data# ls cache1
+hello-cache1
+
+root@K8sNode-1:/tmp/data# ls cache2
+hello-cache2
+</code></pre>
+
+<h4 id="pvc-的创建和使用">PVC 的创建和使用</h4>
+
+<p>PVC 作为用户对 PV 的申请, 主要包括存储空间请求, 访问模式, PV 选择条件和存储类别等信息</p>
+
+<p>用户定义 PVC 可以不用考虑具体的 PV 实现细节, 具体 PV 细节应由管理员来处理</p>
+
+<pre><code class="language-yaml"># 声明一个 PVC
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mypvc1
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:  # 资源请求
+    requests:
+      storage: 1Gi
+</code></pre>
+
+<pre><code class="language-shell"># PVC 声明后需要和 PV 进行绑定才可以使用
+root@K8sMaster-1:~/k8s-yaml# kubectl create -f pvc.yaml 
+persistentvolumeclaim/mypvc1 created
+
+# 这里 mypvc1 和 pv1 绑定了
+root@K8sMaster-1:~/k8s-yaml# kubectl get pvc
+NAME     STATUS   VOLUME   CAPACITY   ACCESS MODES   STORAGECLASS   AGE
+mypvc1   Bound    pv1      2Gi        RWO                           4s
+</code></pre>
+
+<p>接下来可以声明一个 Pod 来使用该 PVC</p>
+
+<pre><code class="language-yaml">apiVersion: v1
+kind: Pod
+metadata:
+  name: mypod1
+spec:
+  containers:
+  - name: mypod1
+    image: busybox
+    args:
+    - /bin/sh
+    - -c
+    - sleep 30000
+    volumeMounts:
+    - name: mydata
+      mountPath: /mydata
+  volumes:
+  - name: mydata
+    persistentVolumeClaim:
+      claimName: mypvc1
+</code></pre>
+
+<p>然后创建该 Pod 并在挂载的目录总创建一个文件, 然后去对应的远程目录中查看 (由于环境原因, 我这里的 PV 使用的是 hostPath, 有条件的可采用其他类型的 PV)</p>
+
+<pre><code class="language-shell">root@K8sMaster-1:~/k8s-yaml# kubectl create -f pvc-pod.yaml 
+pod/mypod1 created
+
+root@K8sMaster-1:~/k8s-yaml# kubectl get pods 
+NAME     READY   STATUS    RESTARTS   AGE
+mypod1   1/1     Running   0          11s
+
+# 在 mypod1 容器中通过 PVC 声明挂载的 PV 中创建文件
+root@K8sMaster-1:~/k8s-yaml# kubectl exec mypod1 touch /mydata/hello
+
+# 在远程挂载目录中查看刚刚创建的文件
+root@K8sNode-1:/tmp# ls
+hello
+</code></pre>
+
+<p>最后, 我们查看一下在删除 Pod 和删除 PVC 的过程中, PV 状态的变化:</p>
+
+<pre><code class="language-shell"># 删除 Pod
+root@K8sMaster-1:~/k8s-yaml# kubectl delete pod mypod1 
+pod &quot;mypod1&quot; deleted
+
+# 可以看到 PVC 仍然和 PV 处在绑定状态
+root@K8sMaster-1:~/k8s-yaml# kubectl get pvc
+NAME     STATUS   VOLUME   CAPACITY   ACCESS MODES   STORAGECLASS   AGE
+mypvc1   Bound    pv1      2Gi        RWO                           13m
+
+# 对应的 PV 中, STATUS 还是 Bound
+root@K8sMaster-1:~/k8s-yaml# kubectl get pv
+NAME   CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS   CLAIM            STORAGECLASS   REASON   AGE
+pv1    2Gi        RWO            Retain           Bound    default/mypvc1                           36m
+
+# 接着删除 PVC
+root@K8sMaster-1:~/k8s-yaml# kubectl delete pvc mypvc1 
+persistentvolumeclaim &quot;mypvc1&quot; deleted
+
+# 此时对应的 PV STATUS 由 Bound 变成 Released, 表示已经解除和 PVC 的绑定, 且由于我们 PV 的回收策略是 Retain, 所以该 PV 并未被删除, 需要手工清理
+root@K8sMaster-1:~/k8s-yaml# kubectl get pv
+NAME   CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS     CLAIM            STORAGECLASS   REASON   AGE
+pv1    2Gi        RWO            Retain           Released   default/mypvc1                           36m
+
+# 此时在远程挂载目录中创建的文件仍然是保留着的
+root@K8sNode-1:/tmp# ls
+hello
+</code></pre>
+
+<p>以上创建 PV 和 PVC 的方式为 <strong>Static Volume Provisioning</strong>, 该方式虽然隔离了用户和管理员的部分, 使得用户不必关心存储的底层逻辑, 却仍然在使用 Pod 之前, 联系管理员, 确定有相应的可分配的 PV 资源, 然后才可创建 PVC, 这便是 <strong>Static Volume Provisioning 的不足: 集群管理员需要提前规划或预测存储需求, 容易导致 User 提交的 PVC 找不到合适的 PV</strong></p>
+
+<p>于是衍生了 <strong>Dynamic Volume Provisioning</strong>: <strong>集群管理员只创建不同类型的存储模板, User 在 PVC 中指定使用哪种存储模板, 以及自己需要的大小, 访问方式等参数, 然后k8s自动生成相应的 PV 对象</strong></p>
+
+<p>Dynamic Volume Provisioning 是通过 StorageClass 实现的, StorageClass 定义了如何创建 PV</p>
+
+<pre><code class="language-yaml">apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: csi-disk
+provisioner: diskplugin.csi.alibabacloud.com  # 这里使用了 阿里云 volume plugin 来 create/delete/attach/detach/mount/unmount 新 PV, 并且该插件需要部署到 Kubernetes 集群中
+parameters:
+  type: cloud_ssd
+  regionId: cn-Shanghai
+  zoneId: cn-shanghai-e
+  fsType: ext4
+reclaimPolicy: Delete
+</code></pre>
+
+<p>然后用户需要创建 PVC 和 Pod:</p>
+
+<pre><code class="language-yaml"># PVC
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: disk-pvc
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi
+  storageClassName: csi-disk  # 指定 StorageClass
+</code></pre>
+
+<pre><code class="language-yaml"># Pod
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+spec:
+  containers:
+  - name: nginx
+    image: nginx:1.7.9
+    ports:
+    - containerPort: 80
+    volumeMounts:
+    - name: disk-pvc  # 指定 PVC
+      mountPath: /data
+  volumes:
+  - name: disk-pvc
+    persistentVolumeClaim:
+      claimName: disk-pvc
+</code></pre>
+
+<p>然后开始创建 PVC 和 Pod, 系统会自动创建对应的 PV, 并分配资源</p>
+
+<pre><code class="language-shell">root@K8sMaster-1:~/k8s-yaml# kubectl create -f storageClass.yaml 
+storageclass.storage.k8s.io/csi-disk created
+
+root@K8sMaster-1:~/k8s-yaml# kubectl get storageclasses.storage.k8s.io 
+NAME       PROVISIONER                       AGE
+csi-disk   diskplugin.csi.alibabacloud.com   5s
+
+root@K8sMaster-1:~/k8s-yaml# kubectl create -f storageClass-pvc.yaml 
+persistentvolumeclaim/disk-pvc create
+
+root@K8sMaster-1:~/k8s-yaml# kubectl create -f storageClass-pod.yaml 
+pod/nginx created
+</code></pre>
+
+<p>PV 的状态流转:</p>
+
+<p><img src="https://raw.githubusercontent.com/Archimedes-Dear/image_bed/master/images/PV%E7%8A%B6%E6%80%81%E6%B5%81%E8%BD%AC.png" alt="PV状态流转(图片来源: CNCF x Alibaba 云原生技术公开课)" /></p>
+
+<p>达到 Released 状态的 PV 无法根据 ReclaimPolicy 回到 available 状态, 再次 bound 新的 PVC, 此时如果想要复用原来 PV 对应的存储中的数据, 只有两种方式:</p>
+
+<ul>
+<li>复用 old PV 中记录的存储信息新建 PV 对象</li>
+<li>直接用 PVC 对象复用, 即不 unbound PVC 和 PV</li>
+</ul>
+
+<p>最后, Kubernetes 对 PV + PVC 体系的完成处理流程如下两张图所示:</p>
+
+<p><img src="https://raw.githubusercontent.com/Archimedes-Dear/image_bed/master/images/Kubernetes-pv-pvc%E6%B5%81%E7%A8%8B-1.png" alt="Kubernetes-pv-pvc流程-1(图片来源: CNCF x Alibaba 云原生技术公开课)" /></p>
+
+<p><img src="https://raw.githubusercontent.com/Archimedes-Dear/image_bed/master/images/Kubernetes-pv-pvc%E6%B5%81%E7%A8%8B-2.png" alt="Kubernetes-pv-pvc流程-2(图片来源: CNCF x Alibaba 云原生技术公开课)" /></p>
+
+<p>首先, 用户提交 Pod &amp; PVC 文件, 对 apiServer 发起请求, apiServer 对 PVC 调用对应的存储类型接口, 这里是调用了 csi-provisioner 接口, 然后由 csi-controller-server 对第三方存储服务发起请求, 创建对应的 PV, 然后将 PVC 和 PV 绑定, 最后由 kubelet 将 Pod 连接对应的 PV, 并进行挂载等操作</p>
+                        </div>
+
+                        
+
+<div class="post-archive">
+    <h2>See Also</h2>
+    <ul class="listing">
+        
+        <li><a href="/posts/Kubernetes-Note/Kubernetes-Pod-Scheduling/">Kubernetes Pod 调度</a></li>
+        
+        <li><a href="/posts/Kubernetes-Note/Kubernetes-Pod/">Kubernetes Pod 详解</a></li>
+        
+        <li><a href="/posts/Kubernetes-Note/Kubernetes-basic-concept/">Kubernetes 基本概念和术语</a></li>
+        
+        <li><a href="/posts/Hugo-build-a-person-blog/">Hugo搭建个人博客</a></li>
+        
+        <li><a href="/about/">About me</a></li>
+        
+    </ul>
+</div>
+
+
+                        <div class="post-meta meta-tags">
+                            
+                            没有标签
+                            
+                        </div>
+                    </article>
+                    
+    
+
+    
+    
+                </div>
+            </div>
+            <div id="secondary">
+    <section class="widget">
+        <form id="search" action="//www.google.com/search" method="get" accept-charset="utf-8" target="_blank" _lpchecked="1">
+      
+      <input type="text" name="q" maxlength="20" placeholder="Search">
+      <input type="hidden" name="sitesearch" value="http://blog.k-8s.com/">
+      <button type="submit" class="submit icon-search"></button>
+</form>
+    </section>
+    
+    <section class="widget">
+        <h3 class="widget-title">最近文章</h3>
+<ul class="widget-list">
+    
+    <li>
+        <a href="http://blog.k-8s.com/posts/Kubernetes-Note/Kubernetes-Volumes/" title="Kubernetes 存储">Kubernetes 存储</a>
+    </li>
+    
+    <li>
+        <a href="http://blog.k-8s.com/posts/Kubernetes-Note/Kubernetes-Pod-Scheduling/" title="Kubernetes Pod 调度">Kubernetes Pod 调度</a>
+    </li>
+    
+    <li>
+        <a href="http://blog.k-8s.com/posts/Kubernetes-Note/Kubernetes-Pod/" title="Kubernetes Pod 详解">Kubernetes Pod 详解</a>
+    </li>
+    
+    <li>
+        <a href="http://blog.k-8s.com/posts/Kubernetes-Note/Kubernetes-basic-concept/" title="Kubernetes 基本概念和术语">Kubernetes 基本概念和术语</a>
+    </li>
+    
+    <li>
+        <a href="http://blog.k-8s.com/posts/Hugo-build-a-person-blog/" title="Hugo搭建个人博客">Hugo搭建个人博客</a>
+    </li>
+    
+</ul>
+    </section>
+
+    
+
+    <section class="widget">
+        <h3 class="widget-title">分类</h3>
+<ul class="widget-list">
+    
+</ul>
+    </section>
+
+    <section class="widget">
+        <h3 class="widget-title">标签</h3>
+<div class="tagcloud">
+    
+</div>
+    </section>
+
+    
+<section class="widget">
+    <h3 class="widget-title">友情链接</h3>
+    <ul class="widget-list">
+        
+        <li>
+            <a target="_blank" href="http://www.jxhs.me" title="jame_xhs">jame_xhs</a>
+        </li>
+        
+    </ul>
+</section>
+
+
+    <section class="widget">
+        <h3 class="widget-title">其它</h3>
+        <ul class="widget-list">
+            <li><a href="http://blog.k-8s.com/index.xml">文章 RSS</a></li>
+        </ul>
+    </section>
+</div>
+        </div>
+    </div>
+</div>
+<footer id="footer">
+    <div class="container">
+        &copy; 2018 <a href="http://blog.k-8s.com/">Mr.耗子 By Mr.耗子</a>.
+        Powered by <a rel="nofollow noreferer noopener" href="https://gohugo.io" target="_blank">Hugo</a>.
+        <a href="https://www.flysnow.org/" target="_blank">Theme</a> based on <a href="https://github.com/rujews/maupassant-hugo" target="_blank">maupassant</a>.
+        
+    </div>
+</footer>
+
+
+    <script type="text/javascript">
+    
+    (function(){
+        $("pre code").parent().addClass("line-numbers")
+    }())
+
+    window.MathJax = {
+        tex2jax: {
+            inlineMath: [ ['$','$'] ],
+            processEscapes: true
+        }
+    };
+    </script>
+    <script type="text/javascript" src="/js/prism.js" async="true"></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
+
+<a id="rocket" href="#top"></a>
+<script type="text/javascript" src="/js/totop.js?v=0.0.0" async=""></script>
+
+
+
+<script type="text/javascript" src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" async></script>
+
+
+
+
+</body>
+</html>
