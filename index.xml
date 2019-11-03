@@ -135,6 +135,36 @@ Containers:
     </item>
     
     <item>
+      <title>Kubernetes 架构和安装</title>
+      <link>http://blog.k-8s.com/posts/Kubernetes-Note/Kubernetes-%E6%9E%B6%E6%9E%84%E5%92%8C%E5%AE%89%E8%A3%85/</link>
+      <pubDate>Wed, 01 May 2019 15:05:33 +0800</pubDate>
+      
+      <guid>http://blog.k-8s.com/posts/Kubernetes-Note/Kubernetes-%E6%9E%B6%E6%9E%84%E5%92%8C%E5%AE%89%E8%A3%85/</guid>
+      <description>&lt;p&gt;本文教大家如何部署一个单 Master 两个 Node 节点的 Kubernetes 集群&lt;/p&gt;
+
+&lt;p&gt;示例采用的系统环境如下:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Ubuntu Server 16.04&lt;/li&gt;
+&lt;li&gt;Docker -CE 18.06.1&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;先关镜像版本如下:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;k8s.gcr.io/kube-proxy&lt;/strong&gt;: v1.14.1&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;k8s.gcr.io/kube-apiserver&lt;/strong&gt;: v1.14.1&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;k8s.gcr.io/kube-scheduler&lt;/strong&gt;: v1.14.1&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;k8s.gcr.io/kube-controller-manager&lt;/strong&gt;: v1.14.1&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;quay.io/coreos/flannel&lt;/strong&gt;: v0.11.0-amd64&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;k8s.gcr.io/coredns&lt;/strong&gt;: 1.3.1&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;k8s.gcr.io/kubernetes-dashboard-amd64&lt;/strong&gt;: v1.10.1&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;k8s.gcr.io/etcd&lt;/strong&gt;: 3.3.10&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;k8s.gcr.io/pause&lt;/strong&gt;: 3.1&lt;/li&gt;
+&lt;/ul&gt;</description>
+    </item>
+    
+    <item>
       <title>Hugo搭建个人博客</title>
       <link>http://blog.k-8s.com/posts/Hugo-build-a-person-blog/</link>
       <pubDate>Mon, 11 Mar 2019 09:02:42 +0800</pubDate>

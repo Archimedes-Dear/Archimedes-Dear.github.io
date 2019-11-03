@@ -23,6 +23,11 @@
   </url>
   
   <url>
+    <loc>http://blog.k-8s.com/posts/Kubernetes-Note/Kubernetes-%E6%9E%B6%E6%9E%84%E5%92%8C%E5%AE%89%E8%A3%85/</loc>
+    <lastmod>2019-05-01T15:05:33+08:00</lastmod>
+  </url>
+  
+  <url>
     <loc>http://blog.k-8s.com/posts/Hugo-build-a-person-blog/</loc>
     <lastmod>2019-03-11T09:02:42+08:00</lastmod>
   </url>
