@@ -6,10 +6,35 @@
     <description>Recent content in Posts on Mr.耗子</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    <lastBuildDate>Fri, 03 May 2019 22:36:22 +0800</lastBuildDate>
+    <lastBuildDate>Sat, 04 May 2019 10:13:32 +0800</lastBuildDate>
     
 	<atom:link href="http://blog.k-8s.com/posts/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Kubernetes Pod 调度</title>
+      <link>http://blog.k-8s.com/posts/Kubernetes-Note/Kubernetes-Pod-Scheduling/</link>
+      <pubDate>Sat, 04 May 2019 10:13:32 +0800</pubDate>
+      
+      <guid>http://blog.k-8s.com/posts/Kubernetes-Note/Kubernetes-Pod-Scheduling/</guid>
+      <description>&lt;p&gt;通常来说, 不会直接创建一个 Pod, 这样管理起来会很不方便. 绝大多数情况下, 会通过 RS, Deployment, DaemonSet, Job 等来完成对一组 Pod 副本的管理工作.&lt;/p&gt;
+
+&lt;p&gt;Pod 调度分一下几种:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Deployment 或 RC: 全自动调度&lt;/li&gt;
+&lt;li&gt;NodeSelector: 定向调度&lt;/li&gt;
+&lt;li&gt;NodeAffinity: Node 亲和性调度&lt;/li&gt;
+&lt;li&gt;PodAffinity: Pod 亲和与互斥调度&lt;/li&gt;
+&lt;li&gt;Taints 和 Tolerations: (污点和容忍)&lt;/li&gt;
+&lt;li&gt;Pod Priority Preemption: Pod 优先级调度&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;由以上控制器产生的副本是归属于这些控制器的, 在 Kubernetes 1.9 版本之前, 删除控制器并不会删除 Pod, Kubernetes 1.9 版本以后, 这些 Pod 会被一并删除. 如果不希望这么做, 可以通过 kubectl 的 &lt;strong&gt;&lt;em&gt;&lt;code&gt;--cascade=false&lt;/code&gt;&lt;/em&gt;&lt;/strong&gt; 来取消这一特性:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-shell&#34;&gt;kubectl delete replicaset my-repset --cascade=false
+&lt;/code&gt;&lt;/pre&gt;</description>
+    </item>
     
     <item>
       <title>Kubernetes Pod 详解</title>

@@ -68,6 +68,38 @@
                         <article class="post">
                             <header>
                                 <h1 class="post-title">
+                                    <a href="http://blog.k-8s.com/posts/Kubernetes-Note/Kubernetes-Pod-Scheduling/" title="Kubernetes Pod 调度" >Kubernetes Pod 调度</a>
+                                </h1>
+                            </header>
+                            <date class="post-meta meta-date">
+                                2019年5月4日
+                            </date>
+                            
+                            <div class="post-content">
+                                <p>通常来说, 不会直接创建一个 Pod, 这样管理起来会很不方便. 绝大多数情况下, 会通过 RS, Deployment, DaemonSet, Job 等来完成对一组 Pod 副本的管理工作.</p>
+
+<p>Pod 调度分一下几种:</p>
+
+<ul>
+<li>Deployment 或 RC: 全自动调度</li>
+<li>NodeSelector: 定向调度</li>
+<li>NodeAffinity: Node 亲和性调度</li>
+<li>PodAffinity: Pod 亲和与互斥调度</li>
+<li>Taints 和 Tolerations: (污点和容忍)</li>
+<li>Pod Priority Preemption: Pod 优先级调度</li>
+</ul>
+
+<p>由以上控制器产生的副本是归属于这些控制器的, 在 Kubernetes 1.9 版本之前, 删除控制器并不会删除 Pod, Kubernetes 1.9 版本以后, 这些 Pod 会被一并删除. 如果不希望这么做, 可以通过 kubectl 的 <strong><em><code>--cascade=false</code></em></strong> 来取消这一特性:</p>
+
+<pre><code class="language-shell">kubectl delete replicaset my-repset --cascade=false
+</code></pre>……
+                            </div>
+                            <p class="readmore"><a href="http://blog.k-8s.com/posts/Kubernetes-Note/Kubernetes-Pod-Scheduling/">阅读全文</a></p>
+                        </article>
+                    
+                        <article class="post">
+                            <header>
+                                <h1 class="post-title">
                                     <a href="http://blog.k-8s.com/posts/Kubernetes-Note/Kubernetes-Pod/" title="Kubernetes Pod 详解" >Kubernetes Pod 详解</a>
                                 </h1>
                             </header>
@@ -193,6 +225,10 @@ Containers:
     <section class="widget">
         <h3 class="widget-title">最近文章</h3>
 <ul class="widget-list">
+    
+    <li>
+        <a href="http://blog.k-8s.com/posts/Kubernetes-Note/Kubernetes-Pod-Scheduling/" title="Kubernetes Pod 调度">Kubernetes Pod 调度</a>
+    </li>
     
     <li>
         <a href="http://blog.k-8s.com/posts/Kubernetes-Note/Kubernetes-Pod/" title="Kubernetes Pod 详解">Kubernetes Pod 详解</a>

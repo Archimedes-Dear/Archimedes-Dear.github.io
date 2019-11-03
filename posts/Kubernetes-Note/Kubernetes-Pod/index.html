@@ -254,7 +254,7 @@ spec:
         command:
         - cat
         - /tmp/health
-      initialDelaySeconds: 15  # 初始探测时间
+      initialDelaySeconds: 15
       timeoutSeconds: 1  # 健康检查发送后的等待响应超时时间
 </code></pre>
 
@@ -270,7 +270,17 @@ NAME            READY   STATUS    RESTARTS   AGE
 liveness-exec   1/1     Running   1          119s
 </code></pre>
 
-<p>最后这里的 RESTART 数量变成了1, 说明容器已经被重启过一次</p>
+<p>最后这里的 RESTART 数量变成了1, 说明容器已经被重启过一次. (为什么这里的效果时间比较长呢? 其实和容器内执行shell的时间有关系: <strong><em>容器内执行shell的调用时间可能会非常长</em></strong>)</p>
+
+<p>其他参数:</p>
+
+<ul>
+<li><strong>initialDelaySeconds</strong>: Pod 启动后多久进行检查, 单位: 秒</li>
+<li><strong>periodSeconds</strong>: 检查的间隔时间, 默认为10秒, 单位: 秒</li>
+<li><strong>timeoutSeconds</strong>: 探测的超时时间, 默认为1秒, 单位: 秒</li>
+<li><strong>successThreshold</strong>: 探测失败后再次判断成功的阀值: 默认为1, 单位: 次</li>
+<li><strong>failureThreshold</strong>: 探测失败的重试次数: 默认为3, 单位: 次</li>
+</ul>
 
 <p>LivenessProbe 支持多种判断方式:</p>
 
@@ -453,6 +463,72 @@ root@K8sMaster-1:~/k8s-yaml# kubectl exec nginx /bin/cat /usr/share/nginx/html/i
 
 <li><p>InitContainer 不能设置 readinessProbe 探针, 且 Pod 重新启动时, InitContainer 将会重新运行</p></li>
 </ul>
+
+<h3 id="资源配置管理">资源配置管理</h3>
+
+<p>支持的资源类型:</p>
+
+<ul>
+<li>CPU: 单位 millicore(1core = 1000millicore)</li>
+<li>Memory: 单位 Byte</li>
+<li>ephemeral storage(临时存储): 单位 Byte</li>
+<li>自定义资源: 配置时必须为整数</li>
+</ul>
+
+<p>配置方法:</p>
+
+<p>资源配置分为request/limit两种类型</p>
+
+<ul>
+<li>CPU:</li>
+</ul>
+
+<p>spec.containers[].resources.limits.cpu</p>
+
+<p>spec.containers[].resources.requests.cpu</p>
+
+<ul>
+<li>Memory:</li>
+</ul>
+
+<p>spec.containers[].resources.limits.memory</p>
+
+<p>spec.containers[].resources.requests.memory</p>
+
+<ul>
+<li>ephemeral storage:</li>
+</ul>
+
+<p>spec.containers[].resources.limits.ephemeral-storage</p>
+
+<p>spec.containers[].resources.requests.ephemeral-storage</p>
+
+<h3 id="pod-服务质量-qos">Pod 服务质量(QoS)</h3>
+
+<p>Pod 服务质量分类:</p>
+
+<ul>
+<li>Guaranteed
+
+<ul>
+<li>Pod 里的每个容器都必须有 <strong>内存</strong> 限制和请求, 而且必须是一样的</li>
+<li>Pod 里的每个容器都必须有 <strong>CPU</strong> 限制和请求, 而且必须是一样的</li>
+</ul></li>
+<li>Burstable
+
+<ul>
+<li>非 Guaranteed</li>
+<li>Pod 里只要有一个容器有内存或 CPU 请求</li>
+</ul></li>
+<li>BestEffort
+
+<ul>
+<li>非 Guaranteed</li>
+<li>非 Burstable</li>
+</ul></li>
+</ul>
+
+<p>当节点上 Memory 资源不足时, 将依据 BestEffort, Burstable, Buaranteed 的优先顺序驱逐 Pod</p>
                         </div>
 
                         
@@ -499,6 +575,10 @@ root@K8sMaster-1:~/k8s-yaml# kubectl exec nginx /bin/cat /usr/share/nginx/html/i
     <section class="widget">
         <h3 class="widget-title">最近文章</h3>
 <ul class="widget-list">
+    
+    <li>
+        <a href="http://blog.k-8s.com/posts/Kubernetes-Note/Kubernetes-Pod-Scheduling/" title="Kubernetes Pod 调度">Kubernetes Pod 调度</a>
+    </li>
     
     <li>
         <a href="http://blog.k-8s.com/posts/Kubernetes-Note/Kubernetes-Pod/" title="Kubernetes Pod 详解">Kubernetes Pod 详解</a>

@@ -1,0 +1,830 @@
+<!doctype html>
+<html lang="zh-cn">
+<head>
+
+    <meta charset="utf-8">
+    <meta name="generator" content="Hugo 0.54.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Kubernetes Pod 调度 | Mr.耗子</title>
+    <meta property="og:title" content="Kubernetes Pod 调度 - Mr.耗子">
+    <meta property="og:type" content="article">
+        
+    <meta property="article:published_time" content="2019-05-04T10:13:32&#43;08:00">
+        
+        
+    <meta property="article:modified_time" content="2019-05-04T10:13:32&#43;08:00">
+        
+    <meta name="Keywords" content="耗子,Mr.耗子,Docker,容器,k8s,kubernetes,golang,go,devops">
+    <meta name="description" content="Kubernetes Pod 调度">
+        
+    <meta name="author" content="Mr.耗子">
+    <meta property="og:url" content="http://blog.k-8s.com/posts/Kubernetes-Note/Kubernetes-Pod-Scheduling/">
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+
+    <link rel="stylesheet" href="/css/normalize.css">
+    
+        <link rel="stylesheet" href="/css/prism.css">
+    
+    <link rel="stylesheet" href="/css/style.css">
+    <script type="text/javascript" src="//cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+
+    
+
+
+    
+    
+</head>
+
+<body>
+<header id="header" class="clearfix">
+    <div class="container">
+        <div class="col-group">
+            <div class="site-name ">
+                
+                    <a id="logo" href="http://blog.k-8s.com/">
+                        Mr.耗子
+                    </a>
+                
+                <p class="description">Linux Docker Kubernetes Golang Python</p>
+            </div>
+            <div>
+                <nav id="nav-menu" class="clearfix">
+                    <a class="" href="http://blog.k-8s.com/">首页</a>
+                    
+                    <a  href="http://blog.k-8s.com/archives/" title="归档">归档</a>
+                    
+                    <a  href="http://blog.k-8s.com/about/" title="关于">关于</a>
+                    
+                </nav>
+            </div>
+        </div>
+    </div>
+</header>
+
+
+<div id="body">
+    <div class="container">
+        <div class="col-group">
+
+            <div class="col-8" id="main">
+                <div class="res-cons">
+                    <article class="post">
+                        <header>
+                            <h1 class="post-title">Kubernetes Pod 调度</h1>
+                        </header>
+                        <date class="post-meta meta-date">
+                            2019年5月4日
+                        </date>
+                        
+                        
+                        <div class="post-meta">
+                            <span id="busuanzi_container_page_pv">|<span id="busuanzi_value_page_pv"></span><span> 阅读</span></span>
+                        </div>
+                        
+                        <div class="post-content">
+                            <p>通常来说, 不会直接创建一个 Pod, 这样管理起来会很不方便. 绝大多数情况下, 会通过 RS, Deployment, DaemonSet, Job 等来完成对一组 Pod 副本的管理工作.</p>
+
+<p>Pod 调度分一下几种:</p>
+
+<ul>
+<li>Deployment 或 RC: 全自动调度</li>
+<li>NodeSelector: 定向调度</li>
+<li>NodeAffinity: Node 亲和性调度</li>
+<li>PodAffinity: Pod 亲和与互斥调度</li>
+<li>Taints 和 Tolerations: (污点和容忍)</li>
+<li>Pod Priority Preemption: Pod 优先级调度</li>
+</ul>
+
+<p>由以上控制器产生的副本是归属于这些控制器的, 在 Kubernetes 1.9 版本之前, 删除控制器并不会删除 Pod, Kubernetes 1.9 版本以后, 这些 Pod 会被一并删除. 如果不希望这么做, 可以通过 kubectl 的 <strong><em><code>--cascade=false</code></em></strong> 来取消这一特性:</p>
+
+<pre><code class="language-shell">kubectl delete replicaset my-repset --cascade=false
+</code></pre>
+
+<h3 id="deployment-或-rc-是什么">Deployment 或 RC 是什么</h3>
+
+<p>Deployment或RC的主要功能之一就是自动部署一个容器应用的多份副本, 以及持续监控副本的数量, 在集群内始终维持用户指定的副本数量</p>
+
+<p>在最早的 Kubernetes 版本里, 仅通过 RC 来控制 Pod, 而 RC 随着 Kubernetes 的发展, 逐渐由 Deployment 所取代, 但严谨的说, RC 的继任者是 RS, 因为 RS 增强了 RC 标签选择器的灵活性</p>
+
+<p>Deployment 本质上还是通过 ReplicaSet 来实现 Pod 副本的自动控制功能</p>
+
+<p>官方建议不要直接使用 ReplicaSet 来控制 Pod 副本, 而应使用 RS 的 Deployment 对象来控制副本</p>
+
+<p>创建一个 Deployment:</p>
+
+<p>如下 yaml 中, 创建一个名为 nginx-deployment 的 Deployment 对象, 该对象有 2 个 Pod 副本</p>
+
+<pre><code class="language-yaml">apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+spec:
+  selector:
+    matchLabels:
+      app: nginx
+  replicas: 2 # indica al controlador que ejecute 2 pods
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.7.9
+        ports:
+        - containerPort: 80
+</code></pre>
+
+<pre><code class="language-shell"># 使用该 yaml 创建 Deployment
+root@K8sMaster-1:~/k8s-yaml# kubectl apply -f deployment.yaml 
+deployment.apps/nginx-deployment created
+
+# 查看该 Deployment 状态, 可以看到该 Deployment 有 2 个 Pod 副本
+root@K8sMaster-1:~/k8s-yaml# kubectl get deployments
+NAME               READY   UP-TO-DATE   AVAILABLE   AGE
+nginx-deployment   2/2     2            2           8s
+
+# 再查看 RS, 由 Deployment 对象会自动创建一个名称为 ${Deployment_name}-${random_temp_id} 的 RS
+root@K8sMaster-1:~/k8s-yaml# kubectl get rs 
+NAME                         DESIRED   CURRENT   READY   AGE
+nginx-deployment-6dd86d77d   2         2         2       15s
+
+# 最后查看 Pod 副本, Pod 由 RS 进行控制数量和调度, 这里分别调度在了 2 台 Node 上
+root@K8sMaster-1:~/k8s-yaml# kubectl get pods -o wide
+NAME                               READY   STATUS    RESTARTS   AGE     IP            NODE        NOMINATED NODE   READINESS GATES
+nginx-deployment-6dd86d77d-n97pc   1/1     Running   0          4m43s   10.244.1.18   k8snode-1   &lt;none&gt;           &lt;none&gt;
+nginx-deployment-6dd86d77d-qq4lf   1/1     Running   0          4m43s   10.244.2.13   k8snode-2   &lt;none&gt;           &lt;none&gt;
+</code></pre>
+
+<h3 id="nodeselector">NodeSelector</h3>
+
+<p>实际生产运用中, 通过 Deployment 创建的 Pod 不需要关心会调度到哪个 Node 上.</p>
+
+<p>但也有某个服务, 需要节点具有特殊性: (例如数据库需要更快的硬盘), 此时使用 NodeSelector 对该种类型的 Pod 实现定向调度</p>
+
+<pre><code class="language-shell"># 首先要给目标 Node 打上一些标签
+# 例如这里的 k8snode-1 是具有 BGP 线路的服务器, 给它打上 network=BGP 的标签
+root@K8sMaster-1:~/k8s-yaml# kubectl label nodes k8snode-1 network=BGP
+node/k8snode-1 labeled
+
+# 查看该节点上的 Labels, 最后添加了一个 network=BGP 的标签
+root@K8sMaster-1:~/k8s-yaml# kubectl get node k8snode-1 --show-labels
+NAME        STATUS   ROLES    AGE    VERSION   LABELS
+k8snode-1   Ready    &lt;none&gt;   100d   v1.14.1   beta.kubernetes.io/arch=amd64,beta.kubernetes.io/os=linux,kubernetes.io/arch=amd64,kubernetes.io/hostname=k8snode-1,kubernetes.io/os=linux,network=BGP
+</code></pre>
+
+<pre><code class="language-yaml"># 编写 yaml, 增加 NodeSelector 部分
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+spec:
+  selector:
+    matchLabels:
+      app: nginx
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.7.9
+        ports:
+        - containerPort: 80
+      nodeSelector:
+        network: BGP
+</code></pre>
+
+<pre><code class="language-shell">root@K8sMaster-1:~/k8s-yaml# kubectl apply -f deployment-nodeSelector.yaml 
+deployment.apps/nginx-deployment created
+
+# 查看该 Pod 运行的 节点信息, 可以发现都运行在 k8snode-1 节点上
+root@K8sMaster-1:~/k8s-yaml# kubectl get pods -o wide 
+NAME                             READY   STATUS    RESTARTS   AGE   IP            NODE        NOMINATED NODE   READINESS GATES
+nginx-deployment-fcc58d8-6hcwl   1/1     Running   0          11s   10.244.1.20   k8snode-1   &lt;none&gt;           &lt;none&gt;
+nginx-deployment-fcc58d8-7xqnd   1/1     Running   0          11s   10.244.1.19   k8snode-1   &lt;none&gt;           &lt;none&gt;
+
+</code></pre>
+
+<p>若是给多个 Node 都定义了相同标签, 则 scheduler 会根据调度算法从这组 Node 中挑选一个可用的 Node 进行 Pod 调度</p>
+
+<p>若要删除 k8snode-1 上的指定标签, 可在对应标签后添加<code>-</code>:</p>
+
+<pre><code class="language-shell">root@K8sMaster-1:~/k8s-yaml# kubectl label nodes k8snode-1 network-
+node/k8snode-1 labeled
+
+# 再查看标签, 已被删除
+root@K8sMaster-1:~/k8s-yaml# kubectl get node k8snode-1 --show-labels
+NAME        STATUS   ROLES    AGE    VERSION   LABELS
+k8snode-1   Ready    &lt;none&gt;   100d   v1.14.1   beta.kubernetes.io/arch=amd64,beta.kubernetes.io/os=linux,kubernetes.io/arch=amd64,kubernetes.io/hostname=k8snode-1,kubernetes.io/os=linux
+</code></pre>
+
+<p>NodeSelector 通过标签的方式, 实现了简单限制 Pod 所在节点的方法.</p>
+
+<p>亲和性调度机制则扩展了 Pod 调度的能力, 亲和性调度有如下两种:</p>
+
+<ul>
+<li>NodeAffinity</li>
+<li>PodAffinity</li>
+</ul>
+
+<h4 id="nodeaffinity">NodeAffinity</h4>
+
+<p>NodeAffinity 是用于替换 NodeSelector 的全新调度策略, 目前有两种节点亲和性表达:</p>
+
+<ul>
+<li>RequiredDuringSchedulingIgnoredDuringExecution: 必须满足指定规则才可以调度 Pod 到 Node 上</li>
+<li>PreferredDuringSchedulingIgnoredDuringExecution: 强调优先满足指定规则, 但不强求. 可对多个优先级设置权重, 以定义执行的先后顺序</li>
+</ul>
+
+<p>IgnoredDuringExecution: 如果一个 Pod 所在节点的标签在 Pod 运行期间发生了变化, 不再符合 Pod 节点亲和性要求, 则系统将忽略 Node 上的 Label 变化, 使得 Pod 继续在该节点运行</p>
+
+<pre><code class="language-yaml"># 该例子设置了如下规则:
+# requiredDuringSchedulingIgnoredDuringExecution 要求只运行在 amd64 节点上
+# preferredDuringSchedulingIgnoredDuringExecution 要求尽量运行在磁盘类型为 SSD 的节点上
+apiVersion: v1
+kind: Pod
+metadata:
+  name: with-node-affinity
+spec:
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: beta.kubernetes.io/arch
+            operator: In
+            values:
+            - amd64
+      preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 1
+        preference:
+          matchExpressions:
+          - key: disk-type
+            operator: In
+            values:
+            - ssd
+  containers:
+  - name: with-node-affinity
+    image: nginx:1.14.1
+</code></pre>
+
+<p>上面的配置中存在一个 <code>operator: In</code> 的操作符, NodeAffinity 语法支持的操作符包括 In, NotIn, Exists, DoesNotExist, Gt, Lt. 可用 NotIn 和 DoesNotExist 可实现排斥功能</p>
+
+<p>NodeAffinity 规则设置时应该注意一下几个条件:</p>
+
+<ul>
+<li>如果同时定义了 nodeSelector 和 nodeAffinity，那么必须两个条件都得到满足, Pod 才能最终运行在指定的Node 上</li>
+<li>如果 nodeAffinity 指定了多个 nodeSelectorTerms，那么其中一个能够匹配成功即可</li>
+<li>如果在 nodeSelectorTerms 中有多个 matchExpressions, 则一个节点必须满足所有matchExpressions才能运行该 Pod</li>
+</ul>
+
+<h4 id="podaffinity">PodAffinity</h4>
+
+<p>从 Kubernetes 1.4 版本开始引入 Pod 间的亲和与互斥. 该功能会根据 Node 上正在运行的 Pod 标签而不是 Node 的标签进行判断和调度</p>
+
+<p>它的规则格式为<strong>&ldquo;如果该 X 已经在运行一个或多个满足规则 Y 的 Pod，则该 Pod 应该 (或者在非亲和性的情况下不应该 ) 在 X 中运行&rdquo;</strong></p>
+
+<p>从概念上讲, X 是一个拓扑域, 例如节点, 机架, 云提供者区域, 云提供者区域等, 通过 Kubernetes 内置节点标签中的 Key 来进行声明, 这个 Key 的名字为 topologyKey, 意思是表达节点所属的 topology 范围. 它有如下几种类别</p>
+
+<ul>
+<li>kubernetes.io/hostname</li>
+<li>failure-domain.beta.kubernetes.io/zone</li>
+<li>failure-domain.beta.kubernetes.io/region</li>
+</ul>
+
+<p>与节点不同, 因为 Pod 是属于某个命名空间的, 所以 Y 表达的是一个或全部命名空间中的一个 LabelSelector</p>
+
+<p>Pod 亲和与互斥的条件设置也是 <code>requiredDuringSchedulingIgnoredDuringExecution</code> 和 <code>preferredDuringSchedulingIgnoredDuringExecution</code></p>
+
+<p>Pod 的亲和性被定义于 PodSpec 的 affinity 字段下的 podAffinity 子字段中</p>
+
+<p>Pod 间的互斥性则被定义于同一层次的 podAntiAffinity 子字段中</p>
+
+<blockquote>
+<p><strong>注意:</strong> Pod 间亲和力和反亲和力需要大量处理, 这可能会大大减慢大型群集中的调度. 我们不建议在大于数百个节点的群集中使用它们</p>
+
+<p><strong>注意:</strong> Pod 反关联性要求对节点进行一致的标记, 即群集中的每个节点必须具有适当的标签匹配 <code>topologyKey</code>. 如果某些或所有节点缺少指定的 <code>topologyKey</code> 标签, 则可能导致意外行为</p>
+</blockquote>
+
+<p><strong><em>Pod 亲和性还未完全理解, 具体操作方式后续补充&hellip;</em></strong></p>
+
+<h3 id="taints-和-tolerations">Taints 和 Tolerations</h3>
+
+<p>Taint 和 NodeSelector 与 NodeAffinity 不同, Taint 用于让 Node 拒绝 Pod 的运行</p>
+
+<p>Taint 需要和 Toleration 配合使用, Toleration 是 Pod 的属性, 让 Pod 能够运行在标注了 Taint 的 Node 上</p>
+
+<pre><code class="language-shell"># 为 Node 设置 Taint 信息, 它的 key 是 web, value 是nginx, effect 是 NoSchedule
+# 只有和这个 Taint 相匹配的 Toleration 的 Pod 才能够被分配到这个节点
+root@K8sMaster-1:~/k8s-yaml# kubectl taint node k8snode-1 web=nginx:NoSchedule
+node/k8snode-1 tainted
+</code></pre>
+
+<p>Pod 的 Toleration 声明中的 key 和 effect 需要与 Taint 的设置保持一致, 并满足以下条件之一:</p>
+
+<ul>
+<li>operator 的值是 Exists (无需指定 value)</li>
+<li>operator 的值是 Equal 并 value 相等</li>
+</ul>
+
+<p>若不指定 operator, 则默认值为 Equal</p>
+
+<pre><code class="language-yaml"># 符合上面 Taint 的例子
+tolerations:
+- key: &quot;key&quot;
+  operator: &quot;Equal&quot;
+  value: &quot;value&quot;
+  effect: &quot;NoSchedule&quot;
+</code></pre>
+
+<pre><code class="language-yaml"># 符合上面 Taint 的例子
+tolerations:
+- key: &quot;key&quot;
+  operator: &quot;Exists&quot;
+  effect: &quot;NoSchedule&quot;
+</code></pre>
+
+<p>有如下两个特例:</p>
+
+<ul>
+<li>空的 key 配合 Exists 操作符能够匹配所有的键和值</li>
+<li>空的 effect 匹配所有的 effect</li>
+</ul>
+
+<pre><code class="language-shell"># 删除 Node 上的 Taint
+root@K8sMaster-1:~/k8s-yaml# kubectl taint nodes k8snode-1 web:NoSchedule-
+node/k8snode-1 untainted
+</code></pre>
+
+<p>上面例子中, effect 的取值为 NoSchedule, 还可以取值为 PreferNoSchedule, 这是优先的意思. 若一个 Pod 没有声明容忍这个 Taint, 则系统会尽量避免把这个 Pod 调度在这一个节点上, 但不是强制</p>
+
+<p>还有一个值是 &ldquo;NoExecute&rdquo;, 当在声明 Taint 前有 Pod 在该节点上运行, 声明后则会被驱逐</p>
+
+<p>但若具有 NoExecute 效果的 Toleration 加入 <code>tolerationSeconds</code> 字段, 则表明 Pod 可以在 Taint 添加到 Node 以后还能在该 Node 上运行多久(单位: 秒), 若该节点在宽限期内 Taint 被移除, 则不会发生驱逐事件</p>
+
+<pre><code class="language-yaml">tolerations:
+- key: &quot;key&quot;
+  operator: &quot;Equal&quot;
+  value: &quot;value&quot;
+  effect: &quot;NoExecute&quot;
+  tolerationSeconds: 3600
+</code></pre>
+
+<p>一个 Node 可设置多个 Taint, 也可在 Pod 上设置多个 Toleration. Kubernetes 的处理机制是: 先看节点上所有的 Taint, 然后忽略 Pod 的 Toleration 能匹配的部分, 剩下的 Taint 便是对 Pod 的效果了.</p>
+
+<p>此外，Kubernetes 1.6 已经支持（alpha阶段）节点问题的表示。换句话说，当某种条件为真时，node controller会自动给节点添加一个 taint。当前内置的 taint 包括：</p>
+
+<ul>
+<li><code>node.kubernetes.io/not-ready</code>: 节点未准备好. 这相当于节点状态 <code>Ready</code> 的值为 <code>False</code></li>
+<li><code>node.kubernetes.io/unreachable</code>: node controller 访问不到节点. 这相当于节点状态 <code>Ready</code> 的值为 Unknown`</li>
+<li><code>node.kubernetes.io/out-of-disk</code>: 节点磁盘耗尽</li>
+<li><code>node.kubernetes.io/memory-pressure</code>: 节点存在内存压力</li>
+<li><code>node.kubernetes.io/disk-pressure</code>：节点存在磁盘压力</li>
+<li><code>node.kubernetes.io/network-unavailable</code>：节点网络不可用</li>
+<li><code>node.kubernetes.io/unschedulable</code>: 节点不可调度</li>
+<li><code>node.cloudprovider.kubernetes.io/uninitialized</code>：如果 kubelet 启动时指定了一个 “外部” cloud provider, 它将给当前节点添加一个 taint 将其标志为不可用. 在 cloud-controller-manager 的一个 controller 初始化这个节点后, kubelet 将删除这个 taint</li>
+</ul>
+
+<p>在版本1.13中, <code>TaintBasedEvictions</code> 功能已升级为 Beta, 并且默认启用, 因此污点会自动给节点添加这类 taint, 上述基于节点状态 Ready 对 pod 进行驱逐的逻辑会被禁用</p>
+
+<blockquote>
+<p>注意: 为了保证由于节点问题引起的 pod 驱逐 <a href="https://kubernetes.io/zh/docs/concepts/architecture/nodes/">rate limiting</a> 行为正常，系统实际上会以 rate-limited 的方式添加 taint. 在像 master 和 node 通讯中断等场景下, 这避免了 pod 被大量驱逐</p>
+</blockquote>
+
+<h3 id="pod-priority-preemption">Pod Priority Preemption</h3>
+
+<p>Pod 优先级调度是为了解决集群资源不足时, 优先调度优先级高的 Pod, 而放弃一些不重要的负载</p>
+
+<p>优先级抢占调度的核心行为是:</p>
+
+<ul>
+<li><strong>驱逐</strong>: 不同优先级的 Pod 调度, 会优先驱逐优先级低的 Pod</li>
+<li><strong>抢占</strong>: 同优先级的 Pod 调度, 会优先驱逐实际使用资源量超过申请量最大倍数的高耗能 Pod</li>
+</ul>
+
+<blockquote>
+<p>注意: Scheduler 可能会驱逐 Node A 上的一个 Pod, 以满足 Node B 上的一个新的 Pod 的调度任务</p>
+
+<p>举例: 一个低优先级的 Pod A 在 Node A (属于机架R) 上运行, 此时有一个高优先级的 Pod B 等待调度, 目标节点是同属 机架R 的 Node B, 他们中的一个或全部都定义了 anti-affinity 规则, 不允许在同一个机架上运行, 此时 Scheduler 只好&rdquo;丢车保帅&rdquo;, 驱逐低优先级的 Pod A 以满足高优先级的 Pod B 的调度</p>
+</blockquote>
+
+<h4 id="pod-priority-的使用">Pod Priority 的使用</h4>
+
+<p>首先, 由集群管理员创建 PriorityClasses, 不属于任何命名空间</p>
+
+<pre><code class="language-yaml"># 定义一个优先级为 1000000 的 PriorityClass, 数字越大, 优先级越高, 超过一亿的数字被保留, 用于系统组件
+apiVersion: scheduling.k8s.io/v1beta1
+kind: PriorityClass
+metadata:
+  name: high-priority
+value: 1000000
+globalDefault: false
+description: &quot;This priority class should be used for XYZ service pods only&quot;
+</code></pre>
+
+<p>接着可以在任意 Pod 中引用上述 Pod 优先级类别:</p>
+
+<pre><code class="language-yaml">apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+  labels:
+    env: test
+spec:
+  containers:
+  - name: nginx
+    image: nginx:1.14.1
+  priorityClassName: high-priority
+</code></pre>
+
+<p>抢占式调度方式, 有可能引起调度&rdquo;死循环&rdquo;状态, 例如一个 Scheduler 在驱逐完 Pod 还未调度时, 被另一个 Scheduler 抢占了资源, 则会引起调度失败. 导致 第一个 Scheduler 的 Pod 无法调度. 所以对于 Pod 优先级的使用, 若是资源紧张, 则应优先考虑集群扩容.</p>
+
+<h3 id="daemonset">DaemonSet</h3>
+
+<p>DaemonSet 用于管理在集群中每个 Node 上仅运行一份的 Pod 副本实例</p>
+
+<p><img src="https://raw.githubusercontent.com/Archimedes-Dear/image_bed/master/images/DaemonSet%E4%BD%BF%E7%94%A8%E5%9C%BA%E6%99%AF.png" alt="DaemonSet使用场景(图片来源: Kubernetes 权威指南(第四版))" /></p>
+
+<p>DaemonSet 的 Pod 调度策略与 RC 类似, 也可以在 Pod 中使用 NodeSelector 或 NodeAffinity 来指定满足条件的 Node 范围</p>
+
+<pre><code class="language-yaml"># 举例: 在每个节点部署一个 busybox 工具箱
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: busybox-daemonset
+spec:
+  selector:
+    matchLabels:
+      app: busybox
+  template:
+    metadata:
+      labels:
+        app: busybox
+    spec:
+      containers:
+      - name: busybox
+        image: busybox
+</code></pre>
+
+<pre><code class="language-shell">root@K8sMaster-1:~/k8s-yaml# kubectl create -f daemonset.yaml 
+daemonset.apps/busybox-daemonset created
+
+# 查看集群中的 daemonsets, 缩写 ds
+root@K8sMaster-1:~/k8s-yaml# kubectl get ds
+NAME                DESIRED   CURRENT   READY   UP-TO-DATE   AVAILABLE   NODE SELECTOR   AGE
+busybox-daemonset   2         2         0       2            0           &lt;none&gt;          12s
+
+# 查看当前运行的 Pod 和对应节点
+root@K8sMaster-1:~/k8s-yaml# kubectl get pods -o wide
+NAME                      READY   STATUS      RESTARTS   AGE   IP            NODE        NOMINATED NODE   READINESS GATES
+busybox-daemonset-8lhw6   0/1     Completed   0          23s   10.244.1.23   k8snode-1   &lt;none&gt;           &lt;none&gt;
+busybox-daemonset-zr4sm   0/1     Completed   0          23s   10.244.2.14   k8snode-2   &lt;none&gt;           &lt;none&gt;
+
+</code></pre>
+
+<p>在 Kubernetes 1.6 以后的版本中, DaemonSet 也可以执行滚动升级了, 此时 DaemonSet 的更新策略 (updateStrategy) 为 RollingUpdate:</p>
+
+<pre><code class="language-yaml">apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: busybox-daemonset
+spec:
+  ...
+  updateStrategy:
+    type: RollingUpdate  # 另一个是 OneDelete, 即需要手工删除 DaemonSet 创建的 Pod, 新 Pod 副本才会创建
+</code></pre>
+
+<h3 id="job">Job</h3>
+
+<p>Job 资源对象可定义一个批处理任务, 批处理任务通常并行 (或串行) 启动多个计算进程去处理一批工作项, 处理完成后, 整个批处理任务结束.</p>
+
+<p>批处理任务可分为以下几种模式:</p>
+
+<ul>
+<li><strong>Job Template Expansion 模式</strong>: 一个 Job 对象对应一个待处理事项</li>
+<li><strong>Queue with Pod Per Work Item 模式</strong>: 采用一个任务队列存放 Work Item, 一个 Job 对象作为消费者去完成这些 Work Item</li>
+<li><strong>Queue with Variable Pod Conunt 模式</strong>: 同上, 但 Job 可启动的 Pod 数量是可变的</li>
+</ul>
+
+<p><img src="https://raw.githubusercontent.com/Archimedes-Dear/image_bed/master/images/Job批处理任务的模式.png" alt="Job批处理任务的模式(图片来源: Kubernetes 权威指南(第四版))" /></p>
+
+<p>Kubernetes 将 Job 分成以下三种类型:</p>
+
+<ol>
+<li><strong>Non-parallel Jobs</strong>: 通常只启动一个 Pod, 除非 Pod 异常, 才会重启 Pod. 否则 Pod 结束, Job 结束</li>
+<li><strong>Parallel Jobs with a fixed completion count</strong>: 并行 Job 会启动多个 Pod, 此时需要设定 Job 的 <code>.spec.completions</code> 参数为一个正数, 当正常结束的 Pod 达到此参数的设定值后, Job结束. 用 <code>.spec.parallelism</code> 参数来控制并行度</li>
+<li><strong>Parallel Jobs with a work queue</strong>: 任务队列的方式并行 Job 需要一个独立的 Queue, 工作项都在 Queue 中存放, 不能设置 <code>.spec.completions</code> 参数, 此时 Job 有如下特性:
+
+<ul>
+<li>每个 Pod 都能独立判断和决定是否还有任务项需要处理</li>
+<li>如果某个 Pod 正常结束, 则 Job 不会再启动新的 Pod</li>
+<li>如果一个 Pod 成功结束, 则此时应该不存在其他Pod还在工作的情况, 它们应该都处于即将结束, 退出的状态</li>
+<li>如果所有 Pod 都结束了, 且至少有一个 Pod 成功结束, 则整个 Job 成功结束</li>
+</ul></li>
+</ol>
+
+<h4 id="单个-job">单个 Job</h4>
+
+<pre><code class="language-yaml">apiVersion: batch/v1
+kind: Job
+metadata:
+  name: myjob
+spec:
+  template:
+    metadata:
+      name: myjob
+    spec:
+      containers:
+      - name: hello
+        image: busybox
+        command: [&quot;echo&quot;, &quot;hello kubernets job&quot;]
+      restartPolicy: Never
+</code></pre>
+
+<pre><code class="language-shell"># 创建一个 job
+root@K8sMaster-1:~/k8s-yaml# kubectl create -f job.yaml 
+job.batch/myjob created
+
+# 查看 job
+root@K8sMaster-1:~/k8s-yaml# kubectl get job
+NAME    COMPLETIONS   DURATION   AGE
+myjob   0/1           4s         4s
+
+# 查看 job 运行的 pod
+root@K8sMaster-1:~/k8s-yaml# kubectl get pods 
+NAME          READY   STATUS      RESTARTS   AGE
+myjob-gc7zf   0/1     Completed   0          30s
+
+# 查看 job 的 pod 日志
+root@K8sMaster-1:~/k8s-yaml# kubectl logs myjob-gc7zf 
+hello kubernets job
+</code></pre>
+
+<p>若在 Job 中配置出现了问题, 而 restartPolicy 策略是 Never, 那么失败的容器不会被重启, 但 Job COMPLETIONS 字段的目标 Pod 是 1, 当前数量 为 0, 不满足. 所以 Job Controller 会不断启动新的 Pod, 导致资源会一直被消耗, 只能删除该 Job</p>
+
+<h4 id="并行-job">并行 Job</h4>
+
+<pre><code class="language-yaml"># 并行的 Job 配置
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: myjob
+spec:
+  parallelism: 2
+  template:
+    metadata:
+      name: myjob
+    spec:
+      containers:
+      - name: hello
+        image: busybox
+        command: [&quot;echo&quot;, &quot;hello kubernets job&quot;]
+      restartPolicy: OnFailure
+</code></pre>
+
+<pre><code class="language-shell"># 创建并行 job
+root@K8sMaster-1:~/k8s-yaml# kubectl create -f job-paralelism.yaml 
+job.batch/myjob created
+
+# 可以看到 COMPLETIONS 的总数为 2 个
+root@K8sMaster-1:~/k8s-yaml# kubectl get jobs
+NAME    COMPLETIONS   DURATION   AGE
+myjob   0/1 of 2      4s         4s
+
+# 查看运行的 Pod 数
+root@K8sMaster-1:~/k8s-yaml# kubectl get pods
+NAME          READY   STATUS      RESTARTS   AGE
+myjob-db8cl   0/1     Completed   0          31s
+myjob-dzn2v   0/1     Completed   0          31s
+</code></pre>
+
+<p>还可以设置一共要运行 m 个 Job, 每次并行 n 个, 只需要增加 <code>completions</code> 字段即可</p>
+
+<pre><code class="language-yaml"># 并行的 Job 配置
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: myjob
+spec:
+  completions: 6
+  parallelism: 2
+  ...
+</code></pre>
+
+<h4 id="cronjob">CronJob</h4>
+
+<p>CronJob 是一种定时 Job, 定时的方式和 Linux Cron 表达式一致:</p>
+
+<pre><code class="language-Mintes">
+```yaml
+# 示例
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: hello
+spec:
+  schedule: &quot;*/1 * * * *&quot;
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: hello
+            image: busybox
+            args:
+            - /bin/sh
+            - -c
+            - date; echo Hello from the Kubernetes cluster
+          restartPolicy: OnFailure
+</code></pre>
+
+<pre><code class="language-shell"># 创建一个定时任务
+root@K8sMaster-1:~/k8s-yaml# kubectl create -f cronJob.yaml 
+cronjob.batch/hello created
+
+# 查看当前运行次数, ACTIVE 字段, LAST SCHEDULE 是最后一次调度(运行)距离现在多久
+root@K8sMaster-1:~/k8s-yaml# kubectl get cronjob -o wide
+NAME    SCHEDULE      SUSPEND   ACTIVE   LAST SCHEDULE   AGE   CONTAINERS   IMAGES    SELECTOR
+hello   */1 * * * *   False     0        35s             57s   hello        busybox   &lt;none&gt;
+
+# 再次查看时, 发现已经完成了一个 cronjob 实例, 启动了一个新的 cronjob 实例
+root@K8sMaster-1:~/k8s-yaml# kubectl get cronjob -o wide
+NAME    SCHEDULE      SUSPEND   ACTIVE   LAST SCHEDULE   AGE   CONTAINERS   IMAGES    SELECTOR
+hello   */1 * * * *   False     1        7s              89s   hello        busybox   &lt;none&gt;
+
+# 使用如下命令可更直观的查看执行历史
+root@K8sMaster-1:~/k8s-yaml# kubectl get jobs --watch
+NAME               COMPLETIONS   DURATION   AGE
+hello-1572686880   1/1           15s        3m10s
+hello-1572686940   1/1           16s        2m10s
+hello-1572687000   1/1           15s        70s
+hello-1572687060   0/1           10s        10s
+
+# 对应的运行的 Pod
+root@K8sMaster-1:~/k8s-yaml# kubectl get pods 
+NAME                     READY   STATUS      RESTARTS   AGE
+hello-1572686940-k2ps7   0/1     Completed   0          2m52s
+hello-1572687000-n6xjr   0/1     Completed   0          112s
+hello-1572687060-7hc4g   0/1     Completed   0          52s
+
+# 查看 Pod 日志
+root@K8sMaster-1:~/k8s-yaml# kubectl logs 1572686940-k2ps7
+Sat Nov  2 09:30:17 UTC 2019
+Hello from the Kubernetes cluster
+
+# 删除 CronJob
+root@K8sMaster-1:~/k8s-yaml# kubectl delete cronjob hello
+cronjob.batch &quot;hello&quot; deleted
+</code></pre>
+
+<p>在 Kubernetes 1.9 版本以后, kubectl 命令增加了别名 cj 表示 cronjob</p>
+                        </div>
+
+                        
+
+<div class="post-archive">
+    <h2>See Also</h2>
+    <ul class="listing">
+        
+        <li><a href="/posts/Kubernetes-Note/Kubernetes-Pod/">Kubernetes Pod 详解</a></li>
+        
+        <li><a href="/posts/Kubernetes-Note/Kubernetes-basic-concept/">Kubernetes 基本概念和术语</a></li>
+        
+        <li><a href="/posts/Hugo-build-a-person-blog/">Hugo搭建个人博客</a></li>
+        
+        <li><a href="/about/">About me</a></li>
+        
+        <li><a href="/archives/">归档</a></li>
+        
+    </ul>
+</div>
+
+
+                        <div class="post-meta meta-tags">
+                            
+                            没有标签
+                            
+                        </div>
+                    </article>
+                    
+    
+
+    
+    
+                </div>
+            </div>
+            <div id="secondary">
+    <section class="widget">
+        <form id="search" action="//www.google.com/search" method="get" accept-charset="utf-8" target="_blank" _lpchecked="1">
+      
+      <input type="text" name="q" maxlength="20" placeholder="Search">
+      <input type="hidden" name="sitesearch" value="http://blog.k-8s.com/">
+      <button type="submit" class="submit icon-search"></button>
+</form>
+    </section>
+    
+    <section class="widget">
+        <h3 class="widget-title">最近文章</h3>
+<ul class="widget-list">
+    
+    <li>
+        <a href="http://blog.k-8s.com/posts/Kubernetes-Note/Kubernetes-Pod-Scheduling/" title="Kubernetes Pod 调度">Kubernetes Pod 调度</a>
+    </li>
+    
+    <li>
+        <a href="http://blog.k-8s.com/posts/Kubernetes-Note/Kubernetes-Pod/" title="Kubernetes Pod 详解">Kubernetes Pod 详解</a>
+    </li>
+    
+    <li>
+        <a href="http://blog.k-8s.com/posts/Kubernetes-Note/Kubernetes-basic-concept/" title="Kubernetes 基本概念和术语">Kubernetes 基本概念和术语</a>
+    </li>
+    
+    <li>
+        <a href="http://blog.k-8s.com/posts/Hugo-build-a-person-blog/" title="Hugo搭建个人博客">Hugo搭建个人博客</a>
+    </li>
+    
+</ul>
+    </section>
+
+    
+
+    <section class="widget">
+        <h3 class="widget-title">分类</h3>
+<ul class="widget-list">
+    
+</ul>
+    </section>
+
+    <section class="widget">
+        <h3 class="widget-title">标签</h3>
+<div class="tagcloud">
+    
+</div>
+    </section>
+
+    
+<section class="widget">
+    <h3 class="widget-title">友情链接</h3>
+    <ul class="widget-list">
+        
+        <li>
+            <a target="_blank" href="http://www.jxhs.me" title="jame_xhs">jame_xhs</a>
+        </li>
+        
+    </ul>
+</section>
+
+
+    <section class="widget">
+        <h3 class="widget-title">其它</h3>
+        <ul class="widget-list">
+            <li><a href="http://blog.k-8s.com/index.xml">文章 RSS</a></li>
+        </ul>
+    </section>
+</div>
+        </div>
+    </div>
+</div>
+<footer id="footer">
+    <div class="container">
+        &copy; 2018 <a href="http://blog.k-8s.com/">Mr.耗子 By Mr.耗子</a>.
+        Powered by <a rel="nofollow noreferer noopener" href="https://gohugo.io" target="_blank">Hugo</a>.
+        <a href="https://www.flysnow.org/" target="_blank">Theme</a> based on <a href="https://github.com/rujews/maupassant-hugo" target="_blank">maupassant</a>.
+        
+    </div>
+</footer>
+
+
+    <script type="text/javascript">
+    
+    (function(){
+        $("pre code").parent().addClass("line-numbers")
+    }())
+
+    window.MathJax = {
+        tex2jax: {
+            inlineMath: [ ['$','$'] ],
+            processEscapes: true
+        }
+    };
+    </script>
+    <script type="text/javascript" src="/js/prism.js" async="true"></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
+
+<a id="rocket" href="#top"></a>
+<script type="text/javascript" src="/js/totop.js?v=0.0.0" async=""></script>
+
+
+
+<script type="text/javascript" src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" async></script>
+
+
+
+
+</body>
+</html>
