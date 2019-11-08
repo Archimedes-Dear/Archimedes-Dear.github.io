@@ -6,10 +6,23 @@
     <description>Recent content on Mr.耗子</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    <lastBuildDate>Tue, 07 May 2019 21:36:22 +0800</lastBuildDate>
+    <lastBuildDate>Thu, 09 May 2019 09:45:26 +0800</lastBuildDate>
     
 	<atom:link href="http://blog.k-8s.com/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Kubernetes Service</title>
+      <link>http://blog.k-8s.com/posts/Kubernetes-Note/Kubernetes-Services/</link>
+      <pubDate>Thu, 09 May 2019 09:45:26 +0800</pubDate>
+      
+      <guid>http://blog.k-8s.com/posts/Kubernetes-Note/Kubernetes-Services/</guid>
+      <description>&lt;h3 id=&#34;service-的作用&#34;&gt;Service 的作用&lt;/h3&gt;
+
+&lt;p&gt;Service 可以为一组具有相同功能的容器应用提供统一的入口和负载均衡&lt;/p&gt;
+
+&lt;h3 id=&#34;创建和使用-service&#34;&gt;创建和使用 Service&lt;/h3&gt;</description>
+    </item>
     
     <item>
       <title>Kubernetes 存储</title>
@@ -135,11 +148,11 @@ Containers:
     </item>
     
     <item>
-      <title>Kubernetes 架构和安装</title>
-      <link>http://blog.k-8s.com/posts/Kubernetes-Note/Kubernetes-%E6%9E%B6%E6%9E%84%E5%92%8C%E5%AE%89%E8%A3%85/</link>
+      <title>Kubernetes 安装</title>
+      <link>http://blog.k-8s.com/posts/Kubernetes-Note/Kubernetes-Install/</link>
       <pubDate>Wed, 01 May 2019 15:05:33 +0800</pubDate>
       
-      <guid>http://blog.k-8s.com/posts/Kubernetes-Note/Kubernetes-%E6%9E%B6%E6%9E%84%E5%92%8C%E5%AE%89%E8%A3%85/</guid>
+      <guid>http://blog.k-8s.com/posts/Kubernetes-Note/Kubernetes-Install/</guid>
       <description>&lt;p&gt;本文教大家如何部署一个单 Master 两个 Node 节点的 Kubernetes 集群&lt;/p&gt;
 
 &lt;p&gt;示例采用的系统环境如下:&lt;/p&gt;

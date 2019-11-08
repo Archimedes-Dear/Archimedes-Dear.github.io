@@ -1,0 +1,544 @@
+<!doctype html>
+<html lang="zh-cn">
+<head>
+
+    <meta charset="utf-8">
+    <meta name="generator" content="Hugo 0.54.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Kubernetes Service | Mr.耗子</title>
+    <meta property="og:title" content="Kubernetes Service - Mr.耗子">
+    <meta property="og:type" content="article">
+        
+    <meta property="article:published_time" content="2019-05-09T09:45:26&#43;08:00">
+        
+        
+    <meta property="article:modified_time" content="2019-05-09T09:45:26&#43;08:00">
+        
+    <meta name="Keywords" content="耗子,Mr.耗子,Docker,容器,k8s,kubernetes,golang,go,devops">
+    <meta name="description" content="Kubernetes Service">
+        
+    <meta name="author" content="Mr.耗子">
+    <meta property="og:url" content="http://blog.k-8s.com/posts/Kubernetes-Note/Kubernetes-Services/">
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+
+    <link rel="stylesheet" href="/css/normalize.css">
+    
+        <link rel="stylesheet" href="/css/prism.css">
+    
+    <link rel="stylesheet" href="/css/style.css">
+    <script type="text/javascript" src="//cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+
+    
+
+
+    
+    
+</head>
+
+<body>
+<header id="header" class="clearfix">
+    <div class="container">
+        <div class="col-group">
+            <div class="site-name ">
+                
+                    <a id="logo" href="http://blog.k-8s.com/">
+                        Mr.耗子
+                    </a>
+                
+                <p class="description">Linux Docker Kubernetes Golang Python</p>
+            </div>
+            <div>
+                <nav id="nav-menu" class="clearfix">
+                    <a class="" href="http://blog.k-8s.com/">首页</a>
+                    
+                    <a  href="http://blog.k-8s.com/archives/" title="归档">归档</a>
+                    
+                    <a  href="http://blog.k-8s.com/about/" title="关于">关于</a>
+                    
+                </nav>
+            </div>
+        </div>
+    </div>
+</header>
+
+
+<div id="body">
+    <div class="container">
+        <div class="col-group">
+
+            <div class="col-8" id="main">
+                <div class="res-cons">
+                    <article class="post">
+                        <header>
+                            <h1 class="post-title">Kubernetes Service</h1>
+                        </header>
+                        <date class="post-meta meta-date">
+                            2019年5月9日
+                        </date>
+                        
+                        
+                        <div class="post-meta">
+                            <span id="busuanzi_container_page_pv">|<span id="busuanzi_value_page_pv"></span><span> 阅读</span></span>
+                        </div>
+                        
+                        <div class="post-content">
+                            <h3 id="service-的作用">Service 的作用</h3>
+
+<p>Service 可以为一组具有相同功能的容器应用提供统一的入口和负载均衡</p>
+
+<h3 id="创建和使用-service">创建和使用 Service</h3>
+
+<p>先创建 2 个 nginx 应用容器</p>
+
+<pre><code class="language-yaml"># deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+spec:
+  selector:
+    matchLabels:
+      app: nginx
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.7.9
+        ports:
+        - containerPort: 80
+</code></pre>
+
+<p>再编写对应的 svcNginx.yaml</p>
+
+<pre><code class="language-yaml"># nginx svc
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-svc 
+spec:
+  type: ClusterIP  # 开放的 Service 类型, 有 ClusterIP, NodePort, LoadBalancer
+  selector:  # 该 Service 应用对应的 Label 的 Pod 上
+    app: nginx
+  ports:
+  - protocol: TCP
+    port: 8080  # 这是 ClusterIP 暴露的端口号
+    targetPort: 80  # 应用在容器中暴露的端口号
+</code></pre>
+
+<p>然后再创建 Deployment 和 Services</p>
+
+<pre><code class="language-shell">root@K8sMaster-1:~/k8s-yaml# kubectl create -f deployment.yaml 
+deployment.apps/nginx-deployment created
+
+root@K8sMaster-1:~/k8s-yaml# kubectl get pods 
+NAME                               READY   STATUS    RESTARTS   AGE
+nginx-deployment-6dd86d77d-dvqkp   1/1     Running   0          34s
+nginx-deployment-6dd86d77d-h4knf   1/1     Running   0          34s
+
+root@K8sMaster-1:~/k8s-yaml# kubectl get svc
+NAME         TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)   AGE
+kubernetes   ClusterIP   10.96.0.1    &lt;none&gt;        443/TCP   106d
+
+root@K8sMaster-1:~/k8s-yaml# kubectl apply -f svcNginx.yaml 
+service/nginx-svc created
+
+root@K8sMaster-1:~/k8s-yaml# kubectl get svc
+NAME         TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)    AGE
+kubernetes   ClusterIP   10.96.0.1      &lt;none&gt;        443/TCP    106d
+nginx-svc    ClusterIP   10.104.50.97   &lt;none&gt;        8080/TCP   4s
+
+# 由于 ClusterIP 仅集群内可访问, 所以我们在 Master 节点上进行测试
+root@K8sMaster-1:~/k8s-yaml# curl 10.104.50.97:8080
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+...
+&lt;h1&gt;Welcome to nginx!&lt;/h1&gt;
+...
+&lt;/html&gt;
+</code></pre>
+
+<p>除了使用 ClusterIP 进行访问意外, 容器还可通过集群内 DNS 的方式进行访问:</p>
+
+<pre><code class="language-shell">root@K8sMaster-1:~/k8s-yaml# kubectl run busybox --rm -it --image=busybox --generator=run-pod/v1 /bin/sh
+If you don't see a command prompt, try pressing enter.
+/ # wget nginx-svc:8080
+Connecting to nginx-svc:8080 (10.104.50.97:8080)
+saving to 'index.html'
+index.html           100% |*****************************************************************************************|   612  0:00:00 ETA
+'index.html' saved
+/ # cat index.html 
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+...
+&lt;h1&gt;Welcome to nginx!&lt;/h1&gt;
+...
+&lt;/body&gt;
+&lt;/html&gt;
+
+# 使用集群内的 coredns 进行解析时, 默认使用的 namespace 为 default, 所以可直接使用 nginx-svc 的形式进行访问, 但如果要访问其他 namespace 的服务, 则需要使用 ${service_name}.${namespace}:${port} 的形式进行访问
+
+/ # wget nginx-svc.default:8080
+Connecting to nginx-svc.default:8080 (10.104.50.97:8080)
+saving to 'index.html'
+index.html           100% |*****************************************************************************************|   612  0:00:00 ETA
+'index.html' saved
+</code></pre>
+
+<h4 id="外网访问-service">外网访问 Service</h4>
+
+<p>只需要修改对应的 svcNginx.yaml:</p>
+
+<pre><code class="language-yaml"># nginx svc
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-svc 
+spec:
+  type: NodePort  # 将 ClusterIP 修改为 NodePort 即可
+  selector:
+    app: nginx
+  ports:
+  - protocol: TCP
+    port: 8080
+    targetPort: 80
+</code></pre>
+
+<p>然后应用一下更改:</p>
+
+<pre><code class="language-shell">root@K8sMaster-1:~/k8s-yaml# kubectl apply -f svcNginx.yaml 
+service/nginx-svc configured
+
+# 这里可以看到 nginx-svc 对应的 TYPE 为 NodePort, 在 Port 可看到, NodePort 同时打开了 ClusterIP 和 一个 3000+ 的端口
+# NodePort 由 Kubernetes 随机分配一个 3000+ 的端口号用于外网访问
+root@K8sMaster-1:~/k8s-yaml# kubectl get svc
+NAME         TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)          AGE
+kubernetes   ClusterIP   10.96.0.1      &lt;none&gt;        443/TCP          106d
+nginx-svc    NodePort    10.104.50.97   &lt;none&gt;        8080:30156/TCP   18m
+</code></pre>
+
+<p>访问效果:</p>
+
+<p><img src="https://raw.githubusercontent.com/Archimedes-Dear/image_bed/master/images/NodePort%E8%AE%BF%E9%97%AE.png" alt="NodePort访问" /></p>
+
+<p>NodePort 也可以指定端口:</p>
+
+<pre><code class="language-yaml">apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-svc
+spec:
+  type: NodePort
+  selector:
+    app: nginx
+  ports:
+  - protocol: TCP
+    nodePort: 30010  # 增加一行 nodePort即可
+    port: 8080
+    targetPort: 80
+</code></pre>
+
+<pre><code class="language-shell">root@K8sMaster-1:~/k8s-yaml# kubectl apply -f svcNginxNodePort.yaml 
+service/nginx-svc created
+
+# nginx-svc 的 PORT 中, 已经修改为 30010 端口了
+root@K8sMaster-1:~/k8s-yaml# kubectl get svc
+NAME         TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)          AGE
+kubernetes   ClusterIP   10.96.0.1       &lt;none&gt;        443/TCP          106d
+nginx-svc    NodePort    10.102.110.83   &lt;none&gt;        8080:30010/TCP   4s
+</code></pre>
+
+<p>Service 一共提供三种访问方式:</p>
+
+<ul>
+<li>CLusterIP: 虚拟服务器的 IP 地址, 该地址用于集群内 Pod 访问, 在 Node 上 kube-proxy 通过设置 iptables 进行转发</li>
+<li>NodePort: 使用宿主机端口, 是的 Node 外部客户端能够访问服务</li>
+<li>LoadBalancer: 使用外部负载均衡器完成到指定服务的负载均衡, 多用于公有云厂商</li>
+</ul>
+
+<p>Service 的负载均衡有两种策略:</p>
+
+<ul>
+<li>RoundRobin: 轮询模式(默认模式)</li>
+<li>SessionAffinity: 基于客户端 IP 地址进行会话保持的模式</li>
+</ul>
+
+<h3 id="多端口-service">多端口 Service</h3>
+
+<p>有可能一个容器应用需要开放多个端口, Service 也支持将多个端口对应到多个应用服务.</p>
+
+<pre><code class="language-yaml"># Service 设置多端口号, 并进行命名
+apiVersion: v1
+kind: Service
+metadata:
+  name: webapp
+spec:
+  selector:
+    app: webapp
+  ports:
+  - port: 80
+    target: 8080
+    name: web
+  - port: 8005
+    targetPort: 8005
+    name: management
+</code></pre>
+
+<pre><code class="language-yaml"># Service 多端口号使用不同的协议(用kube-dns 举例)
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    prometheus.io/port: &quot;9153&quot;
+    prometheus.io/scrape: &quot;true&quot;
+  creationTimestamp: &quot;2019-07-24T13:55:00Z&quot;
+  labels:
+    k8s-app: kube-dns
+    kubernetes.io/cluster-service: &quot;true&quot;
+    kubernetes.io/name: KubeDNS
+  name: kube-dns
+  namespace: kube-system
+  resourceVersion: &quot;204&quot;
+  selfLink: /api/v1/namespaces/kube-system/services/kube-dns
+  uid: a0cb9a94-ae1a-11e9-8fa1-000c2984301b
+spec:
+  clusterIP: 10.96.0.10
+  ports:
+  - name: dns
+    port: 53
+    protocol: UDP
+    targetPort: 53
+  - name: dns-tcp
+    port: 53
+    protocol: TCP
+    targetPort: 53
+  - name: metrics
+    port: 9153
+    protocol: TCP
+    targetPort: 9153
+  selector:
+    k8s-app: kube-dns
+  sessionAffinity: None
+  type: ClusterIP
+status:
+  loadBalancer: {}
+</code></pre>
+
+<h3 id="clusterip-的底层实现">ClusterIP 的底层实现</h3>
+
+<p>我们查看下 iptables 规则</p>
+
+<pre><code class="language-shell">root@K8sMaster-1:~/k8s-yaml# iptables-save | grep nginx-svc
+-A KUBE-SERVICES ! -s 10.244.0.0/16 -d 10.106.110.68/32 -p tcp -m comment --comment &quot;default/nginx-svc: cluster IP&quot; -m tcp --dport 8080 -j KUBE-MARK-MASQ
+-A KUBE-SERVICES -d 10.106.110.68/32 -p tcp -m comment --comment &quot;default/nginx-svc: cluster IP&quot; -m tcp --dport 8080 -j KUBE-SVC-R2VK7O5AFVLRAXSH
+...
+</code></pre>
+
+<p>以上两条规则的含义是:</p>
+
+<ol>
+<li>如果集群内的 Pod 原地址来自 (10.244.0.0/16) 要访问 nginx-svc, 则允许</li>
+<li>其他源地址访问 nginx-svc, 跳转到规则 KUBE-SVC-R2VK7O5AFVLRAXSH</li>
+</ol>
+
+<p>KUBE-SVC-R2VK7O5AFVLRAXSH 有关的规则如下:</p>
+
+<pre><code class="language-shell">-A KUBE-SVC-R2VK7O5AFVLRAXSH -m statistic --mode random --probability 0.50000000000 -j KUBE-SEP-4RVHCNGHJJLWND3D
+-A KUBE-SVC-R2VK7O5AFVLRAXSH -j KUBE-SEP-RNZQXNGJY46OHS7G
+</code></pre>
+
+<p>表示有 <sup>1</sup>&frasl;<sub>2</sub> 的概率将请求转发到 KUBE-SEP-4RVHCNGHJJLWND3D, 其余的跳转到 KUBE-SEP-RNZQXNGJY46OHS7G</p>
+
+<p>KUBE-SEP-4RVHCNGHJJLWND3D 和 KUBE-SEP-RNZQXNGJY46OHS7G 的规则如下:</p>
+
+<pre><code class="language-shell">-A KUBE-SEP-4RVHCNGHJJLWND3D -s 10.244.1.80/32 -j KUBE-MARK-MASQ
+-A KUBE-SEP-4RVHCNGHJJLWND3D -p tcp -m tcp -j DNAT --to-destination 10.244.1.80:80
+
+-A KUBE-SEP-RNZQXNGJY46OHS7G -s 10.244.2.35/32 -j KUBE-MARK-MASQ
+-A KUBE-SEP-RNZQXNGJY46OHS7G -p tcp -m tcp -j DNAT --to-destination 10.244.2.35:80
+</code></pre>
+
+<p>再查看 Nginx 对应的容器 IP:</p>
+
+<pre><code class="language-shell">root@K8sMaster-1:~/k8s-yaml# kubectl get pods 
+NAME                               READY   STATUS    RESTARTS   AGE
+nginx-deployment-6dd86d77d-dvqkp   1/1     Running   0          102m
+nginx-deployment-6dd86d77d-h4knf   1/1     Running   0          102m
+
+root@K8sMaster-1:~/k8s-yaml# kubectl exec nginx-deployment-6dd86d77d-dvqkp ip a
+1: lo: ...
+3: eth0@if9: 
+    inet 10.244.2.35/24 scope global eth0
+    ...
+root@K8sMaster-1:~/k8s-yaml# kubectl exec nginx-deployment-6dd86d77d-h4knf ip a
+1: lo: ...
+3: eth0@if9: 
+    inet 10.244.1.80/24 scope global eth0
+    ...
+</code></pre>
+
+<p>规则中的 <code>10.244.1.80/32</code> 与 <code>10.244.2.35/32</code> 分别对应 Deployment 中创建的 2 个 nginx 副本. 从而实现 Service 通过负载均衡的方式访问 Nginx 的副本.</p>
+
+<p>集群中每个 Node 上都配置了相同的 iptables 规则, 这样就可保证整个集群都能够通过 Service 的 ClusterIP 访问到对应的 Pod 中.</p>
+                        </div>
+
+                        
+
+<div class="post-archive">
+    <h2>See Also</h2>
+    <ul class="listing">
+        
+        <li><a href="/posts/Kubernetes-Note/Kubernetes-Volumes/">Kubernetes 存储</a></li>
+        
+        <li><a href="/posts/Kubernetes-Note/Kubernetes-Pod-Scheduling/">Kubernetes Pod 调度</a></li>
+        
+        <li><a href="/posts/Kubernetes-Note/Kubernetes-Pod/">Kubernetes Pod 详解</a></li>
+        
+        <li><a href="/posts/Kubernetes-Note/Kubernetes-basic-concept/">Kubernetes 基本概念和术语</a></li>
+        
+        <li><a href="/posts/Kubernetes-Note/Kubernetes-Install/">Kubernetes 安装</a></li>
+        
+    </ul>
+</div>
+
+
+                        <div class="post-meta meta-tags">
+                            
+                            没有标签
+                            
+                        </div>
+                    </article>
+                    
+    
+
+    
+    
+                </div>
+            </div>
+            <div id="secondary">
+    <section class="widget">
+        <form id="search" action="//www.google.com/search" method="get" accept-charset="utf-8" target="_blank" _lpchecked="1">
+      
+      <input type="text" name="q" maxlength="20" placeholder="Search">
+      <input type="hidden" name="sitesearch" value="http://blog.k-8s.com/">
+      <button type="submit" class="submit icon-search"></button>
+</form>
+    </section>
+    
+    <section class="widget">
+        <h3 class="widget-title">最近文章</h3>
+<ul class="widget-list">
+    
+    <li>
+        <a href="http://blog.k-8s.com/posts/Kubernetes-Note/Kubernetes-Services/" title="Kubernetes Service">Kubernetes Service</a>
+    </li>
+    
+    <li>
+        <a href="http://blog.k-8s.com/posts/Kubernetes-Note/Kubernetes-Volumes/" title="Kubernetes 存储">Kubernetes 存储</a>
+    </li>
+    
+    <li>
+        <a href="http://blog.k-8s.com/posts/Kubernetes-Note/Kubernetes-Pod-Scheduling/" title="Kubernetes Pod 调度">Kubernetes Pod 调度</a>
+    </li>
+    
+    <li>
+        <a href="http://blog.k-8s.com/posts/Kubernetes-Note/Kubernetes-Pod/" title="Kubernetes Pod 详解">Kubernetes Pod 详解</a>
+    </li>
+    
+    <li>
+        <a href="http://blog.k-8s.com/posts/Kubernetes-Note/Kubernetes-basic-concept/" title="Kubernetes 基本概念和术语">Kubernetes 基本概念和术语</a>
+    </li>
+    
+    <li>
+        <a href="http://blog.k-8s.com/posts/Kubernetes-Note/Kubernetes-Install/" title="Kubernetes 安装">Kubernetes 安装</a>
+    </li>
+    
+    <li>
+        <a href="http://blog.k-8s.com/posts/Hugo-build-a-person-blog/" title="Hugo搭建个人博客">Hugo搭建个人博客</a>
+    </li>
+    
+</ul>
+    </section>
+
+    
+
+    <section class="widget">
+        <h3 class="widget-title">分类</h3>
+<ul class="widget-list">
+    
+</ul>
+    </section>
+
+    <section class="widget">
+        <h3 class="widget-title">标签</h3>
+<div class="tagcloud">
+    
+</div>
+    </section>
+
+    
+<section class="widget">
+    <h3 class="widget-title">友情链接</h3>
+    <ul class="widget-list">
+        
+        <li>
+            <a target="_blank" href="http://www.jxhs.me" title="jame_xhs">jame_xhs</a>
+        </li>
+        
+    </ul>
+</section>
+
+
+    <section class="widget">
+        <h3 class="widget-title">其它</h3>
+        <ul class="widget-list">
+            <li><a href="http://blog.k-8s.com/index.xml">文章 RSS</a></li>
+        </ul>
+    </section>
+</div>
+        </div>
+    </div>
+</div>
+<footer id="footer">
+    <div class="container">
+        &copy; 2018 <a href="http://blog.k-8s.com/">Mr.耗子 By Mr.耗子</a>.
+        Powered by <a rel="nofollow noreferer noopener" href="https://gohugo.io" target="_blank">Hugo</a>.
+        <a href="https://www.flysnow.org/" target="_blank">Theme</a> based on <a href="https://github.com/rujews/maupassant-hugo" target="_blank">maupassant</a>.
+        
+    </div>
+</footer>
+
+
+    <script type="text/javascript">
+    
+    (function(){
+        $("pre code").parent().addClass("line-numbers")
+    }())
+
+    window.MathJax = {
+        tex2jax: {
+            inlineMath: [ ['$','$'] ],
+            processEscapes: true
+        }
+    };
+    </script>
+    <script type="text/javascript" src="/js/prism.js" async="true"></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
+
+<a id="rocket" href="#top"></a>
+<script type="text/javascript" src="/js/totop.js?v=0.0.0" async=""></script>
+
+
+
+<script type="text/javascript" src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" async></script>
+
+
+
+
+</body>
+</html>
