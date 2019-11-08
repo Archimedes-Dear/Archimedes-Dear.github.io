@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>hugo on Mr.耗子</title>
+    <link>http://blog.k-8s.com/tags/hugo/</link>
+    <description>Recent content in hugo on Mr.耗子</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Mon, 11 Mar 2019 09:02:42 +0800</lastBuildDate>
+    
+	<atom:link href="http://blog.k-8s.com/tags/hugo/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Hugo搭建个人博客</title>
+      <link>http://blog.k-8s.com/posts/Hugo-build-a-person-blog/</link>
+      <pubDate>Mon, 11 Mar 2019 09:02:42 +0800</pubDate>
+      
+      <guid>http://blog.k-8s.com/posts/Hugo-build-a-person-blog/</guid>
+      <description>&lt;h3 id=&#34;0x01-前言&#34;&gt;0x01 前言&lt;/h3&gt;
+
+&lt;p&gt;作为技术圈的一名初生小白, 在技术的道路上不可避免的要踩一些坑. 在采坑这个事情上, 有的人踩完就过去了, 不带走一片云彩, 不留下一点经验. 作为小白我呢, 在这里建议大家, 踩完坑一定要记得拿出&amp;rdquo;小本本&amp;rdquo;记录一下, 然后给记录的文字取一个显眼的大标题, 最后把记录放在坑边最显眼的地方, 给后来的采坑的人一个提醒, 也给自己涨点记性, 同样的坑不要老踩, 这样才能前进的更快 ^_^&lt;/p&gt;</description>
+    </item>
+    
+  </channel>
+</rss>
