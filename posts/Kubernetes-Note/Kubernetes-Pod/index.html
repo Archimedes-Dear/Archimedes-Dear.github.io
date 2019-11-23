@@ -536,6 +536,101 @@ root@K8sMaster-1:~/k8s-yaml# kubectl exec nginx /bin/cat /usr/share/nginx/html/i
 </ul>
 
 <p>当节点上 Memory 资源不足时, 将依据 BestEffort, Burstable, Buaranteed 的优先顺序驱逐 Pod</p>
+
+<h3 id="将-pod-端口映射到物理机">将 Pod 端口映射到物理机</h3>
+
+<p>映射方式分 2 种:</p>
+
+<ul>
+<li>hostPort</li>
+<li>hostNetwork</li>
+</ul>
+
+<h4 id="hostport">hostPort</h4>
+
+<p>hostPort 可以指定映射容器中的哪几个端口到物理机上, 需要注意的是, 仅绑定 Pod 运行的物理机端口</p>
+
+<pre><code class="language-yaml"> # pod-hostPort.yaml
+ apiVersion: v1
+ kind: Pod
+ metadata:
+   name: webapp
+   labels:
+     app: webapp
+ spec:
+   containers:
+   - name: webapp
+     image: nginx
+     ports:
+     - containerPort: 80
+       hostPort: 8081
+</code></pre>
+
+<p>然后通过 kubectl create 创建该 Pod</p>
+
+<pre><code class="language-shell">root@K8sMaster-1:~/k8s-yaml# kubectl create -f pod-hostPort.yaml 
+pod/webapp created
+
+# 创建成功后, 查看该 Pod 运行在哪个 Node 上, 这里是 k8snode-1 节点
+root@K8sMaster-1:~/k8s-yaml# kubectl get pods -o wide 
+NAME     READY   STATUS    RESTARTS   AGE   IP            NODE        NOMINATED NODE   READINESS GATES
+webapp   1/1     Running   0          12s   10.244.1.81   k8snode-1   &lt;none&gt;           &lt;none&gt;
+
+# 然后查看 k8snode-1 节点的物理 ip 地址
+root@K8sMaster-1:~/k8s-yaml# kubectl get nodes -o wide
+NAME          STATUS   ROLES    AGE    VERSION   INTERNAL-IP       EXTERNAL-IP   OS-IMAGE             KERNEL-VERSION      CONTAINER-RUNTIME
+k8smaster-1   Ready    master   121d   v1.14.1   192.168.206.131   &lt;none&gt;        Ubuntu 16.04.6 LTS   4.4.0-145-generic   docker://18.6.3
+k8snode-1     Ready    &lt;none&gt;   121d   v1.14.1   192.168.206.151   &lt;none&gt;        Ubuntu 16.04.6 LTS   4.4.0-145-generic   docker://18.6.3
+k8snode-2     Ready    &lt;none&gt;   121d   v1.14.1   192.168.206.152   &lt;none&gt;        Ubuntu 16.04.6 LTS   4.4.0-145-generic   docker://18.6.3
+
+# 在 Master 节点上通过 curl 工具访问 Pod 的 hostPort 端口
+root@K8sMaster-1:~/k8s-yaml# curl 192.168.206.151:8081
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+...
+&lt;h1&gt;Welcome to nginx!&lt;/h1&gt;
+...
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+
+<h4 id="hostnetwork">hostNetwork</h4>
+
+<p>hostNetwork 与 hostPort 的区别在于, hostNetwork 会将 Pod 中开放的端口都映射到物理机上</p>
+
+<p>但需要注意的是, 如果配置了 hostNetwork=true 后, 如果不指定 hostPort, 则默认 hostPort 等于 containerPort, 如果指定了 hostPort, 则 hostPort 必须等于 containerPort.</p>
+
+<pre><code class="language-yaml"># pod-hostNetwork.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+spec:
+  hostNetwork: true
+  containers:
+    - name: nginx
+      image: nginx:1.14.1
+</code></pre>
+
+<pre><code class="language-shell">root@K8sMaster-1:~/k8s-yaml# kubectl create -f pod-hostNetwork.yaml 
+pod/nginx created
+
+root@K8sMaster-1:~/k8s-yaml# kubectl get pods 
+NAME    READY   STATUS    RESTARTS   AGE
+nginx   1/1     Running   0          9m5s
+
+root@K8sMaster-1:~/k8s-yaml# kubectl get pods -o wide
+NAME    READY   STATUS    RESTARTS   AGE     IP                NODE        NOMINATED NODE   READINESS GATES
+nginx   1/1     Running   0          9m12s   192.168.206.152   k8snode-2   &lt;none&gt;           &lt;none&gt;
+
+root@K8sMaster-1:~/k8s-yaml# curl 192.168.206.152
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+...
+&lt;h1&gt;Welcome to nginx!&lt;/h1&gt;
+...
+&lt;/html&gt;
+</code></pre>
                         </div>
 
                         

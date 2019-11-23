@@ -392,6 +392,52 @@ root@K8sMaster-1:~/k8s-yaml# kubectl exec nginx-deployment-6dd86d77d-h4knf ip a
 <p>规则中的 <code>10.244.1.80/32</code> 与 <code>10.244.2.35/32</code> 分别对应 Deployment 中创建的 2 个 nginx 副本. 从而实现 Service 通过负载均衡的方式访问 Nginx 的副本.</p>
 
 <p>集群中每个 Node 上都配置了相同的 iptables 规则, 这样就可保证整个集群都能够通过 Service 的 ClusterIP 访问到对应的 Pod 中.</p>
+
+<h3 id="dns-服务">DNS 服务</h3>
+
+<p>微服务化后的应用需要有一个在集群内能通过服务名对相应的服务进行访问的方式, 于是就有了服务发现和 DNS 服务.</p>
+
+<p>DNS 服务主要是完成从服务名到 ClusterIP 的解析</p>
+
+<p>Kubernetes 中的 DNS 服务经过了 3 个阶段的演变:</p>
+
+<ul>
+<li>skyDNS</li>
+</ul>
+
+<p>主要是由 kube2sky 容器监控 Kubernetes 中 Service 资源的变化, 根据 Service 的名称和 IP 生成 DNS 记录, 并保存到 etcd 中;</p>
+
+<p>skydns 容器从 etcd 中读取 DNS 记录, 并为客户端容器提供 DNS 查询服务;</p>
+
+<p>healthz 容器提供对 skydns 服务的健康检查功能.</p>
+
+<p><img src="https://raw.githubusercontent.com/Archimedes-Dear/image_bed/master/images/skyDNS%E6%80%BB%E4%BD%93%E6%9E%B6%E6%9E%84.png" alt="skyDNS总体架构(图片来源: Kubernetes 权威指南(第四版))" /></p>
+
+<ul>
+<li>KubeDNS</li>
+</ul>
+
+<p>kubeDNS 由 3 个组件组成: kubedns, dnsmasq 和 sidecar.</p>
+
+<p>kubedns 容器监控 Kubernetes 中 Service 资源的变化, 根据 Service 的名称和 IP 生成 DNS 记录, 并保存到内存中;</p>
+
+<p>dnsmasq 容器从 kubedns 中获取 DNS 记录, 提供 DNS 缓存, 为客户端容器提供 DNS 查询服务;</p>
+
+<p>sidecar 提供 kubedns 和 dnsmasq 服务的健康检查功能.</p>
+
+<p><img src="https://raw.githubusercontent.com/Archimedes-Dear/image_bed/master/images/KubeDNS%E6%80%BB%E4%BD%93%E6%9E%B6%E6%9E%84.png" alt="KubeDNS总体架构(图片来源: Kubernetes 权威指南(第四版))" /></p>
+
+<ul>
+<li>coreDNS</li>
+</ul>
+
+<p>coreDNS 是用 Go 语言实现的高性能, 插件式, 易扩展的 DNS 服务端.</p>
+
+<p>coreDNS 还支持自定义 DNS 记录及配置 upstream DNS Server, 可以统一管理 Kubernetes 基于服务的内部 DNS 和数据中心的物理 DNS</p>
+
+<p>coreDNS 只用了一个容器及实现了以前 3 个容器的全部功能</p>
+
+<p><img src="https://raw.githubusercontent.com/Archimedes-Dear/image_bed/master/images/coreDNS%E6%80%BB%E4%BD%93%E6%9E%B6%E6%9E%84.png" alt="coreDNS总体架构(图片来源: Kubernetes 权威指南(第四版))" /></p>
                         </div>
 
                         
