@@ -492,6 +492,8 @@ nginx-svc    ClusterIP   10.104.155.57   &lt;none&gt;        8080/TCP   50s
 <p>接着创建一个 busybox 镜像, 用于测试 DNS 解析</p>
 
 <pre><code class="language-yaml"># busybox.yaml
+# busybox 镜像版本有个坑注意一下, 需要用1.28.4一下的版本才可以, 否则可能会没有结果
+# 参考 issue: https://github.com/easzlab/kubeasz/issues/260
 apiVersion: v1
 kind: Pod
 metadata:
@@ -499,7 +501,7 @@ metadata:
 spec:
   containers:
   - name: busybox
-    image: busybox
+    image: busybox:1.28.1  # 这里有个坑
     command:
     - sleep
     - &quot;30000&quot;
@@ -512,10 +514,10 @@ pod/busybox created
 # 用 exec 命令在容器内执行 nslookup, 系统命令和容器命令中间用 '--' 连接
 root@K8sMaster-1:~/k8s-yaml# kubectl exec busybox -- nslookup nginx-svc
 Server:		10.96.0.10
-Address:	10.96.0.10:53
+Address:	10.96.0.10:53 kube-dns.kube-system.svc.cluster.local
 
-Name:	nginx-svc.default.svc.cluster.local
-Address: 10.104.155.57
+Name:	nginx-svc
+Address: 10.104.155.57 nginx-svc.default.svc.cluster.local
 </code></pre>
 
 <p>可以看出, busybox 通过 nginx-svc 解析出了 IP 地址</p>
