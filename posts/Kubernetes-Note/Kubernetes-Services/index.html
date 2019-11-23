@@ -438,6 +438,87 @@ root@K8sMaster-1:~/k8s-yaml# kubectl exec nginx-deployment-6dd86d77d-h4knf ip a
 <p>coreDNS 只用了一个容器及实现了以前 3 个容器的全部功能</p>
 
 <p><img src="https://raw.githubusercontent.com/Archimedes-Dear/image_bed/master/images/coreDNS%E6%80%BB%E4%BD%93%E6%9E%B6%E6%9E%84.png" alt="coreDNS总体架构(图片来源: Kubernetes 权威指南(第四版))" /></p>
+
+<h4 id="使用-dns-解析服务名">使用 DNS 解析服务名</h4>
+
+<p>先创建一个 Nginx 服务, 服务名为 nginx-svc</p>
+
+<pre><code class="language-yaml"># deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+spec:
+  selector:
+    matchLabels:
+      app: nginx
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.7.9
+        ports:
+        - containerPort: 80
+</code></pre>
+
+<p>接着创建一个关联的 Services</p>
+
+<pre><code class="language-yaml"># nginxServices.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-svc
+spec:
+  type: ClusterIP
+  selector:
+    app: nginx
+  ports:
+  - protocol: TCP
+    port: 8080
+    targetPort: 80
+</code></pre>
+
+<pre><code class="language-shell"># nginx-svc 已经创建成功
+root@K8sMaster-1:~/k8s-yaml# kubectl get svc 
+NAME         TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)    AGE
+kubernetes   ClusterIP   10.96.0.1       &lt;none&gt;        443/TCP    121d
+nginx-svc    ClusterIP   10.104.155.57   &lt;none&gt;        8080/TCP   50s
+</code></pre>
+
+<p>接着创建一个 busybox 镜像, 用于测试 DNS 解析</p>
+
+<pre><code class="language-yaml"># busybox.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: busybox
+spec:
+  containers:
+  - name: busybox
+    image: busybox
+    command:
+    - sleep
+    - &quot;30000&quot;
+</code></pre>
+
+<pre><code class="language-shell"># 创建 busybox Pod
+root@K8sMaster-1:~/k8s-yaml# kubectl create -f busybox.yaml 
+pod/busybox created
+
+# 用 exec 命令在容器内执行 nslookup, 系统命令和容器命令中间用 '--' 连接
+root@K8sMaster-1:~/k8s-yaml# kubectl exec busybox -- nslookup nginx-svc
+Server:		10.96.0.10
+Address:	10.96.0.10:53
+
+Name:	nginx-svc.default.svc.cluster.local
+Address: 10.104.155.57
+</code></pre>
+
+<p>可以看出, busybox 通过 nginx-svc 解析出了 IP 地址</p>
                         </div>
 
                         

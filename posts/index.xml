@@ -21,7 +21,33 @@
 
 &lt;p&gt;Service 可以为一组具有相同功能的容器应用提供统一的入口和负载均衡&lt;/p&gt;
 
-&lt;h3 id=&#34;创建和使用-service&#34;&gt;创建和使用 Service&lt;/h3&gt;</description>
+&lt;h3 id=&#34;创建和使用-service&#34;&gt;创建和使用 Service&lt;/h3&gt;
+
+&lt;p&gt;先创建 2 个 nginx 应用容器&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-yaml&#34;&gt;# deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+spec:
+  selector:
+    matchLabels:
+      app: nginx
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.7.9
+        ports:
+        - containerPort: 80
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;再编写对应的 svcNginx.yaml&lt;/p&gt;</description>
     </item>
     
     <item>

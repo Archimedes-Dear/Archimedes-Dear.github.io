@@ -87,7 +87,33 @@
 
 <p>Service 可以为一组具有相同功能的容器应用提供统一的入口和负载均衡</p>
 
-<h3 id="创建和使用-service">创建和使用 Service</h3>……
+<h3 id="创建和使用-service">创建和使用 Service</h3>
+
+<p>先创建 2 个 nginx 应用容器</p>
+
+<pre><code class="language-yaml"># deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+spec:
+  selector:
+    matchLabels:
+      app: nginx
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.7.9
+        ports:
+        - containerPort: 80
+</code></pre>
+
+<p>再编写对应的 svcNginx.yaml</p>……
                             </div>
                             <p class="readmore"><a href="http://blog.k-8s.com/posts/Kubernetes-Note/Kubernetes-Services/">阅读全文</a></p>
                         </article>
