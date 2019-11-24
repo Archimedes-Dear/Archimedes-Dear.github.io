@@ -521,6 +521,49 @@ Address 1: 10.104.155.57 nginx-svc.default.svc.cluster.local
 </code></pre>
 
 <p>可以看出, busybox 通过 nginx-svc 解析出了 IP 地址</p>
+
+<h3 id="headless-service">Headless Service</h3>
+
+<p>当开发人员希望自己控制负载均衡策略时, 可使用 Kubernetes 的 Headless Service 来实现这种功能.</p>
+
+<p>以下是一个简单的 Headless 例子:</p>
+
+<pre><code class="language-yaml"># headlessNginx.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: headless-nginx
+  labels:
+    app: nginx
+spec:
+  ports:
+  - port: 80
+  clusterIP: None
+  selector:
+    app: nginx
+</code></pre>
+
+<pre><code class="language-shell">root@K8sMaster-1:~/k8s-yaml# kubectl create -f headlessService.yaml 
+service/headless-nginx created
+
+root@K8sMaster-1:~/k8s-yaml# kubectl get svc 
+NAME             TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)    AGE
+headless-nginx   ClusterIP   None            &lt;none&gt;        80/TCP     2s
+kubernetes       ClusterIP   10.96.0.1       &lt;none&gt;        443/TCP    122d
+nginx-svc        ClusterIP   10.104.155.57   &lt;none&gt;        8080/TCP   25h
+
+root@K8sMaster-1:~/k8s-yaml# kubectl exec busybox -- nslookup headless-nginx
+Server:    10.96.0.10
+Address 1: 10.96.0.10 kube-dns.kube-system.svc.cluster.local
+
+Name:      headless-nginx
+Address 1: 10.244.1.5 10-244-1-5.headless-nginx.default.svc.cluster.local
+Address 2: 10.244.2.5 10-244-2-5.headless-nginx.default.svc.cluster.local
+</code></pre>
+
+<p>这样 Service 就不再具有一个特定的 ClusterIP 地址, 对其进行访问将获得包含 Label &ldquo;app=nginx&rdquo; 的全部 Pod 列表, 然后由客户端自行决定如何处理这个 Pod 列表. (Service 只会返回 Service 的 ClusterIP)</p>
+
+<p>通过 Headless Service 中的 Pod 可以互相访问的特点, 可以用于解决一些集群类型的应用互相之间的身份识别的问题了</p>
                         </div>
 
                         
