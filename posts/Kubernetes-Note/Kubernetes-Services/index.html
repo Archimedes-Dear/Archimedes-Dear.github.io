@@ -513,11 +513,11 @@ pod/busybox created
 
 # 用 exec 命令在容器内执行 nslookup, 系统命令和容器命令中间用 '--' 连接
 root@K8sMaster-1:~/k8s-yaml# kubectl exec busybox -- nslookup nginx-svc
-Server:		10.96.0.10
-Address:	10.96.0.10:53 kube-dns.kube-system.svc.cluster.local
+Server:    10.96.0.10
+Address 1: 10.96.0.10 kube-dns.kube-system.svc.cluster.local
 
-Name:	nginx-svc
-Address: 10.104.155.57 nginx-svc.default.svc.cluster.local
+Name:      nginx-svc
+Address 1: 10.104.155.57 nginx-svc.default.svc.cluster.local
 </code></pre>
 
 <p>可以看出, busybox 通过 nginx-svc 解析出了 IP 地址</p>
