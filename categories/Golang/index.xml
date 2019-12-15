@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Golang on Mr.耗子</title>
+    <link>http://blog.k-8s.com/categories/Golang/</link>
+    <description>Recent content in Golang on Mr.耗子</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Tue, 08 Oct 2019 09:30:42 +0800</lastBuildDate>
+    
+	<atom:link href="http://blog.k-8s.com/categories/Golang/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Golang 安装和环境配置</title>
+      <link>http://blog.k-8s.com/posts/Golang-Note/Golang-install-and-env/</link>
+      <pubDate>Tue, 08 Oct 2019 09:30:42 +0800</pubDate>
+      
+      <guid>http://blog.k-8s.com/posts/Golang-Note/Golang-install-and-env/</guid>
+      <description>&lt;h3 id=&#34;安装&#34;&gt;安装&lt;/h3&gt;
+
+&lt;p&gt;&lt;strong&gt;Golang 配置方式分为两种&lt;/strong&gt;:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Go Modules包管理模式&lt;/li&gt;
+&lt;li&gt;原始GOPATH模式&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;strong&gt;前提&lt;/strong&gt;:&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;Golang &lt;a href=&#34;https://golang.org&#34;&gt;官网&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Golang &lt;a href=&#34;https://golang.google.cn&#34;&gt;国内官网&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;GoModules配置 &lt;a href=&#34;https://segmentfault.com/a/1190000018690961&#34;&gt;思否&lt;/a&gt; &lt;a href=&#34;https://www.jishuwen.com/d/2n6e&#34;&gt;技术文&lt;/a&gt;&lt;/li&gt;
+&lt;/ol&gt;</description>
+    </item>
+    
+  </channel>
+</rss>

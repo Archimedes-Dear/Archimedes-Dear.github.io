@@ -13,10 +13,10 @@
     
     <item>
       <title>Kubernetes Service</title>
-      <link>http://blog.k-8s.com/posts/Kubernetes-Note/Kubernetes-Services/</link>
+      <link>http://blog.k-8s.com/posts/Kubernetes-Note/Kubernetes-Service/</link>
       <pubDate>Thu, 09 May 2019 09:45:26 +0800</pubDate>
       
-      <guid>http://blog.k-8s.com/posts/Kubernetes-Note/Kubernetes-Services/</guid>
+      <guid>http://blog.k-8s.com/posts/Kubernetes-Note/Kubernetes-Service/</guid>
       <description>&lt;h3 id=&#34;service-的作用&#34;&gt;Service 的作用&lt;/h3&gt;
 
 &lt;p&gt;Service 可以为一组具有相同功能的容器应用提供统一的入口和负载均衡&lt;/p&gt;
