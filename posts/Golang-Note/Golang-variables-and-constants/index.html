@@ -1,0 +1,520 @@
+<!doctype html>
+<html lang="zh-cn">
+<head>
+
+    <meta charset="utf-8">
+    <meta name="generator" content="Hugo 0.54.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Golang 变量与常量 | Mr.耗子</title>
+    <meta property="og:title" content="Golang 变量与常量 - Mr.耗子">
+    <meta property="og:type" content="article">
+        
+    <meta property="article:published_time" content="2019-10-08T10:02:42&#43;08:00">
+        
+        
+    <meta property="article:modified_time" content="2019-10-08T10:02:42&#43;08:00">
+        
+    <meta name="Keywords" content="耗子,Mr.耗子,Docker,容器,k8s,kubernetes,golang,go,devops">
+    <meta name="description" content="Golang 变量与常量">
+        
+    <meta name="author" content="Mr.耗子">
+    <meta property="og:url" content="http://blog.k-8s.com/posts/Golang-Note/Golang-variables-and-constants/">
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+
+    <link rel="stylesheet" href="/css/normalize.css">
+    
+        <link rel="stylesheet" href="/css/prism.css">
+    
+    <link rel="stylesheet" href="/css/style.css">
+    <script type="text/javascript" src="//cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+
+    
+
+
+    
+    
+</head>
+
+<body>
+<header id="header" class="clearfix">
+    <div class="container">
+        <div class="col-group">
+            <div class="site-name ">
+                
+                    <a id="logo" href="http://blog.k-8s.com/">
+                        Mr.耗子
+                    </a>
+                
+                <p class="description">Linux Docker Kubernetes Golang Python</p>
+            </div>
+            <div>
+                <nav id="nav-menu" class="clearfix">
+                    <a class="" href="http://blog.k-8s.com/">首页</a>
+                    
+                    <a  href="http://blog.k-8s.com/archives/" title="归档">归档</a>
+                    
+                    <a  href="http://blog.k-8s.com/about/" title="关于">关于</a>
+                    
+                </nav>
+            </div>
+        </div>
+    </div>
+</header>
+
+
+<div id="body">
+    <div class="container">
+        <div class="col-group">
+
+            <div class="col-8" id="main">
+                <div class="res-cons">
+                    <article class="post">
+                        <header>
+                            <h1 class="post-title">Golang 变量与常量</h1>
+                        </header>
+                        <date class="post-meta meta-date">
+                            2019年10月8日
+                        </date>
+                        
+                        <div class="post-meta">
+                            <span>|</span>
+                            
+                                <span class="meta-category"><a href="http://blog.k-8s.com/categories/Golang">Golang</a></span>
+                            
+                        </div>
+                        
+                        
+                        <div class="post-meta">
+                            <span id="busuanzi_container_page_pv">|<span id="busuanzi_value_page_pv"></span><span> 阅读</span></span>
+                        </div>
+                        
+                        <div class="post-content">
+                            <p><strong>前置学习:</strong> 第一个 Go 程序</p>
+
+<p>学习编程惯例, 先放一个 Hello, World! 程序上来:</p>
+
+<pre><code class="language-go">package main
+
+import &quot;fmt&quot;
+
+func main() {
+    // First Go program
+	fmt.Println(&quot;Hello, world!&quot;)
+}
+</code></pre>
+
+<p>一个简单的 Go 语言程序如上, Go 源码 文件开头都是一个 package 声明, 表示该 Go 源码文件所属的包</p>
+
+<p>包是 Go 语言里最基本的分发单位. 若要生成可执行程序, 必须建立一个名字为 main 的包, 并且在该包中包含一个 叫 main() 的函数.</p>
+
+<p><strong>main() 函数不能带参数, 也不能定义返回值</strong></p>
+
+<p>在包声明后, 即是 import 语句, 用于导入该程序所需要的依赖包, 多个依赖包导入可写成如下形式:</p>
+
+<pre><code class="language-go">import (
+	&quot;fmt&quot;
+    &quot;flag&quot;
+)
+</code></pre>
+
+<p>所有 Go 的函数以关键字 func 开头, 常规的函数格式如下:</p>
+
+<pre><code class="language-go">func function_name(args args_type) (return_value return_type) {
+    // function body
+}
+</code></pre>
+
+<p>Go 中的注释和 C++ 风格一致, 支持以下两种写法:</p>
+
+<pre><code class="language-go">/*
+块注释
+*/
+
+// 行注释
+</code></pre>
+
+<p>运行该程序时, 需要对程序提前编译:</p>
+
+<pre><code class="language-shell">go build hello.go  # 自动生成可执行文件 hello
+./hello
+Hello, world!
+</code></pre>
+
+<p>若不想编译, 则可以用 run 参数</p>
+
+<pre><code class="language-shell">go run hello.go
+Hello, world!
+</code></pre>
+
+<p>最后, 需要注意的地方有以下两点:</p>
+
+<p><strong>1. Go 程序非常注重代码格式, 函数花括号一定不要另起一行</strong></p>
+
+<p><strong>2. 不要在程序中导入不需要的包或编写不用的变量, 否则会在编译时报错</strong></p>
+
+<h3 id="一-变量声明">一. 变量声明</h3>
+
+<p>Golang 使用 <strong><em>var</em></strong> 关键字用来声明变量:</p>
+
+<pre><code class="language-go">var v1 int      // 整数
+var v2 string   // 字符串
+var v3 [10]int  // 数组
+var v4 []int    // 数组切片
+
+var v5 struct {  // 结构体
+    name string
+    age  int
+}
+
+var v6 *int  // 指针
+
+var v7 map[string]int  // map(字典), key为string类型, value为int类型
+
+var v8 func(a int) int
+
+// var 关键字的另一种写法是将若干个需要声明的变量放置在一起
+var (
+    v1 int
+    v2 string
+)
+</code></pre>
+
+<h3 id="二-变量的初始化">二. 变量的初始化</h3>
+
+<p>Golang 变量初始化有三种方式:</p>
+
+<ul>
+<li>使用 <strong><em>var</em></strong> 关键字声明时带类型的初始化</li>
+<li>使用 <strong><em>var</em></strong> 关键字不带类型的初始化</li>
+<li>不使用 <strong><em>var</em></strong> 关键字的初始化</li>
+</ul>
+
+<pre><code class="language-go">var v1 int = 10 // 正确方式1
+var v2 = 10     // 正确方式2, 类型由编译器自动推导
+v3 := 10        // 正确方式3, 类型由编译器自动推导
+
+// Go 编译器可以从表达式右值推导出变量类型, 使得Go 有点像动态类型语言, 实际上Go 是强类型语言(静态类型语言)
+
+// 声明变量时需要注意, := 左侧的变量不应该是被声明过的, 否则会导致编译错误, 如下:
+var v1 int
+v1 := 10
+</code></pre>
+
+<h3 id="三-变量赋值">三. 变量赋值</h3>
+
+<pre><code class="language-go">// 变量赋值
+var v3 int
+v3 = 5
+
+// 多重赋值
+i, j = j, i
+</code></pre>
+
+<h3 id="四-匿名变量">四. 匿名变量</h3>
+
+<p>在使用强类型语言编程时, 当调用函数获取一个值, 却因为函数返回多个值而不得不定义一堆没用的变量. 这种情况在Go中可以使用匿名变量来避免这种写法</p>
+
+<pre><code class="language-go">func GetName() (firstName, lastName, nickName string) {
+    return &quot;May&quot;, &quot;Chan&quot;, &quot;chibi Maruko&quot;
+}
+
+// 若只想获得nickName, 则可以用匿名变量获取:
+_, _, nickName := GetName()
+
+// &quot;_&quot; 在 Golang 中是一个特殊符号, 用于舍弃不需要的值
+</code></pre>
+
+<h2 id="常量">常量</h2>
+
+<p>常量可以是数值类型(整型, 浮点型和复数类型), 布尔类型, 字符串类型等</p>
+
+<h3 id="一-字面常量">一. 字面常量</h3>
+
+<p>字面常量, 是指程序中硬编码的常量</p>
+
+<p>Go 使用 <strong><em>const</em></strong> 关键字来定义常量, 并且字面常量更接近我们自然语言中的常量概念, 它是没有类型区分的. 例如 12 这个值可以赋值给 int, uint, int32 &hellip; 等</p>
+
+<pre><code class="language-go">// const 关键字用来定义常量
+const Pi float64 = 3.1415926
+const zero = 0.0  // 无类型浮点常量
+
+const (
+    size int64 = 1024
+    eof = -1  // 无类型整型常量
+)
+
+const u, v float32 = 0, 3  // 常量的多重赋值
+const a, b, c = 3, 4, &quot;foo&quot;  // 无类型整型和字符串常量
+
+// 常量的右值也可以是一个在编译期运算的常量表达式
+const mask = 1 &lt;&lt; 3  // 位运算
+
+// 由于常量的赋值是一个编译期行为, 所以运行期才能得出结果的表达式无法用于定义常量, 如:
+const Home = os.GetEnv(&quot;HOME&quot;)
+</code></pre>
+
+<h3 id="二-预定义常量">二. 预定义常量</h3>
+
+<p>Golang 中, 预定义了如下常量:</p>
+
+<ul>
+<li><strong><em>true</em></strong></li>
+<li><strong><em>false</em></strong></li>
+<li><strong><em>iota</em></strong>  这个比较特殊, 可以被认为时一个可被编译器修改的常量. 每当出现一个 <strong><em>const</em></strong> 关键字时被重制为0, 在下一个 <strong><em>const</em></strong> 关键字出现之前, 每出现一次 <strong><em>iota</em></strong>, 其所代表的数字会自动增1.</li>
+</ul>
+
+<pre><code class="language-go">// iota example
+package main
+
+const (                    // iota被重设为0
+	c0 = iota              // c0 == 0
+	c1 = iota              // c1 == 1
+	c2 = iota              // c2 == 2
+)
+const (
+	a = 1 &lt;&lt; iota          // a == 1 (iota在每个const开头被重设为0)
+	b = 1 &lt;&lt; iota          // b == 2
+	c = 1 &lt;&lt; iota          // c == 4
+)
+const (
+	u = iota * 42          // u == 0
+	v float64 = iota * 42  // v == 42.000000
+	w = iota * 42          // w == 84
+)
+
+const x = iota             // x == 0 (因为iota又被重设为0了)
+const y = iota             // y == 0 (同上)
+
+//如果两个 const 的赋值语句的表达式是一样的，那么可以省略后一个赋值表达式。因此，上面的前两个 const 语句可简写为：
+const (                    // iota被重设为0
+	c0 = iota              // c0 == 0
+	c1                     // c1 == 1
+	c2                     // c2 == 2
+)
+
+const (
+	a = 1 &lt;&lt;iota           // a == 1 (iota在每个const开头被重设为0)
+	b                      // b == 2
+	c                      // c == 4
+)
+
+func main() {
+	fmt.Printf(&quot;c0: %d, c1: %d, c2: %d\n&quot;, c0, c1, c2)
+	fmt.Printf(&quot;a: %d, b: %d, c: %d\n&quot;, a, b, c)
+	fmt.Printf(&quot;u: %d, v: %f, w: %d\n&quot;, u, v, w)
+	fmt.Printf(&quot;x: %d, y: %d\n&quot;, x, y)
+}
+</code></pre>
+
+<h3 id="三-枚举">三. 枚举</h3>
+
+<p>枚举指一系列相关的常量. 在上节中定义预常量的方法通常用于定义枚举值. Go 语言并不支持其他语言中支持的 enum 关键字</p>
+
+<pre><code class="language-go">const (
+	Sunday = iota
+	Monday
+	Tuesday
+	Wednesday
+	Thursday
+	Friday
+	Saturday
+    numberOfDays  // 该变量首字母小写, 表示没有导出, 包外不可见
+)
+</code></pre>
+
+<p>在 Go 中使用变量需要注意一点:</p>
+
+<p><strong>Go 语言中, 大写字母开头的变量可以在包外访问, 小写变量为私有, 不可被其他包访问</strong></p>
+
+<p>参考书籍:</p>
+
+<p><a href="https://book.douban.com/subject/11577300/">Go语言编程</a></p>
+                        </div>
+
+                        
+
+<div class="post-archive">
+    <h2>See Also</h2>
+    <ul class="listing">
+        
+        <li><a href="/posts/Golang-Note/Golang-install-and-env/">Golang 安装和环境配置</a></li>
+        
+        <li><a href="/posts/Kubernetes-Note/Kubernetes-Service/">Kubernetes Service</a></li>
+        
+        <li><a href="/posts/Kubernetes-Note/Kubernetes-Volumes/">Kubernetes 存储</a></li>
+        
+        <li><a href="/posts/Kubernetes-Note/Kubernetes-Pod-Scheduling/">Kubernetes Pod 调度</a></li>
+        
+        <li><a href="/posts/Kubernetes-Note/Kubernetes-Pod/">Kubernetes Pod 详解</a></li>
+        
+    </ul>
+</div>
+
+
+                        <div class="post-meta meta-tags">
+                            
+                            <ul class="clearfix">
+                                
+                                <li><a href="http://blog.k-8s.com/tags/Golang">Golang</a></li>
+                                
+                            </ul>
+                            
+                        </div>
+                    </article>
+                    
+    
+
+    
+    
+                </div>
+            </div>
+            <div id="secondary">
+    <section class="widget">
+        <form id="search" action="//www.google.com/search" method="get" accept-charset="utf-8" target="_blank" _lpchecked="1">
+      
+      <input type="text" name="q" maxlength="20" placeholder="Search">
+      <input type="hidden" name="sitesearch" value="http://blog.k-8s.com/">
+      <button type="submit" class="submit icon-search"></button>
+</form>
+    </section>
+    
+    <section class="widget">
+        <h3 class="widget-title">最近文章</h3>
+<ul class="widget-list">
+    
+    <li>
+        <a href="http://blog.k-8s.com/posts/Golang-Note/Golang-variables-and-constants/" title="Golang 变量与常量">Golang 变量与常量</a>
+    </li>
+    
+    <li>
+        <a href="http://blog.k-8s.com/posts/Golang-Note/Golang-install-and-env/" title="Golang 安装和环境配置">Golang 安装和环境配置</a>
+    </li>
+    
+    <li>
+        <a href="http://blog.k-8s.com/posts/Kubernetes-Note/Kubernetes-Service/" title="Kubernetes Service">Kubernetes Service</a>
+    </li>
+    
+    <li>
+        <a href="http://blog.k-8s.com/posts/Kubernetes-Note/Kubernetes-Volumes/" title="Kubernetes 存储">Kubernetes 存储</a>
+    </li>
+    
+    <li>
+        <a href="http://blog.k-8s.com/posts/Kubernetes-Note/Kubernetes-Pod-Scheduling/" title="Kubernetes Pod 调度">Kubernetes Pod 调度</a>
+    </li>
+    
+    <li>
+        <a href="http://blog.k-8s.com/posts/Kubernetes-Note/Kubernetes-Pod/" title="Kubernetes Pod 详解">Kubernetes Pod 详解</a>
+    </li>
+    
+    <li>
+        <a href="http://blog.k-8s.com/posts/Kubernetes-Note/Kubernetes-basic-concept/" title="Kubernetes 基本概念和术语">Kubernetes 基本概念和术语</a>
+    </li>
+    
+    <li>
+        <a href="http://blog.k-8s.com/posts/Kubernetes-Note/Kubernetes-Install/" title="Kubernetes 安装">Kubernetes 安装</a>
+    </li>
+    
+    <li>
+        <a href="http://blog.k-8s.com/posts/Hugo-build-a-person-blog/" title="Hugo搭建个人博客">Hugo搭建个人博客</a>
+    </li>
+    
+</ul>
+    </section>
+
+    
+
+    <section class="widget">
+        <h3 class="widget-title">分类</h3>
+<ul class="widget-list">
+    
+    <li>
+        <a href="http://blog.k-8s.com/categories/Golang/">Golang(2)</a>
+    </li>
+    
+    <li>
+        <a href="http://blog.k-8s.com/categories/Kubernetes/">Kubernetes(6)</a>
+    </li>
+    
+    <li>
+        <a href="http://blog.k-8s.com/categories/hugo/">hugo(1)</a>
+    </li>
+    
+</ul>
+    </section>
+
+    <section class="widget">
+        <h3 class="widget-title">标签</h3>
+<div class="tagcloud">
+    
+    <a href="http://blog.k-8s.com/tags/Golang/">Golang</a>
+    
+    <a href="http://blog.k-8s.com/tags/Kubernetes/">Kubernetes</a>
+    
+    <a href="http://blog.k-8s.com/tags/hugo/">hugo</a>
+    
+</div>
+    </section>
+
+    
+<section class="widget">
+    <h3 class="widget-title">友情链接</h3>
+    <ul class="widget-list">
+        
+        <li>
+            <a target="_blank" href="http://www.jxhs.me" title="jame_xhs">jame_xhs</a>
+        </li>
+        
+    </ul>
+</section>
+
+
+    <section class="widget">
+        <h3 class="widget-title">其它</h3>
+        <ul class="widget-list">
+            <li><a href="http://blog.k-8s.com/index.xml">文章 RSS</a></li>
+        </ul>
+    </section>
+</div>
+        </div>
+    </div>
+</div>
+<footer id="footer">
+    <div class="container">
+        &copy; 2018 <a href="http://blog.k-8s.com/">Mr.耗子 By Mr.耗子</a>.
+        Powered by <a rel="nofollow noreferer noopener" href="https://gohugo.io" target="_blank">Hugo</a>.
+        <a href="https://www.flysnow.org/" target="_blank">Theme</a> based on <a href="https://github.com/rujews/maupassant-hugo" target="_blank">maupassant</a>.
+        
+    </div>
+</footer>
+
+
+    <script type="text/javascript">
+    
+    (function(){
+        $("pre code").parent().addClass("line-numbers")
+    }())
+
+    window.MathJax = {
+        tex2jax: {
+            inlineMath: [ ['$','$'] ],
+            processEscapes: true
+        }
+    };
+    </script>
+    <script type="text/javascript" src="/js/prism.js" async="true"></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
+
+<a id="rocket" href="#top"></a>
+<script type="text/javascript" src="/js/totop.js?v=0.0.0" async=""></script>
+
+
+
+<script type="text/javascript" src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" async></script>
+
+
+
+
+</body>
+</html>

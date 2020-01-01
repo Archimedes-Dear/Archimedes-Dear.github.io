@@ -6,10 +6,37 @@
     <description>Recent content in Golang on Mr.耗子</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    <lastBuildDate>Tue, 08 Oct 2019 09:30:42 +0800</lastBuildDate>
+    <lastBuildDate>Tue, 08 Oct 2019 10:02:42 +0800</lastBuildDate>
     
 	<atom:link href="http://blog.k-8s.com/tags/Golang/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Golang 变量与常量</title>
+      <link>http://blog.k-8s.com/posts/Golang-Note/Golang-variables-and-constants/</link>
+      <pubDate>Tue, 08 Oct 2019 10:02:42 +0800</pubDate>
+      
+      <guid>http://blog.k-8s.com/posts/Golang-Note/Golang-variables-and-constants/</guid>
+      <description>&lt;p&gt;&lt;strong&gt;前置学习:&lt;/strong&gt; 第一个 Go 程序&lt;/p&gt;
+
+&lt;p&gt;学习编程惯例, 先放一个 Hello, World! 程序上来:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-go&#34;&gt;package main
+
+import &amp;quot;fmt&amp;quot;
+
+func main() {
+    // First Go program
+	fmt.Println(&amp;quot;Hello, world!&amp;quot;)
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;一个简单的 Go 语言程序如上, Go 源码 文件开头都是一个 package 声明, 表示该 Go 源码文件所属的包&lt;/p&gt;
+
+&lt;p&gt;包是 Go 语言里最基本的分发单位. 若要生成可执行程序, 必须建立一个名字为 main 的包, 并且在该包中包含一个 叫 main() 的函数.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;main() 函数不能带参数, 也不能定义返回值&lt;/strong&gt;&lt;/p&gt;</description>
+    </item>
     
     <item>
       <title>Golang 安装和环境配置</title>
