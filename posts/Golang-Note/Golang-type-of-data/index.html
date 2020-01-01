@@ -1,0 +1,728 @@
+<!doctype html>
+<html lang="zh-cn">
+<head>
+
+    <meta charset="utf-8">
+    <meta name="generator" content="Hugo 0.54.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Golang 数据类型 | Mr.耗子</title>
+    <meta property="og:title" content="Golang 数据类型 - Mr.耗子">
+    <meta property="og:type" content="article">
+        
+    <meta property="article:published_time" content="2019-10-12T10:23:08&#43;08:00">
+        
+        
+    <meta property="article:modified_time" content="2019-10-12T10:23:08&#43;08:00">
+        
+    <meta name="Keywords" content="耗子,Mr.耗子,Docker,容器,k8s,kubernetes,golang,go,devops">
+    <meta name="description" content="Golang 数据类型">
+        
+    <meta name="author" content="Mr.耗子">
+    <meta property="og:url" content="http://blog.k-8s.com/posts/Golang-Note/Golang-type-of-data/">
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+
+    <link rel="stylesheet" href="/css/normalize.css">
+    
+        <link rel="stylesheet" href="/css/prism.css">
+    
+    <link rel="stylesheet" href="/css/style.css">
+    <script type="text/javascript" src="//cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+
+    
+
+
+    
+    
+</head>
+
+<body>
+<header id="header" class="clearfix">
+    <div class="container">
+        <div class="col-group">
+            <div class="site-name ">
+                
+                    <a id="logo" href="http://blog.k-8s.com/">
+                        Mr.耗子
+                    </a>
+                
+                <p class="description">Linux Docker Kubernetes Golang Python</p>
+            </div>
+            <div>
+                <nav id="nav-menu" class="clearfix">
+                    <a class="" href="http://blog.k-8s.com/">首页</a>
+                    
+                    <a  href="http://blog.k-8s.com/archives/" title="归档">归档</a>
+                    
+                    <a  href="http://blog.k-8s.com/about/" title="关于">关于</a>
+                    
+                </nav>
+            </div>
+        </div>
+    </div>
+</header>
+
+
+<div id="body">
+    <div class="container">
+        <div class="col-group">
+
+            <div class="col-8" id="main">
+                <div class="res-cons">
+                    <article class="post">
+                        <header>
+                            <h1 class="post-title">Golang 数据类型</h1>
+                        </header>
+                        <date class="post-meta meta-date">
+                            2019年10月12日
+                        </date>
+                        
+                        <div class="post-meta">
+                            <span>|</span>
+                            
+                                <span class="meta-category"><a href="http://blog.k-8s.com/categories/Golang">Golang</a></span>
+                            
+                        </div>
+                        
+                        
+                        <div class="post-meta">
+                            <span id="busuanzi_container_page_pv">|<span id="busuanzi_value_page_pv"></span><span> 阅读</span></span>
+                        </div>
+                        
+                        <div class="post-content">
+                            <h3 id="数据类型">数据类型</h3>
+
+<p>Golang 中内置以下基础类型:</p>
+
+<ul>
+<li>布尔类型  bool</li>
+<li>整形  int uint int8 int16 byte uintptr</li>
+<li>浮点类型  float32 float64</li>
+<li>复数类型  complex64 complex128</li>
+<li>字符串  string</li>
+<li>字符类型  rune</li>
+<li>错误类型  error</li>
+</ul>
+
+<p>此外, Golang 也支持以下复合类型:</p>
+
+<ul>
+<li>指针  (pointer)</li>
+<li>数组  (array)</li>
+<li>切片  (slice)</li>
+<li>字典  (map)</li>
+<li>通道  (chan)</li>
+<li>结构体  (struct)</li>
+<li>接口  (interface)</li>
+</ul>
+
+<p>另外, 还有错误类型, 这里暂不过多介绍</p>
+
+<h3 id="一-布尔类型">一. 布尔类型</h3>
+
+<pre><code class="language-go">var v1 bool
+v1 = true
+v2 := (1 == 2)  // v2也会被推导为bool类型, 值为false(因为1不等于2)
+</code></pre>
+
+<p>布尔类型不能接受其他类型的赋值, 不支持自动或强类型转换</p>
+
+<h3 id="二-整形">二. 整形</h3>
+
+<p>整形是所有编程语言里最基础的数据类型.</p>
+
+<p>下面列举出常用的几个类型</p>
+
+<p><img src="https://raw.githubusercontent.com/Archimedes-Dear/image_bed/master/images/Go%E6%94%AF%E6%8C%81%E7%9A%84%E6%95%B4%E5%BD%A2%E7%B1%BB%E5%9E%8B.png" alt="Go支持的整形类型" /></p>
+
+<p>在 Go 语言里 int 和 int32 是不同类型, 可以使用强制类型转换来转换类型, 但需要注意数据长度被截短而发生的<strong>精度损失</strong>和<strong>值溢出</strong>问题</p>
+
+<pre><code class="language-go">var value2 int32
+value1 := 64     // value1 会被推导为 int 类型
+value2 = value1  // 编译错误 cannot use v1 (type int) as type int32 in assignment
+
+value2 = int32(v1)  // 可手动强制类型转换, 但要注意精度损失问题
+</code></pre>
+
+<p>整形中的数值运算:</p>
+
+<ul>
+<li>加减乘除取余 +, -, *, /, %(取余运算)</li>
+<li>比较 &gt;, &lt;, ==, &gt;=, &lt;=, !=</li>
+</ul>
+
+<p>需要注意的是, 两种不同类型的整形不能直接比较, 但各种类型的整形变量可与字面常量比较</p>
+
+<pre><code class="language-go">var x int32
+var y int64
+
+x, y = 10, 20
+
+if x == y {  // 编译错误 mismatched types int32 and int64
+    fmt.Println(&quot;x == y&quot;)
+}
+
+if x == 10 || y == 20 {  // 编译通过
+    fmt.Println(&quot;x == 10, y == 20&quot;)
+}
+</code></pre>
+
+<ul>
+<li>位运算</li>
+</ul>
+
+<p>Golang 支持如下位运算符:</p>
+
+<pre><code>x &lt;&lt; y  左移
+
+x &gt;&gt; y  右移
+
+x ^ y   异或
+
+x &amp; y   与
+
+x | y   或
+
+^x      取反
+</code></pre>
+
+<h3 id="三-浮点型">三. 浮点型</h3>
+
+<p>浮点型用于包含小数点的数据.</p>
+
+<p>Golang 中浮点数有两种类型 float32, float64</p>
+
+<p>定义一个浮点数:</p>
+
+<pre><code class="language-go">package main
+
+import &quot;fmt&quot;
+
+func main() {
+	var fv1 float32
+
+	fv1 = 12
+	fv2 := 12.0  // 如果不加小数点, fv2 会被推导为整形. 默认推导为 float64
+
+	fmt.Printf(&quot;%f, %f&quot;, fv1, fv2)
+}
+</code></pre>
+
+<p><strong>浮点数比较</strong></p>
+
+<p>因为浮点数不是一种精确表达方式, 所以直接用 <strong><em>==</em></strong> 判断两个浮点数是否相等是不可行的. 推荐使用如下方案:</p>
+
+<pre><code class="language-go">import &quot;math&quot;
+
+// p 为用户自定义的比较精度, 比如 0.00001
+func IsEqual(f1, f2, p float64) bool {
+	return math.Dim(f1, f2) &lt; p
+}
+</code></pre>
+
+<h3 id="四-复数类型">四. 复数类型</h3>
+
+<p>复数实际上由两个实数(在计算机中用浮点数表示)构成, 一个表示实部, 一个表示虚部</p>
+
+<p>复数表示的示例:</p>
+
+<pre><code class="language-go">var v1 complex64  // 由 2 个 float32 构成的复数类型
+
+v1 = 3.2 + 12i
+v2 := 3.2 + 12i
+v3 := complex(3.2, 12)
+
+// 对于一个复数 z = complex(x, y), 可以通过内置函数 real(z) 获取实部, imag(z) 获取虚部
+real_v3 := real(v3)  // 获取复数的实部
+imag_v3 := imag(v3)  // 获取复数的虚部
+</code></pre>
+
+<h3 id="五-字符串">五. 字符串</h3>
+
+<p>Go 语言中, 字符串也是一种基本类型</p>
+
+<pre><code class="language-go">var str string
+
+str = &quot;Hello, world&quot;  // 字符串赋值
+ch := str[0]  // 取字符串第一个字符
+fmt.Printf(&quot;The leght of \&quot;%s\&quot; is %d\n&quot;, str, len(str))  // 可以用 len() 获取长度
+fmt.Printf(&quot;The first char of \&quot;%s\&quot; is %c\n&quot;, str, ch)
+</code></pre>
+
+<p>注意: <strong>字符串的内容可以用类似数组下标的方式获取, 但字符串的内容一旦初始化便不可修改</strong>!</p>
+
+<p>例如:</p>
+
+<pre><code class="language-go">str := &quot;hello, world&quot;
+str[3] = 'x'  // 编译错误
+</code></pre>
+
+<p><strong>字符串操作</strong>: (更多操作参考标准库 strings 包)</p>
+
+<pre><code>x + y  字符串连接
+len(s) 字符串长度
+s[i]   取字符
+</code></pre>
+
+<p><strong>字符串遍历</strong>:</p>
+
+<p>Golang 支持两种方式遍历字符串:</p>
+
+<ul>
+<li>以字节数组的方式遍历</li>
+</ul>
+
+<pre><code class="language-go">str := &quot;Hello, 世界&quot;
+	n := len(str)
+
+for i := 0; i &lt; n; i++ {
+	ch := str[i]
+	fmt.Println(i, ch)
+}
+</code></pre>
+
+<ul>
+<li>以 Unicode 字符遍历</li>
+</ul>
+
+<pre><code class="language-go">for i, ch := range str {
+	fmt.Println(i, ch)
+}
+</code></pre>
+
+<p>以 Unicode 字符遍历时, 每个字符类型是 <strong><em>rune</em></strong></p>
+
+<h3 id="六-字符类型">六. 字符类型</h3>
+
+<p>Golang 中支持两个字符类型, 一个是 <strong><em>byte</em></strong> (实际上是 uint8 的别名), 代表 UTF-8 字符串的单个字节的值, 另一个是 <strong><em>rune</em></strong>, 代表单个 Unicode 字符.</p>
+
+<h3 id="七-数组">七. 数组</h3>
+
+<p>数组是一系列同一类型数据的集合. 数组中包含的每个数据称为数组元素, 一个数组包含的元素个数被称为数组的长度</p>
+
+<p><strong>声明数组</strong></p>
+
+<pre><code class="language-go">[32]byte                    // 长度为32的数组, 每个元素为一个字节
+[2*N] struct {x, y int32})  // 复杂类型数组
+[1000]*float64              // 指针数组
+[3][5]int                   // 二维数组, 三行五列
+</code></pre>
+
+<p>Golang 中, <strong>数组的长度定义后就不可更改</strong>, 在声明时长度可以为一个<strong>常量</strong>或<strong>常量表达式</strong>(在编译时可以计算得出结果的表达式)</p>
+
+<pre><code class="language-go">// 获取数组的长度
+arrLength := len(arr)
+</code></pre>
+
+<p><strong>元素访问</strong></p>
+
+<p>使用数组下表来访问数组中的元素, 下标从0开始</p>
+
+<pre><code class="language-go">arr := [5]int {1, 2, 3, 4, 5}
+for i := 0; i &lt; len(arr); i++ {
+	fmt.Println()
+}
+</code></pre>
+
+<p>Golang 还提供一个关键字 range, 用于便捷的遍历容器中的元素, 数组也是 range 支持的范围</p>
+
+<pre><code class="language-go">// range 有2个返回值, 第一个返回值是数组下标, 第二个返回值是元素的值
+for i, v in range(arr) {
+	fmt.Println(i, v)
+}
+</code></pre>
+
+<p><strong>值类型</strong></p>
+
+<p>在Go语言中<strong>数组是一个值类型</strong>(value type).</p>
+
+<p>所有的<strong>值类型变量</strong>在<strong>赋值</strong>和<strong>作为参数传递</strong>时都<strong>将产生一次复制动作</strong>, 导致函数体内修改的操作都为副本</p>
+
+<p>若要在函数中修改作为参数传递的数组, 可以传入数组切片</p>
+
+<pre><code class="language-go">func modify(array [5]int) {
+	array[0] = 10 // 试图修改数组的第一个元素
+	fmt.Println(&quot;In modify(), array values:&quot;, array)
+}
+
+func main() {
+	array := [5]int{1, 2, 3, 4, 5} // 定义并初始化一个数组
+	modify(array)                  // 传递给一个函数，并试图在函数体内修改这个数组内容
+	fmt.Println(&quot;In main(), array values:&quot;, array)
+}
+</code></pre>
+
+<h3 id="八-数组切片">八. 数组切片</h3>
+
+<p>由于数组创建后无法修改长度, 并且每次传递都将产生一份副本, 因此 Go 语言提供了<strong><em>数组切片</em></strong>来弥补数组的不足</p>
+
+<p>数组切片的数据结构可以抽象为以下三个变量:</p>
+
+<ul>
+<li>一个指向原生数组的指针</li>
+<li>数组切片中的元素个数</li>
+<li>数组切片已分配的存储空间</li>
+</ul>
+
+<p>数组切片提供了一系列管理功能, 可以随时动态扩充存放空间, 并且可以被随意传递而不会导致所管理的元素被重复复制.</p>
+
+<p>创建数组切片的方式有两种:</p>
+
+<ul>
+<li>基于数组, 可以只用数组的一部分或整个数组. 也可以创建一个比所基于的数组还大的数组切片(中括号中的长度, 通常为左闭右开</li>
+</ul>
+
+<pre><code class="language-go">var myArray [10]int = [10]int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
+
+// 基于数组创建一个数组切片
+var mySlice []int = myArray[:5]
+
+fmt.Println(&quot;Elements of myArray:&quot;, myArray)
+fmt.Println(&quot;\nElements of mySlice:&quot;, mySlice)
+</code></pre>
+
+<ul>
+<li>直接创建</li>
+</ul>
+
+<p>Golang 中提供内置函数 <strong><em>make()</em></strong> 可以用于创建数组切片</p>
+
+<pre><code class="language-go">mySlice1 := make([]int, 5)        // 创建一个初始元素个数为5, 元素初始值为0的数组切片
+mySlice2 := make([]int, 5, 10)    // 创建一个初始元素个数为5, 并预留10个元素的数组切片
+mySlice3 := []int{1, 2, 3, 4, 5}  // 直接创建并初始化包含5个元素的数组切片
+</code></pre>
+
+<p><strong>元素遍历</strong></p>
+
+<ul>
+<li>传统遍历</li>
+</ul>
+
+<pre><code class="language-go">package main
+
+import &quot;fmt&quot;
+
+func main() {
+	mySlice := [5]int {1, 2, 3, 4, 5}
+    for i := 0; i &lt;len(mySlice); i++ {
+        fmt.Println(&quot;mySlice[&quot;, i, &quot;] =&quot;, mySlice[i])
+    }
+}
+</code></pre>
+
+<ul>
+<li>使用 <strong><em>range</em></strong> 关键字遍历</li>
+</ul>
+
+<pre><code class="language-go">package main
+
+import &quot;fmt&quot;
+
+func main() {
+	mySlice := [5]int {1, 2, 3, 4, 5}
+	for i, v := range mySlice {
+		fmt.Println(&quot;mySlice[&quot;, i, &quot;] =&quot;, v)
+	}
+}
+</code></pre>
+
+<p><strong>动态增减元素</strong></p>
+
+<p>动态增减元素是因为数组切片比数组多了一个<strong>存储能力</strong>的概念. 合理的设置<strong>存储能力</strong>的值, 可以大幅降低数组切片内部重新分配内存和搬运内存块的频率, 从而大大提升性能.</p>
+
+<p>数组切片支持内置的 <strong><em>cap()</em></strong> 和 <strong><em>len()</em></strong> 函数, <strong><em>cap()</em></strong> 是返回数组切片分配的空间大小, 而 <strong><em>len()</em></strong> 是返回数组切片中当前存储的元素个数</p>
+
+<pre><code class="language-go">mySlice := make([]int, 5, 10)
+
+fmt.Println(&quot;len(mySlice):&quot;, len(mySlice))
+fmt.Println(&quot;cap(mySlice):&quot;, cap(mySlice))
+
+// 在已包含的5个元素后新增元素
+mySlice = append(mySlice, 1, 2, 3)
+fmt.Println(mySlice)
+
+// append() 可以添加另一个数组切片, 需要注意的是, 添加数组切片需要增加三个点.
+// 因为append 第二个参数起所有元素都是附加的元素, 而 mySlice 元素类型为 int
+mySlice2 := []int{8, 9, 10}
+mySlice = append(mySlice, mySlice2...)
+
+fmt.Println(mySlice)
+</code></pre>
+
+<p><strong>基于数组切片创建数组切片</strong></p>
+
+<p>基于数组切片创建数据切片时, 可<strong>超过原数组切片的元素个数</strong>, 但<strong>不能超过原数组切片的存储能力</strong></p>
+
+<p><strong>内容复制</strong></p>
+
+<p>数组切片支持 Golang 中的内置函数 <strong><em>copy()</em></strong>, 用于将内容从一个数组切片复制到另一个数组切片.</p>
+
+<p>如果加入的两个数组切片不一样大, 就会按较小的那个数组切片的元素个数进行复制.</p>
+
+<pre><code class="language-go">slice1 := []int{1, 2, 3, 4, 5}
+slice2 := []int{5, 4, 3}
+
+copy(slice2, slice1) // 只会复制slice1的前3个元素到slice2中
+fmt.Println(slice1, slice2)
+
+copy(slice1, slice2) // 只会复制slice2的3个元素到slice1的前3个位置
+fmt.Println(slice1, slice2)
+</code></pre>
+
+<h3 id="九-map">九. map</h3>
+
+<p>map 是一堆键值对的未排序的集合.</p>
+
+<p><strong>创建</strong> map</p>
+
+<pre><code class="language-go">package main
+
+import &quot;fmt&quot;
+
+func main() {
+	var myMap map[int]string
+    myMap = make(map[int]string)  // 再使用 make 创建一个非 nil 的map, nil map 不能赋值
+    
+	myMap2 := map[int]string {  // 创建时初始化
+		1: &quot;a&quot;,
+		2: &quot;b&quot;,
+		3: &quot;c&quot;,
+		4: &quot;d&quot;,
+		5: &quot;e&quot;,
+	}
+
+	myMap[1] = &quot;str1&quot;
+	myMap[2] = &quot;str2&quot;
+	
+	fmt.Print(myMap,&quot;\n&quot;, myMap2)
+}
+</code></pre>
+
+<p><strong>元素赋值</strong></p>
+
+<p>元素赋值就是将键和值用下面的方式对应起来:</p>
+
+<pre><code class="language-go">myMap[&quot;1234&quot;] = &quot;str1234&quot;
+</code></pre>
+
+<p><strong>元素删除</strong></p>
+
+<p>Golang 提供一个内置函数 <strong><em>delete()</em></strong> 用于删除容器内的元素.</p>
+
+<pre><code class="language-go">delete(myMap, &quot;1234&quot;)
+</code></pre>
+
+<p><strong>元素查找</strong></p>
+
+<p>在 Go 的 map 中查找一个特定的键, 可以通过以下代码实现:</p>
+
+<pre><code class="language-go">v, ok := myMap[&quot;1234&quot;]
+if ok {
+	fmt.Println(&quot;find value:&quot;, v)
+} else {
+    fmt.Println(&quot;did not find value:&quot;, v)
+}
+</code></pre>
+
+<p><strong>遍历 map</strong></p>
+
+<pre><code class="language-go">for k, v in range myMap {
+    fmt.Println(k, v)
+}
+</code></pre>
+
+<p>参考书籍:</p>
+
+<p><a href="https://book.douban.com/subject/11577300/">Go语言编程</a></p>
+                        </div>
+
+                        
+
+<div class="post-archive">
+    <h2>See Also</h2>
+    <ul class="listing">
+        
+        <li><a href="/posts/Golang-Note/Golang-variables-and-constants/">Golang 变量与常量</a></li>
+        
+        <li><a href="/posts/Golang-Note/Golang-install-and-env/">Golang 安装和环境配置</a></li>
+        
+        <li><a href="/posts/Kubernetes-Note/Kubernetes-Service/">Kubernetes Service</a></li>
+        
+        <li><a href="/posts/Kubernetes-Note/Kubernetes-Volumes/">Kubernetes 存储</a></li>
+        
+        <li><a href="/posts/Kubernetes-Note/Kubernetes-Pod-Scheduling/">Kubernetes Pod 调度</a></li>
+        
+    </ul>
+</div>
+
+
+                        <div class="post-meta meta-tags">
+                            
+                            <ul class="clearfix">
+                                
+                                <li><a href="http://blog.k-8s.com/tags/Golang">Golang</a></li>
+                                
+                            </ul>
+                            
+                        </div>
+                    </article>
+                    
+    
+
+    
+    
+                </div>
+            </div>
+            <div id="secondary">
+    <section class="widget">
+        <form id="search" action="//www.google.com/search" method="get" accept-charset="utf-8" target="_blank" _lpchecked="1">
+      
+      <input type="text" name="q" maxlength="20" placeholder="Search">
+      <input type="hidden" name="sitesearch" value="http://blog.k-8s.com/">
+      <button type="submit" class="submit icon-search"></button>
+</form>
+    </section>
+    
+    <section class="widget">
+        <h3 class="widget-title">最近文章</h3>
+<ul class="widget-list">
+    
+    <li>
+        <a href="http://blog.k-8s.com/posts/Golang-Note/Golang-type-of-data/" title="Golang 数据类型">Golang 数据类型</a>
+    </li>
+    
+    <li>
+        <a href="http://blog.k-8s.com/posts/Golang-Note/Golang-variables-and-constants/" title="Golang 变量与常量">Golang 变量与常量</a>
+    </li>
+    
+    <li>
+        <a href="http://blog.k-8s.com/posts/Golang-Note/Golang-install-and-env/" title="Golang 安装和环境配置">Golang 安装和环境配置</a>
+    </li>
+    
+    <li>
+        <a href="http://blog.k-8s.com/posts/Kubernetes-Note/Kubernetes-Service/" title="Kubernetes Service">Kubernetes Service</a>
+    </li>
+    
+    <li>
+        <a href="http://blog.k-8s.com/posts/Kubernetes-Note/Kubernetes-Volumes/" title="Kubernetes 存储">Kubernetes 存储</a>
+    </li>
+    
+    <li>
+        <a href="http://blog.k-8s.com/posts/Kubernetes-Note/Kubernetes-Pod-Scheduling/" title="Kubernetes Pod 调度">Kubernetes Pod 调度</a>
+    </li>
+    
+    <li>
+        <a href="http://blog.k-8s.com/posts/Kubernetes-Note/Kubernetes-Pod/" title="Kubernetes Pod 详解">Kubernetes Pod 详解</a>
+    </li>
+    
+    <li>
+        <a href="http://blog.k-8s.com/posts/Kubernetes-Note/Kubernetes-basic-concept/" title="Kubernetes 基本概念和术语">Kubernetes 基本概念和术语</a>
+    </li>
+    
+    <li>
+        <a href="http://blog.k-8s.com/posts/Kubernetes-Note/Kubernetes-Install/" title="Kubernetes 安装">Kubernetes 安装</a>
+    </li>
+    
+    <li>
+        <a href="http://blog.k-8s.com/posts/Hugo-build-a-person-blog/" title="Hugo搭建个人博客">Hugo搭建个人博客</a>
+    </li>
+    
+</ul>
+    </section>
+
+    
+
+    <section class="widget">
+        <h3 class="widget-title">分类</h3>
+<ul class="widget-list">
+    
+    <li>
+        <a href="http://blog.k-8s.com/categories/Golang/">Golang(3)</a>
+    </li>
+    
+    <li>
+        <a href="http://blog.k-8s.com/categories/Kubernetes/">Kubernetes(6)</a>
+    </li>
+    
+    <li>
+        <a href="http://blog.k-8s.com/categories/hugo/">hugo(1)</a>
+    </li>
+    
+</ul>
+    </section>
+
+    <section class="widget">
+        <h3 class="widget-title">标签</h3>
+<div class="tagcloud">
+    
+    <a href="http://blog.k-8s.com/tags/Golang/">Golang</a>
+    
+    <a href="http://blog.k-8s.com/tags/Kubernetes/">Kubernetes</a>
+    
+    <a href="http://blog.k-8s.com/tags/hugo/">hugo</a>
+    
+</div>
+    </section>
+
+    
+<section class="widget">
+    <h3 class="widget-title">友情链接</h3>
+    <ul class="widget-list">
+        
+        <li>
+            <a target="_blank" href="http://www.jxhs.me" title="jame_xhs">jame_xhs</a>
+        </li>
+        
+    </ul>
+</section>
+
+
+    <section class="widget">
+        <h3 class="widget-title">其它</h3>
+        <ul class="widget-list">
+            <li><a href="http://blog.k-8s.com/index.xml">文章 RSS</a></li>
+        </ul>
+    </section>
+</div>
+        </div>
+    </div>
+</div>
+<footer id="footer">
+    <div class="container">
+        &copy; 2018 <a href="http://blog.k-8s.com/">Mr.耗子 By Mr.耗子</a>.
+        Powered by <a rel="nofollow noreferer noopener" href="https://gohugo.io" target="_blank">Hugo</a>.
+        <a href="https://www.flysnow.org/" target="_blank">Theme</a> based on <a href="https://github.com/rujews/maupassant-hugo" target="_blank">maupassant</a>.
+        
+    </div>
+</footer>
+
+
+    <script type="text/javascript">
+    
+    (function(){
+        $("pre code").parent().addClass("line-numbers")
+    }())
+
+    window.MathJax = {
+        tex2jax: {
+            inlineMath: [ ['$','$'] ],
+            processEscapes: true
+        }
+    };
+    </script>
+    <script type="text/javascript" src="/js/prism.js" async="true"></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
+
+<a id="rocket" href="#top"></a>
+<script type="text/javascript" src="/js/totop.js?v=0.0.0" async=""></script>
+
+
+
+<script type="text/javascript" src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" async></script>
+
+
+
+
+</body>
+</html>

@@ -6,10 +6,45 @@
     <description>Recent content on Mr.耗子</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    <lastBuildDate>Tue, 08 Oct 2019 10:02:42 +0800</lastBuildDate>
+    <lastBuildDate>Sat, 12 Oct 2019 10:23:08 +0800</lastBuildDate>
     
 	<atom:link href="http://blog.k-8s.com/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Golang 数据类型</title>
+      <link>http://blog.k-8s.com/posts/Golang-Note/Golang-type-of-data/</link>
+      <pubDate>Sat, 12 Oct 2019 10:23:08 +0800</pubDate>
+      
+      <guid>http://blog.k-8s.com/posts/Golang-Note/Golang-type-of-data/</guid>
+      <description>&lt;h3 id=&#34;数据类型&#34;&gt;数据类型&lt;/h3&gt;
+
+&lt;p&gt;Golang 中内置以下基础类型:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;布尔类型  bool&lt;/li&gt;
+&lt;li&gt;整形  int uint int8 int16 byte uintptr&lt;/li&gt;
+&lt;li&gt;浮点类型  float32 float64&lt;/li&gt;
+&lt;li&gt;复数类型  complex64 complex128&lt;/li&gt;
+&lt;li&gt;字符串  string&lt;/li&gt;
+&lt;li&gt;字符类型  rune&lt;/li&gt;
+&lt;li&gt;错误类型  error&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;此外, Golang 也支持以下复合类型:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;指针  (pointer)&lt;/li&gt;
+&lt;li&gt;数组  (array)&lt;/li&gt;
+&lt;li&gt;切片  (slice)&lt;/li&gt;
+&lt;li&gt;字典  (map)&lt;/li&gt;
+&lt;li&gt;通道  (chan)&lt;/li&gt;
+&lt;li&gt;结构体  (struct)&lt;/li&gt;
+&lt;li&gt;接口  (interface)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;另外, 还有错误类型, 这里暂不过多介绍&lt;/p&gt;</description>
+    </item>
     
     <item>
       <title>Golang 变量与常量</title>
