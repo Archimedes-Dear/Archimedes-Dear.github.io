@@ -6,10 +6,40 @@
     <description>Recent content in Posts on Mr.耗子</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    <lastBuildDate>Sat, 12 Oct 2019 10:23:08 +0800</lastBuildDate>
+    <lastBuildDate>Sat, 12 Oct 2019 15:16:24 +0800</lastBuildDate>
     
 	<atom:link href="http://blog.k-8s.com/posts/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Golang 流程控制</title>
+      <link>http://blog.k-8s.com/posts/Golang-Note/Golang-process-control/</link>
+      <pubDate>Sat, 12 Oct 2019 15:16:24 +0800</pubDate>
+      
+      <guid>http://blog.k-8s.com/posts/Golang-Note/Golang-process-control/</guid>
+      <description>&lt;h3 id=&#34;流程控制&#34;&gt;流程控制&lt;/h3&gt;
+
+&lt;p&gt;流程控制语句, 用于设定计算执行的次序, 简历程序的逻辑结构&lt;/p&gt;
+
+&lt;p&gt;流程控制语句一般起以下三个作用:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;选择&lt;/li&gt;
+&lt;li&gt;循环&lt;/li&gt;
+&lt;li&gt;跳转&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Go 语言中支持如下几种流程控制语句:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;条件语句: &lt;strong&gt;&lt;em&gt;if&lt;/em&gt;&lt;/strong&gt;, &lt;strong&gt;&lt;em&gt;else&lt;/em&gt;&lt;/strong&gt; 和 &lt;strong&gt;&lt;em&gt;else if&lt;/em&gt;&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;选择语句: &lt;strong&gt;&lt;em&gt;switch&lt;/em&gt;&lt;/strong&gt;, &lt;strong&gt;&lt;em&gt;case&lt;/em&gt;&lt;/strong&gt; 和 &lt;strong&gt;&lt;em&gt;select&lt;/em&gt;&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;循环语句: &lt;strong&gt;&lt;em&gt;for&lt;/em&gt;&lt;/strong&gt; 和 &lt;strong&gt;&lt;em&gt;range&lt;/em&gt;&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;跳转语句: &lt;strong&gt;&lt;em&gt;goto&lt;/em&gt;&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;为了能在具体的场景中满足更丰富的控制需求, Go 语言还增加了如下关键字: break, continue 和 fallthrough&lt;/p&gt;</description>
+    </item>
     
     <item>
       <title>Golang 数据类型</title>
