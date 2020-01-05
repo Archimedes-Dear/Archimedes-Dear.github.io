@@ -68,6 +68,52 @@
                         <article class="post">
                             <header>
                                 <h1 class="post-title">
+                                    <a href="http://blog.k-8s.com/posts/Golang-Note/Golang-error-handling/" title="Golang 错误处理" >Golang 错误处理</a>
+                                </h1>
+                            </header>
+                            <date class="post-meta meta-date">
+                                2019年10月13日
+                            </date>
+                            
+                            <div class="post-meta">
+                                <span>|</span>
+                                
+                                <span class="meta-category"><a href="http://blog.k-8s.com/categories/Golang">Golang</a></span>
+                                
+                            </div>
+                            
+                            <div class="post-content">
+                                <h3 id="错误处理">错误处理</h3>
+
+<h3 id="一-error-接口">一. error 接口</h3>
+
+<p>Go 引入了一个关于错误处理的标准模式, 即 <strong><em>error</em></strong> 接口, 定义如下:</p>
+
+<pre><code class="language-go">type error interface {
+    Error() string
+}
+
+// 对于大多数函数, 如果要返回错误, 大致上可以定义为如下模式, 将 error 作为多返回结果的最后一个
+func Foo(param int) (n int, err error) {
+    ...
+}
+
+// 调用时错误处理格式
+n, err := Foo(0)
+
+if err != nil {
+    // 错误处理
+} else {
+    // 使用返回值n
+}
+</code></pre>……
+                            </div>
+                            <p class="readmore"><a href="http://blog.k-8s.com/posts/Golang-Note/Golang-error-handling/">阅读全文</a></p>
+                        </article>
+                    
+                        <article class="post">
+                            <header>
+                                <h1 class="post-title">
                                     <a href="http://blog.k-8s.com/posts/Golang-Note/Golang-function/" title="Golang 函数" >Golang 函数</a>
                                 </h1>
                             </header>
@@ -462,47 +508,6 @@ Containers:
                             <p class="readmore"><a href="http://blog.k-8s.com/posts/Kubernetes-Note/Kubernetes-Pod/">阅读全文</a></p>
                         </article>
                     
-                        <article class="post">
-                            <header>
-                                <h1 class="post-title">
-                                    <a href="http://blog.k-8s.com/posts/Kubernetes-Note/Kubernetes-basic-concept/" title="Kubernetes 基本概念和术语" >Kubernetes 基本概念和术语</a>
-                                </h1>
-                            </header>
-                            <date class="post-meta meta-date">
-                                2019年5月3日
-                            </date>
-                            
-                            <div class="post-meta">
-                                <span>|</span>
-                                
-                                <span class="meta-category"><a href="http://blog.k-8s.com/categories/Kubernetes">Kubernetes</a></span>
-                                
-                            </div>
-                            
-                            <div class="post-content">
-                                <h2 id="基本概念和术语">基本概念和术语</h2>
-
-<p>Kubernetes 中, 大部分的概念都是一种资源对象, 几乎所有的资源都可以通过 <strong><em>kubectl</em></strong> 或 <strong><em>API</em></strong> 来执行 <strong><em>增, 删, 改, 查</em></strong> 等操作. 所有的修改都将被保存在 <strong><em>etcd</em></strong> (etcd 是一个分布式键值对数据库, 这里暂时不讨论) 中持久化存储.</p>
-
-<p>在 Kubernetes 中, 可以采用 <strong><em>YAML</em></strong> 或 <strong><em>JSON</em></strong> 格式声明一个 Kubernetes 资源对象</p>
-
-<h3 id="master">Master</h3>
-
-<p>Master 是集群中的控制节点, 每个 Kubernetes 集群中都需要一个 Master 来负责.</p>
-
-<p>在 Master 上, 运行着一下几个关键进程:</p>
-
-<ul>
-<li><strong>Kubernetes API Server</strong> :提供HTTP Rest 接口</li>
-<li><strong>Kubernetes Controller Manager</strong>: 所有对象的管理者</li>
-<li><strong>Kubernetes Scheduler</strong>: 负责资源调度</li>
-</ul>
-
-<p>通常来说, Master 上还需要部署 <strong><em>etcd</em></strong> 服务, 用于保存所有资源对象的数据. (etcd 也可不部署在 Master 节点上)</p>……
-                            </div>
-                            <p class="readmore"><a href="http://blog.k-8s.com/posts/Kubernetes-Note/Kubernetes-basic-concept/">阅读全文</a></p>
-                        </article>
-                    
 
                     
 
@@ -547,6 +552,10 @@ Containers:
 <ul class="widget-list">
     
     <li>
+        <a href="http://blog.k-8s.com/posts/Golang-Note/Golang-error-handling/" title="Golang 错误处理">Golang 错误处理</a>
+    </li>
+    
+    <li>
         <a href="http://blog.k-8s.com/posts/Golang-Note/Golang-function/" title="Golang 函数">Golang 函数</a>
     </li>
     
@@ -582,10 +591,6 @@ Containers:
         <a href="http://blog.k-8s.com/posts/Kubernetes-Note/Kubernetes-Pod/" title="Kubernetes Pod 详解">Kubernetes Pod 详解</a>
     </li>
     
-    <li>
-        <a href="http://blog.k-8s.com/posts/Kubernetes-Note/Kubernetes-basic-concept/" title="Kubernetes 基本概念和术语">Kubernetes 基本概念和术语</a>
-    </li>
-    
 </ul>
     </section>
 
@@ -596,7 +601,7 @@ Containers:
 <ul class="widget-list">
     
     <li>
-        <a href="http://blog.k-8s.com/categories/Golang/">Golang(5)</a>
+        <a href="http://blog.k-8s.com/categories/Golang/">Golang(6)</a>
     </li>
     
     <li>

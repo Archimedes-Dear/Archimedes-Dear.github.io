@@ -7,20 +7,20 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>Golang 流程控制 | Mr.耗子</title>
-    <meta property="og:title" content="Golang 流程控制 - Mr.耗子">
+    <title>Golang 错误处理 | Mr.耗子</title>
+    <meta property="og:title" content="Golang 错误处理 - Mr.耗子">
     <meta property="og:type" content="article">
         
-    <meta property="article:published_time" content="2019-10-12T15:16:24&#43;08:00">
+    <meta property="article:published_time" content="2019-10-13T20:17:18&#43;08:00">
         
         
-    <meta property="article:modified_time" content="2019-10-12T15:16:24&#43;08:00">
+    <meta property="article:modified_time" content="2019-10-13T20:17:18&#43;08:00">
         
     <meta name="Keywords" content="耗子,Mr.耗子,Docker,容器,k8s,kubernetes,golang,go,devops">
-    <meta name="description" content="Golang 流程控制">
+    <meta name="description" content="Golang 错误处理">
         
     <meta name="author" content="Mr.耗子">
-    <meta property="og:url" content="http://blog.k-8s.com/posts/Golang-Note/Golang-process-control/">
+    <meta property="og:url" content="http://blog.k-8s.com/posts/Golang-Note/Golang-error-handling/">
     <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
 
     <link rel="stylesheet" href="/css/normalize.css">
@@ -72,10 +72,10 @@
                 <div class="res-cons">
                     <article class="post">
                         <header>
-                            <h1 class="post-title">Golang 流程控制</h1>
+                            <h1 class="post-title">Golang 错误处理</h1>
                         </header>
                         <date class="post-meta meta-date">
-                            2019年10月12日
+                            2019年10月13日
                         </date>
                         
                         <div class="post-meta">
@@ -91,180 +91,127 @@
                         </div>
                         
                         <div class="post-content">
-                            <h3 id="流程控制">流程控制</h3>
+                            <h3 id="错误处理">错误处理</h3>
 
-<p>流程控制语句, 用于设定计算执行的次序, 简历程序的逻辑结构</p>
+<h3 id="一-error-接口">一. error 接口</h3>
 
-<p>流程控制语句一般起以下三个作用:</p>
+<p>Go 引入了一个关于错误处理的标准模式, 即 <strong><em>error</em></strong> 接口, 定义如下:</p>
 
-<ul>
-<li>选择</li>
-<li>循环</li>
-<li>跳转</li>
-</ul>
+<pre><code class="language-go">type error interface {
+    Error() string
+}
 
-<p>Go 语言中支持如下几种流程控制语句:</p>
+// 对于大多数函数, 如果要返回错误, 大致上可以定义为如下模式, 将 error 作为多返回结果的最后一个
+func Foo(param int) (n int, err error) {
+    ...
+}
 
-<ul>
-<li>条件语句: <strong><em>if</em></strong>, <strong><em>else</em></strong> 和 <strong><em>else if</em></strong></li>
-<li>选择语句: <strong><em>switch</em></strong>, <strong><em>case</em></strong> 和 <strong><em>select</em></strong></li>
-<li>循环语句: <strong><em>for</em></strong> 和 <strong><em>range</em></strong></li>
-<li>跳转语句: <strong><em>goto</em></strong></li>
-</ul>
+// 调用时错误处理格式
+n, err := Foo(0)
 
-<p>为了能在具体的场景中满足更丰富的控制需求, Go 语言还增加了如下关键字: break, continue 和 fallthrough</p>
+if err != nil {
+    // 错误处理
+} else {
+    // 使用返回值n
+}
+</code></pre>
 
-<h3 id="一-条件语句">一. 条件语句</h3>
+<p>error 接口使用示范:</p>
 
-<p>对应关键字: <strong><em>if</em></strong>, <strong><em>else</em></strong>, <strong><em>else if</em></strong></p>
+<pre><code class="language-go">// err example
+package main
 
-<p>需要注意有以下几点:</p>
+import (
+	&quot;errors&quot;
+	&quot;fmt&quot;
+)
 
-<ul>
-<li>条件语句不需要用括号将条件包含起来</li>
-<li>无论语句体内有几条语句, 花括号都是必须存在的</li>
-<li>在 <strong><em>if</em></strong> 之后, 条件语句之前, 可以添加变量初始化语句, 用 <strong>;</strong> 号间隔</li>
-</ul>
-
-<pre><code class="language-go">package main
-
-import &quot;fmt&quot;
-
-func example(x int) {
-	if x == 0 {
-		fmt.Println(&quot;x == 0&quot;)
+func Add(x, y int) (result int, err error) {
+	if x &lt; 0 || y &lt; 0 {
+		err = errors.New(&quot;x, y need &gt; 0&quot;)
 	} else {
-		fmt.Println(&quot;x is&quot;, x)
+		result = x + y
 	}
+	return result, err
 }
 
 func main() {
-	var x = 10
-	example(x)
+	result, err := Add(10, -1)
+
+	if err != nil {
+		fmt.Println(err)
+	} else {
+		fmt.Println(&quot;x + y =&quot;, result)
+	}
 }
 </code></pre>
 
-<h3 id="二-选择语句">二. 选择语句</h3>
+<h3 id="二-defer">二. defer</h3>
 
-<p>对应关键字: <strong><em>switch</em></strong>, <strong><em>case</em></strong>, <strong><em>select</em></strong></p>
-
-<p>需要注意有以下几点:</p>
-
-<ul>
-<li>条件表达式不限制为常量或者整数</li>
-<li>单个 <strong><em>case</em></strong> 中, 可以出现多个结果选项</li>
-<li>只有在 <strong><em>case</em></strong> 中明确添加 <strong><em>fallthrough</em></strong> 关键字, 才会继续执行紧跟的下一个 <strong><em>case</em></strong></li>
-</ul>
+<p><strong><em>defer</em></strong> 语句会在函数结束候执行, 但需要注意的是, 如果有多层 <strong><em>defer</em></strong> 语句的执行顺序是最后一个 <strong><em>defer</em></strong> 语句将被最先执行</p>
 
 <pre><code class="language-go">package main
 
 import &quot;fmt&quot;
 
 func main() {
-	i := 3
+	fmt.Println(&quot;Start...&quot;)
 
-	switch i {
-	case 1:
-		fmt.Printf(&quot;1&quot;)
-	case 2:
-		fallthrough
-	case 3, 4, 5:
-		fmt.Printf(&quot;3, 4, 5&quot;)
-	default:
-		fmt.Printf(&quot;Default&quot;)
-	}
+    // defer 语句的内容将在 &quot;hello, world!&quot; 之后显示
+	defer fmt.Println(&quot;End... This is defer&quot;)
+
+	fmt.Println(&quot;Hello, World!&quot;)
 }
 </code></pre>
 
-<ul>
-<li>可不设定 <strong><em>switch</em></strong> 之后的条件表达式</li>
-</ul>
+<h3 id="三-panic-和-recover">三. panic() 和 recover()</h3>
+
+<p>Go 语言引入了两个内置函数 <strong><em>panic()</em></strong> 和 <strong><em>recover()</em></strong> 以报告和处理运行时错误和程序中的错误场景</p>
+
+<p>当一个函数执行过程中调用 <strong><em>panic()</em></strong> 函数时, 正常的函数执行流程将立即终止(<strong><em>defer</em></strong> 关键字依旧正常执行), 之后该函数返回到调用函数, 并逐层向上执行 <strong><em>panic</em></strong> 流程, 直至所属的 <strong><em>goroutine</em></strong> 中所有正在执行的函数被终止</p>
+
+<p><strong><em>panic()</em></strong> 函数接受任意类型的数据:</p>
+
+<pre><code class="language-go">panic(404)
+panic(&quot;network broken&quot;)
+panic(Error(&quot;file not exists&quot;))
+</code></pre>
+
+<p><strong><em>recover()</em></strong> 函数用于终止错误处理流程</p>
+
+<p>一般情况下, <strong><em>recover()</em></strong> 应该在一个使用 <strong><em>defer</em></strong> 关键字的函数中执行, 以有效截取错误处理流程</p>
+
+<p>如果在没有发生异常的 goroutine 中明确调用恢复过程(使用 <strong><em>recover()</em></strong> 关键字), 会导致该 goroutine 所属的进程打印异常信息后直接退出</p>
+
+<p>例如如下代码中, 无论函数 g() 中触发了错误处理流程, 该匿名 <strong><em>defer</em></strong> 函数都将在函数退出时得到执行</p>
+
+<p>我们手动让函数 g() 中触发了错误处理流程, 可以观察到 <strong><em>recover()</em></strong> 函数执行使得该错误处理过程终止, 并且还会打印 <strong><em>panic()</em></strong> 传入的错误信息</p>
 
 <pre><code class="language-go">package main
 
-import &quot;fmt&quot;
-
-func example(num int) {
-	switch {
-	case 0 &lt;= num &amp;&amp; num &lt;= 3:
-		fmt.Println(&quot;0-3&quot;)
-	case 4 &lt;= num &amp;&amp; num &lt;= 6:
-		fmt.Println(&quot;4-6&quot;)
-	}
-}
+import (
+	&quot;fmt&quot;
+)
 
 func main() {
-	a := 5
-
-	example(a)
+	f()
+	fmt.Println(&quot;Returned normally from f.&quot;)
 }
-</code></pre>
 
-<h3 id="三-循环语句">三. 循环语句</h3>
-
-<p>对应关键字: <strong><em>for</em></strong>, <strong><em>range</em></strong></p>
-
-<p>Go 中的循环语句只支持 <strong><em>for</em></strong> 关键字</p>
-
-<p>需要注意有以下几点:</p>
-
-<ul>
-<li>Go 的 <strong><em>for</em></strong> 循环条件中允许定义和初始化变量, 但 Go 不支持以逗号为间隔的多个赋值语句, 必须用平行赋值的方式来初始化多个变量</li>
-<li>Go 的 <strong><em>for</em></strong> 支持 <strong><em>continue</em></strong> 和 <strong><em>break</em></strong> 来控制循环, 而且还能够指定中断哪一个循环.</li>
-</ul>
-
-<pre><code class="language-go">sum := 0
-
-for i := 0; i &lt; 10; i++ {
-	fmt.Println(sum)
-}
-</code></pre>
-
-<pre><code class="language-go">// 无限循环的场景
-sum := 0
-
-for {
-	sum++
-	if sum &gt; 100 {
-		break
-	}
-}
-</code></pre>
-
-<pre><code class="language-go">// 条件表达式中也支持赋值
-a := []int{1, 2, 3, 4, 5, 6}
-for i, j := 0, len(a) -1; i &lt; j; j = i + 1, j -1 {
-	a[i], a[j] = a[j], a[i]
-}
-</code></pre>
-
-<pre><code class="language-go">for j := 0; j &lt; 5; j++ {
-	for i := 0; i &lt; 10; i++ {
-		if i &gt; 5 {
-			break JLoop
+func f() {
+	defer func() {
+		if r := recover(); r != nil {
+			fmt.Println(&quot;Recovered in f&quot;, r)
+			fmt.Println(&quot;Recovered in f&quot;, r)
 		}
-		fmt.Println(i)
-	}
+	}()
+	fmt.Println(&quot;Calling g.&quot;)
+	g()
+	fmt.Println(&quot;Returned normally from g.&quot;)
 }
-JLoop:
-...
-// break 语句终止的是 JLoop 标签处的外层循环
-</code></pre>
 
-<h3 id="四-跳转语句">四. 跳转语句</h3>
-
-<p>对应关键字: <strong><em>goto</em></strong></p>
-
-<p><strong><em>goto</em></strong> 的作用就是跳转到本函数内的某个标签.</p>
-
-<pre><code class="language-go">func myfunc() {
-	i := 0
-HERE:
-	fmt.Println(i)
-	i++
-	if i &lt; 10 {
-		goto HERE
-	}
+func g() {
+	panic(&quot;ERROR Info&quot;)
 }
 </code></pre>
 
@@ -279,15 +226,15 @@ HERE:
     <h2>See Also</h2>
     <ul class="listing">
         
+        <li><a href="/posts/Golang-Note/Golang-function/">Golang 函数</a></li>
+        
+        <li><a href="/posts/Golang-Note/Golang-process-control/">Golang 流程控制</a></li>
+        
         <li><a href="/posts/Golang-Note/Golang-type-of-data/">Golang 数据类型</a></li>
         
         <li><a href="/posts/Golang-Note/Golang-variables-and-constants/">Golang 变量与常量</a></li>
         
         <li><a href="/posts/Golang-Note/Golang-install-and-env/">Golang 安装和环境配置</a></li>
-        
-        <li><a href="/posts/Kubernetes-Note/Kubernetes-Service/">Kubernetes Service</a></li>
-        
-        <li><a href="/posts/Kubernetes-Note/Kubernetes-Volumes/">Kubernetes 存储</a></li>
         
     </ul>
 </div>

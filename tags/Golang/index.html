@@ -78,6 +78,52 @@
                         <article class="post">
                             <header>
                                 <h1 class="post-title">
+                                    <a href="http://blog.k-8s.com/posts/Golang-Note/Golang-error-handling/">Golang 错误处理</a>
+                                </h1>
+                            </header>
+                            <date class="post-meta meta-date">
+                                2019年10月13日
+                            </date>
+                            
+                            <div class="post-meta meta-category">
+                                |
+                                
+                                    <a href="http://blog.k-8s.com/categories/Golang">Golang</a>
+                                
+                            </div>
+                            
+                            <div class="post-content">
+                                <h3 id="错误处理">错误处理</h3>
+
+<h3 id="一-error-接口">一. error 接口</h3>
+
+<p>Go 引入了一个关于错误处理的标准模式, 即 <strong><em>error</em></strong> 接口, 定义如下:</p>
+
+<pre><code class="language-go">type error interface {
+    Error() string
+}
+
+// 对于大多数函数, 如果要返回错误, 大致上可以定义为如下模式, 将 error 作为多返回结果的最后一个
+func Foo(param int) (n int, err error) {
+    ...
+}
+
+// 调用时错误处理格式
+n, err := Foo(0)
+
+if err != nil {
+    // 错误处理
+} else {
+    // 使用返回值n
+}
+</code></pre>……
+                                <p class="readmore"><a href="http://blog.k-8s.com/posts/Golang-Note/Golang-error-handling/">阅读全文</a></p>
+                            </div>
+                        </article>
+                    
+                        <article class="post">
+                            <header>
+                                <h1 class="post-title">
                                     <a href="http://blog.k-8s.com/posts/Golang-Note/Golang-function/">Golang 函数</a>
                                 </h1>
                             </header>
@@ -305,6 +351,10 @@ func main() {
 <ul class="widget-list">
     
     <li>
+        <a href="http://blog.k-8s.com/posts/Golang-Note/Golang-error-handling/" title="Golang 错误处理">Golang 错误处理</a>
+    </li>
+    
+    <li>
         <a href="http://blog.k-8s.com/posts/Golang-Note/Golang-function/" title="Golang 函数">Golang 函数</a>
     </li>
     
@@ -340,10 +390,6 @@ func main() {
         <a href="http://blog.k-8s.com/posts/Kubernetes-Note/Kubernetes-Pod/" title="Kubernetes Pod 详解">Kubernetes Pod 详解</a>
     </li>
     
-    <li>
-        <a href="http://blog.k-8s.com/posts/Kubernetes-Note/Kubernetes-basic-concept/" title="Kubernetes 基本概念和术语">Kubernetes 基本概念和术语</a>
-    </li>
-    
 </ul>
     </section>
 
@@ -354,7 +400,7 @@ func main() {
 <ul class="widget-list">
     
     <li>
-        <a href="http://blog.k-8s.com/categories/Golang/">Golang(5)</a>
+        <a href="http://blog.k-8s.com/categories/Golang/">Golang(6)</a>
     </li>
     
     <li>
