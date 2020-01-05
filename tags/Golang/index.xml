@@ -6,10 +6,36 @@
     <description>Recent content in Golang on Mr.耗子</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    <lastBuildDate>Sun, 13 Oct 2019 20:17:18 +0800</lastBuildDate>
+    <lastBuildDate>Mon, 14 Oct 2019 10:03:41 +0800</lastBuildDate>
     
 	<atom:link href="http://blog.k-8s.com/tags/Golang/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Golang 类型系统</title>
+      <link>http://blog.k-8s.com/posts/Golang-Note/Golang-type-system/</link>
+      <pubDate>Mon, 14 Oct 2019 10:03:41 +0800</pubDate>
+      
+      <guid>http://blog.k-8s.com/posts/Golang-Note/Golang-type-system/</guid>
+      <description>&lt;h3 id=&#34;类型系统&#34;&gt;类型系统&lt;/h3&gt;
+
+&lt;p&gt;类型系统是指一个语言的类型体系结构, 是一门编程语言的地基&lt;/p&gt;
+
+&lt;p&gt;一个典型的类型系统通常包含如下基本内容:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;基础类型, 如 &lt;strong&gt;byte&lt;/strong&gt;, &lt;strong&gt;int&lt;/strong&gt;, &lt;strong&gt;bool&lt;/strong&gt;, &lt;strong&gt;floot&lt;/strong&gt; 等&lt;/li&gt;
+&lt;li&gt;复合类型, 如&lt;strong&gt;数组&lt;/strong&gt;, &lt;strong&gt;结构体&lt;/strong&gt;, &lt;strong&gt;指针&lt;/strong&gt;等&lt;/li&gt;
+&lt;li&gt;可以指向任意对象的类型(Any 类型)&lt;/li&gt;
+&lt;li&gt;值语义和引用语义&lt;/li&gt;
+&lt;li&gt;面向对象, 即所有具备面向对象特征的类型&lt;/li&gt;
+&lt;li&gt;接口&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Go 语言中的大多数类型都是值语义, 并且都可以包含对应的操作方法. 在需要的时候, 你可以给任何类型 (包括内置类型) &amp;ldquo;增加&amp;rdquo; 新的方法. 而在实现某个接口时, 无需从该接口继承 (实际上, Go 语言不支持面向对象中的&lt;strong&gt;继承&lt;/strong&gt;语法), 只需要实现该接口要求的所有方法即可&lt;/p&gt;
+
+&lt;p&gt;任意类型都可以被 &lt;strong&gt;&lt;em&gt;Any类型&lt;/em&gt;&lt;/strong&gt; 引用. &lt;strong&gt;&lt;em&gt;Any类型&lt;/em&gt;&lt;/strong&gt; 就是空接口, 即 &lt;strong&gt;&lt;em&gt;interface{}&lt;/em&gt;&lt;/strong&gt;&lt;/p&gt;</description>
+    </item>
     
     <item>
       <title>Golang 错误处理</title>

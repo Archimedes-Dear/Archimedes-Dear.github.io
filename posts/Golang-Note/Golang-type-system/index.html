@@ -7,20 +7,20 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>Golang 函数 | Mr.耗子</title>
-    <meta property="og:title" content="Golang 函数 - Mr.耗子">
+    <title>Golang 类型系统 | Mr.耗子</title>
+    <meta property="og:title" content="Golang 类型系统 - Mr.耗子">
     <meta property="og:type" content="article">
         
-    <meta property="article:published_time" content="2019-10-13T09:18:45&#43;08:00">
+    <meta property="article:published_time" content="2019-10-14T10:03:41&#43;08:00">
         
         
-    <meta property="article:modified_time" content="2019-10-13T09:18:45&#43;08:00">
+    <meta property="article:modified_time" content="2019-10-14T10:03:41&#43;08:00">
         
     <meta name="Keywords" content="耗子,Mr.耗子,Docker,容器,k8s,kubernetes,golang,go,devops">
-    <meta name="description" content="Golang 函数">
+    <meta name="description" content="Golang 类型系统">
         
     <meta name="author" content="Mr.耗子">
-    <meta property="og:url" content="http://blog.k-8s.com/posts/Golang-Note/Golang-function/">
+    <meta property="og:url" content="http://blog.k-8s.com/posts/Golang-Note/Golang-type-system/">
     <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
 
     <link rel="stylesheet" href="/css/normalize.css">
@@ -72,10 +72,10 @@
                 <div class="res-cons">
                     <article class="post">
                         <header>
-                            <h1 class="post-title">Golang 函数</h1>
+                            <h1 class="post-title">Golang 类型系统</h1>
                         </header>
                         <date class="post-meta meta-date">
-                            2019年10月13日
+                            2019年10月14日
                         </date>
                         
                         <div class="post-meta">
@@ -91,287 +91,250 @@
                         </div>
                         
                         <div class="post-content">
-                            <h3 id="函数">函数</h3>
+                            <h3 id="类型系统">类型系统</h3>
 
-<p>函数的基本组成为:</p>
+<p>类型系统是指一个语言的类型体系结构, 是一门编程语言的地基</p>
 
-<ul>
-<li>关键字 <strong><em>func</em></strong></li>
-<li>函数名</li>
-<li>参数列表</li>
-<li>返回值</li>
-<li>函数体</li>
-<li>返回语句</li>
-</ul>
-
-<h3 id="一-函数定义">一. 函数定义</h3>
-
-<p>需要注意以下几点:</p>
+<p>一个典型的类型系统通常包含如下基本内容:</p>
 
 <ul>
-<li>函数参数中若干个相邻参数类型相同, 则可省略前面的变量类型声明</li>
-<li>多个返回值类型相同也可合并类型</li>
-<li><strong>函数小写字母开头的函数只在本包内可见, 大写字母开头的函数才
-能被其他包使用(该规则也适用于类型和变量)</strong></li>
+<li>基础类型, 如 <strong>byte</strong>, <strong>int</strong>, <strong>bool</strong>, <strong>floot</strong> 等</li>
+<li>复合类型, 如<strong>数组</strong>, <strong>结构体</strong>, <strong>指针</strong>等</li>
+<li>可以指向任意对象的类型(Any 类型)</li>
+<li>值语义和引用语义</li>
+<li>面向对象, 即所有具备面向对象特征的类型</li>
+<li>接口</li>
 </ul>
 
-<pre><code class="language-go">func Add(a, b int) (result int, err error) {
-	if a &lt; 0 || b &lt; 0 {
-		err = errors.New(&quot;Should be non-negative numbers!&quot;)
-	}
+<p>Go 语言中的大多数类型都是值语义, 并且都可以包含对应的操作方法. 在需要的时候, 你可以给任何类型 (包括内置类型) &ldquo;增加&rdquo; 新的方法. 而在实现某个接口时, 无需从该接口继承 (实际上, Go 语言不支持面向对象中的<strong>继承</strong>语法), 只需要实现该接口要求的所有方法即可</p>
 
-	return a + b, err  // 多重返回值
-}
-</code></pre>
+<p>任意类型都可以被 <strong><em>Any类型</em></strong> 引用. <strong><em>Any类型</em></strong> 就是空接口, 即 <strong><em>interface{}</em></strong></p>
 
-<ul>
-<li>如果函数只有一个返回值, 可省略变量名</li>
-</ul>
+<h3 id="为类型添加方法">为类型添加方法</h3>
 
-<pre><code class="language-go">func Add(a, b int) int {
-	...
-}
-</code></pre>
+<p>在 Golang 中, 可以给任意类型添加相应的方法 (包括内置类型, 但不包括指针类型) 添加对应的方法</p>
 
-<h3 id="二-函数调用">二. 函数调用</h3>
+<p>下面的例子中, 定义了一个新的类型 <strong><em>Integer</em></strong>, 它和 <strong><em>int</em></strong> 没有本质不同, 但我们为它增加了一个新的方法 <strong><em>Less()</em></strong></p>
 
-<p>一种是调用自身文件中的函数, 直接调用即可:</p>
-
-<pre><code class="language-go">package main
-
-import (
-	&quot;errors&quot;
-	&quot;fmt&quot;
-)
-
-func Add(a, b int) (result int, err error) {
-	if a &lt; 0 || b &lt; 0 {
-		err = errors.New(&quot;Should be non-negative numbers!&quot;)
-	}
-
-	return a + b, err  // 多重返回值
-}
-
-func main() {
-
-	sum, err := Add(10, 20)
-	if err != nil {
-		fmt.Println(err)
-	} else {
-		fmt.Println(&quot;sum 10 and 20 is &quot;, sum)
-	}
-}
-</code></pre>
-
-<p>若函数在其他包中, 函数调用只需要导入该函数所在的包, 就可是如下方式使用(函数名第一个字母大写(导出)):</p>
-
-<pre><code class="language-go">import &quot;mymath&quot;  // 假如 Add 函数放在一个叫 mymath 的包中
-
-c := mymath.Add(10, 20)
-</code></pre>
-
-<h3 id="三-不定参数">三. 不定参数</h3>
-
-<p>不定参数是指传入函数的参数个数为不定数量. 需要将函数定义为接受不定参数类型</p>
-
-<pre><code class="language-go">/// myfunc() 函数接受不定数量的参数, 这些参数全部是 int 类型
-func myfunc(args ...int) {
-	for _, arg := range args {
-		fmt.Println(arg)
-	}
-}
-
-myfunc(2, 3, 4)  // 调用时可以传入不定数量的 int 类型参数
-</code></pre>
-
-<p>形如 &hellip;type 格式的类型只能作为参数类型存在, 并且必须是最后一个参数. 这是一个语法糖</p>
-
-<p>从内部实现机理上来说, 类型 &hellip;type 本质上是一个数组切片, 也就是 []type
-假如没有 &hellip;type 这样的语法糖, 那么上面的函数写为:</p>
-
-<pre><code class="language-go">func myfunc(args []int) {
-	for _, arg := range args {
-		fmt.Println(arg)
-	}
-}
-
-myfunc2([]int{5, 6, 7})  // 没有语法糖的写法, 调用时必须传入切片实例
-</code></pre>
-
-<p>还可以<strong>向不定参数的函数传递变参</strong>:</p>
+<p>使用这个方法就像普通的类一样使用</p>
 
 <pre><code class="language-go">package main
 
 import &quot;fmt&quot;
 
-func myfunc(args ...int) {
-	for _, arg := range(args) {
-		fmt.Println(arg)
-	}
+type Integer int
+
+func (a Integer) Less(b Integer) bool {
+	return a &lt; b
 }
 
 func main() {
-	args := []int {1, 2, 3, 4, 5}
-
-	myfunc(args...)  // 按原样传递
-
-	myfunc(args[1:]...)  // 传递参数片段
+	var a Integer = 1
+	if a.Less(2) {
+		fmt.Println(a, &quot;Less 2&quot;)
+	}
 }
 </code></pre>
 
-<p>以上为指定不定参数的类型的举例, 如果你希望传递任意类型, 可以指定类型为 <strong><em>interface{}</em></strong></p>
-
-<pre><code class="language-go">// 以下为 Golang 标准库中 fmt.Printf() 的函数原型
-func Printf(format string, a ...interface{}) (n int, err error) {
-	...
-}
-</code></pre>
-
-<p>用 <strong><em>interface{}</em></strong> 来传递任意类型的参数是 Go 语言的惯例用法</p>
-
-<p>以下程序使用 *<strong>interface{}</strong> 获取任意类型参数定打印参数的类型</p>
+<p>如果将上面的例子使用面向过程来实现, 则如下:</p>
 
 <pre><code class="language-go">package main
 
 import &quot;fmt&quot;
 
-func myPrintf(args ...interface{}) {
-	for _, arg := range(args) {
-		switch arg.(type) {
-		case int:
-			fmt.Println(arg, &quot;is an int value&quot;)
-		case string:
-			fmt.Println(arg, &quot;is a string value&quot;)
-		case int64:
-			fmt.Println(arg, &quot;is an int64 value&quot;)
-		default:
-			fmt.Println(arg, &quot;is an unknown type&quot;)
-		}
+type Integer int
+
+func integerLess(a Integer, b Integer) bool {
+	return a &lt; b
+}
+func main() {
+	var a Integer = 1
+	if integerLess(a, 2) {
+		fmt.Println(a, &quot;Less 2&quot;)
 	}
+}
+</code></pre>
+
+<p>可以看出, 面向对象只是换了一种语法形来表达</p>
+
+<p>&ldquo;在 Golang 中没有隐藏的 this 指针&rdquo;的含义是:</p>
+
+<ul>
+<li>方法施加的目标(也就是&rdquo;对象&rdquo;)显式传递, 没有被隐藏起来</li>
+<li>方法施加的目标(也就是&rdquo;对象&rdquo;)不需要非得是指针, 也不用非得叫 this</li>
+</ul>
+
+<p>只有当你需要修改对象时, 才必须用指针:</p>
+
+<pre><code class="language-go">// 这里为 Integer 类型增加了 Add 方法, 传入的参数类型为指针类型
+func (a *Integer) Add (b Integer) {
+    *a += b
+}
+</code></pre>
+
+<h3 id="值语义和引用语义">值语义和引用语义</h3>
+
+<p>值语义和引用语义的差别在于赋值</p>
+
+<pre><code class="language-go">// example
+b = a
+b.Modify()
+
+// 如果 b 的修改不会影响 a 的值, 那么此类型属于值类型
+// 如果会影响到 a 的值, 那么此类型是引用类型
+</code></pre>
+
+<p>Go 语言中大多数类型都基于值语义:</p>
+
+<ul>
+<li>基本类型, 如 byte, int, bool, float32, float64 和 string 等</li>
+<li>复合类型, 如 数组(array), 结构体(struct) 和 指针(pointer) 等</li>
+</ul>
+
+<p>有 4 个类型比较特别, 看起来像引用类型:</p>
+
+<ul>
+<li>数组切片</li>
+<li>map</li>
+<li>channel</li>
+<li>接口(interface)</li>
+</ul>
+
+<h3 id="结构体">结构体</h3>
+
+<p>Go 的结构体是很普通的复合类型, 放弃了包括继承在内的大量面向对象特性, 只保留了<strong>组合</strong>这个最基础的特性</p>
+
+<pre><code class="language-go">// 定义一个矩形类型
+type Rect struct {
+	x, y float64
+	width, height float64
+}
+
+// 定义成员方法 Area() 计算矩形面积
+func (r *Rect) Area() float64 {
+	return r.width * r.height
+}
+</code></pre>
+
+<h3 id="初始化">初始化</h3>
+
+<p>上面定义了 Rect 类型后, 如何创建并初始化 Rect 类型的对象实例呢?</p>
+
+<p>Go 中类型的实例化可通过如下几种方式实现</p>
+
+<pre><code class="language-go">rect1 := new(Rect)
+rect2 := &amp;Rect{}
+rect3 := &amp;Rect{0, 0, 100, 200}
+rect4 := &amp;Rect{width: 100, height: 200}
+</code></pre>
+
+<p>在 Go 中, 未进行显式初始化的变量都会被初始化为该类型的零值: 如 bool 类型零值为 false, int 类型零值为0, string 类型的零值为空字符串</p>
+
+<p>Go 中没有构造函数的概念, 对象的创建通常要交给一个全局创建函数来完成, 表示&rdquo;<strong>构造函数</strong>&ldquo;:</p>
+
+<pre><code class="language-go">func NewRect(x, y, width, height float64) *Rect {
+	return &amp;Rect{x, y, width, height}
+}
+</code></pre>
+
+<p>结构体初始化示例:</p>
+
+<pre><code class="language-go">package main
+
+import &quot;fmt&quot;
+
+type rect struct {
+	x, y float64
+	width, height float64
+}
+
+func newRect(x, y, width, height float64) *rect {
+	return &amp;rect{x, y, width, height}
 }
 
 func main() {
-	var v1 int = 1
-	var v2 int64 = 120
-	var v3 string = &quot;hello&quot;
-	var v4 float32 = 1.20
+	a := rect{}
+	fmt.Println(a)
+	a.x = 10
+	a.y = 20
+	fmt.Println(a)
 
-	myPrintf(v1, v2, v3, v4)
+	b := new(rect)
+	b.width = 500
+	b.height = 300
+	fmt.Println(b)
+
+	c := &amp;rect{}
+	c.y = 30
+	c.height = 400
+	fmt.Println(c)
+
+	d := newRect(10, 20, 30,40)
+	fmt.Println(d)
 }
 </code></pre>
 
-<h3 id="四-多返回值">四. 多返回值</h3>
+<h3 id="匿名组合">匿名组合</h3>
 
-<p>Golang 的函数或者成员的方法可以有多个返回值</p>
+<p>确切的说, Go 也提供了继承, 但是采用了组合的文法, 所以被其称为匿名组合</p>
 
-<pre><code class="language-go">// 可以给返回值命名, 在函数开始时, 返回值的值被自动初始化为空
-// 函数中执行不带任何参数的 return 语句时, 会返回对应变量的值
-func (file *File) Read(b []byte) (n int, err Error)
-
-// 如果不想接收函数中的某个返回值, 可以用 &quot;_&quot; 符号跳过这个返回值
-n, _ := f.Read(buf)
-</code></pre>
-
-<h3 id="五-匿名函数与闭包">五. 匿名函数与闭包</h3>
-
-<p><strong>匿名函数</strong>是指不需要定义函数名的一种函数实现方式</p>
-
-<p>Go 允许将函数像普通变量一样进行传递或使用, 也支持随时在代码里定义匿名函数</p>
-
-<pre><code class="language-go">// 以下是一个匿名函数, 由一个不带函数名的函数声明和函数体组成
-func(a, b int, z float64) bool {
-	return a * b &lt; int(z)
+<pre><code class="language-go">// 定义一个 Base 类, 实现 Foo() 和 Bar() 两个成员方法, 然后定义了一个 Foo 类
+// Foo 类从 Base 类&quot;继承&quot;并改写了 Bar() 方法
+// &quot;派生类&quot; Foo 中没有改写&quot;基类&quot; Base 的成员方法时, 响应的方法就被&quot;继承&quot;
+// 因此, 调用 foo.Foo() 和 调用 foo.Base.Foo() 效果一致
+type Base struct {
+	Name string
 }
 
-// 匿名函数可以直接赋值给一个变量或直接执行
-f := func(x, y int) int {
-	return x + y
+func (base *Base) Foo() { ... }
+func (base *Base) Bar() { ... }
+
+// Golang 中内存布局就和结构体中成员顺序一致, 可随意修改
+type Foo struct {
+	Base
+	...
 }
 
-// 定义匿名函数时调用匿名函数
-func main() {
-	var v1 int = 1
-
-	func(a int) {
-		fmt.Println(&quot;This is anonymous func, a is &quot;, a)
-	} (v1) // 花括号后面根参数列表表示函数调用
+func (foo *Foo) Bar() {
+	foo.Base.Bar()
+	...
 }
 </code></pre>
 
-<p>Go 的匿名函数时一个闭包, 关于闭包: <strong>闭包是由函数与其相关的引用环境组合而成的实体</strong></p>
+<p>另外, 再 Go 中, 还可以以指针的方式从一个类型 &ldquo;派生&rdquo;:</p>
 
-<p>说明闭包之前, 先来了解一下什么是<strong>函数变量</strong>:</p>
-
-<p>Go 语言中, 函数被看作是<strong>第一类值</strong>, 这表示函数可以像变量一样, 有类型, 有值</p>
-
-<pre><code class="language-go">func square(x int) {
-    fmt.Println(x * x)
+<pre><code class="language-go">type Foo struct {
+    *Base
+    ...
 }
-
-// 直接调用 square(2)
-square(2)
-
-// 把函数当成变量一样赋值
-s := square
-
-// 接着可以直接调用这个函数变量
-s(3)
 </code></pre>
 
-<p>需要注意的是, 调用 <strong><em>nil</em></strong> 的函数会导致 <strong><em>panic</em></strong></p>
+<p>这段代码也有 &ldquo;派生&rdquo; 的效果, 但是 Foo 在创建实例时, 需要外部提供一个 Base 类的实例的指针</p>
 
-<p>函数变量的零值是 <strong><em>nil</em></strong>, 这表示它可以和 <strong><em>nil</em></strong> 比较, 但两个函数变量之间不能比较</p>
+<h3 id="可见性">可见性</h3>
 
-<p>下面再看个例子</p>
+<p>Go 中的某个符号要对其他包可见 (可以被访问), 需要将该符号定义为以大写字母开头即可</p>
 
-<pre><code class="language-go">// 调用该函数会返回一个函数变量
-func incr() func() int {
-	var x int = 1
-	fmt.Println(&quot;This x&quot;, x)
-	return func() int {
-		x++
-		fmt.Println(&quot;This x++&quot;, x)
-		return x
-	}
+<pre><code class="language-go">type Rect struct {
+    X, Y float64,
+    Width, Height float64
 }
-
-i := incr()  // 把这个函数变量赋值给 i, i 就成为了一个闭包
-
-// 由于 i 保存着对 x 变量的引用, 所以可以修改 x, 且可以保持状态
-
-fmt.Println(i())  // 1
-fmt.Println(i())  // 2
-fmt.Println(i())  // 3
-// 也就是说 x 逃逸了, 它的生命周期没有随着它的作用域结束而结束
-
-// 重新调用 incr() 会产生一个新的闭包, 引用着不同的x, 所以值不延续原来的递增
-fmt.Println(incr()())  // 1
-fmt.Println(incr()())  // 1
-fmt.Println(incr()())  // 1 
 </code></pre>
 
-<p>那么闭包会产生什么问题呢?</p>
+<p>这样, Rect 类型的成员变量就全部被导出了, 可以被所有引用了 Rect 所在的包的代码访问到</p>
 
-<pre><code class="language-go">// 闭包对外层变量时引用的方式, 所以外层变量修改, 会引起闭包内的变量的修改
-x := 1
+<p>成员方法的可访问性遵循同样的规则, 如:</p>
 
-f := func() {
-    fmt.Println(x)
+<pre><code class="language-go">func (r *Rect) area() float64 {
+    return r.Width * r.Height
 }
-
-x = 2
-x = 3
-
-f()  // 这里会输出 x 为 3, 因为 f 中保存着 x 的地址, 所以 x 的值改变也会导致 f 引用的值改变
 </code></pre>
+
+<p>这样, Rect 的 area() 方法只能在该类型所在的包内使用</p>
 
 <p>参考书籍:</p>
 
 <p><a href="https://book.douban.com/subject/11577300/">Go语言编程</a></p>
-
-<p>参考链接:</p>
-
-<p><a href="https://juejin.im/post/5c850d035188257ec629e73e">Go 语言闭包详解</a></p>
                         </div>
 
                         
@@ -380,15 +343,15 @@ f()  // 这里会输出 x 为 3, 因为 f 中保存着 x 的地址, 所以 x 的
     <h2>See Also</h2>
     <ul class="listing">
         
+        <li><a href="/posts/Golang-Note/Golang-error-handling/">Golang 错误处理</a></li>
+        
+        <li><a href="/posts/Golang-Note/Golang-function/">Golang 函数</a></li>
+        
         <li><a href="/posts/Golang-Note/Golang-process-control/">Golang 流程控制</a></li>
         
         <li><a href="/posts/Golang-Note/Golang-type-of-data/">Golang 数据类型</a></li>
         
         <li><a href="/posts/Golang-Note/Golang-variables-and-constants/">Golang 变量与常量</a></li>
-        
-        <li><a href="/posts/Golang-Note/Golang-install-and-env/">Golang 安装和环境配置</a></li>
-        
-        <li><a href="/posts/Kubernetes-Note/Kubernetes-Service/">Kubernetes Service</a></li>
         
     </ul>
 </div>

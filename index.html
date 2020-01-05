@@ -68,6 +68,46 @@
                         <article class="post">
                             <header>
                                 <h1 class="post-title">
+                                    <a href="http://blog.k-8s.com/posts/Golang-Note/Golang-type-system/" title="Golang 类型系统" >Golang 类型系统</a>
+                                </h1>
+                            </header>
+                            <date class="post-meta meta-date">
+                                2019年10月14日
+                            </date>
+                            
+                            <div class="post-meta">
+                                <span>|</span>
+                                
+                                <span class="meta-category"><a href="http://blog.k-8s.com/categories/Golang">Golang</a></span>
+                                
+                            </div>
+                            
+                            <div class="post-content">
+                                <h3 id="类型系统">类型系统</h3>
+
+<p>类型系统是指一个语言的类型体系结构, 是一门编程语言的地基</p>
+
+<p>一个典型的类型系统通常包含如下基本内容:</p>
+
+<ul>
+<li>基础类型, 如 <strong>byte</strong>, <strong>int</strong>, <strong>bool</strong>, <strong>floot</strong> 等</li>
+<li>复合类型, 如<strong>数组</strong>, <strong>结构体</strong>, <strong>指针</strong>等</li>
+<li>可以指向任意对象的类型(Any 类型)</li>
+<li>值语义和引用语义</li>
+<li>面向对象, 即所有具备面向对象特征的类型</li>
+<li>接口</li>
+</ul>
+
+<p>Go 语言中的大多数类型都是值语义, 并且都可以包含对应的操作方法. 在需要的时候, 你可以给任何类型 (包括内置类型) &ldquo;增加&rdquo; 新的方法. 而在实现某个接口时, 无需从该接口继承 (实际上, Go 语言不支持面向对象中的<strong>继承</strong>语法), 只需要实现该接口要求的所有方法即可</p>
+
+<p>任意类型都可以被 <strong><em>Any类型</em></strong> 引用. <strong><em>Any类型</em></strong> 就是空接口, 即 <strong><em>interface{}</em></strong></p>……
+                            </div>
+                            <p class="readmore"><a href="http://blog.k-8s.com/posts/Golang-Note/Golang-type-system/">阅读全文</a></p>
+                        </article>
+                    
+                        <article class="post">
+                            <header>
+                                <h1 class="post-title">
                                     <a href="http://blog.k-8s.com/posts/Golang-Note/Golang-error-handling/" title="Golang 错误处理" >Golang 错误处理</a>
                                 </h1>
                             </header>
@@ -447,67 +487,6 @@ spec:
                             <p class="readmore"><a href="http://blog.k-8s.com/posts/Kubernetes-Note/Kubernetes-Pod-Scheduling/">阅读全文</a></p>
                         </article>
                     
-                        <article class="post">
-                            <header>
-                                <h1 class="post-title">
-                                    <a href="http://blog.k-8s.com/posts/Kubernetes-Note/Kubernetes-Pod/" title="Kubernetes Pod 详解" >Kubernetes Pod 详解</a>
-                                </h1>
-                            </header>
-                            <date class="post-meta meta-date">
-                                2019年5月3日
-                            </date>
-                            
-                            <div class="post-meta">
-                                <span>|</span>
-                                
-                                <span class="meta-category"><a href="http://blog.k-8s.com/categories/Kubernetes">Kubernetes</a></span>
-                                
-                            </div>
-                            
-                            <div class="post-content">
-                                <h3 id="创建-pod">创建 Pod</h3>
-
-<p>我们先来通过命令的方式, 来创建一个简单的 Pod</p>
-
-<p>需要注意的一点是, 如果只想创建一个 Pod, 而不是创建一个 Deployment, 则需要指定参数 <strong><em><code>--generator=run-pod/v1</code></em></strong></p>
-
-<pre><code class="language-shell">root@K8sMaster-1:~# kubectl run my-nginx --image=nginx:1.14.1 --replicas=2 --port=80 --generator=run-pod/v1
-pod/my-nginx created
-
-root@K8sMaster-1:~# kubectl get pods
-NAME       READY   STATUS    RESTARTS   AGE
-my-nginx   1/1     Running   0          8s
-
-# 查看pod 详情
-root@K8sMaster-1:~# kubectl describe pod my-nginx
-Name:               my-nginx
-Namespace:          default
-Priority:           0
-PriorityClassName:  &lt;none&gt;
-Node:               k8snode-1/192.168.206.151
-Start Time:         Sun, 27 Oct 2019 14:29:22 +0800
-Labels:             run=my-nginx
-Annotations:        &lt;none&gt;
-Status:             Running
-IP:                 10.244.1.11
-Containers:
-  my-nginx:
-    Container ID:   docker://9edea905f888a0a10d9e7859f995ce0e4e43e388b42b8d9c7a20f880915307c8
-    Image:          nginx:1.14.1
-    Image ID:       docker-pullable://nginx@sha256:32fdf92b4e986e109e4db0865758020cb0c3b70d6ba80d02fe87bad5cc3dc228
-    Port:           80/TCP
-    Host Port:      0/TCP
-    State:          Running
-      Started:      Sun, 27 Oct 2019 14:29:23 +0800
-    Ready:          True
-    ...
-</code></pre>
-
-<p>通过以上方式, 我们就能创建一个名为 <strong>my-nginx</strong> 的 Pod, 使用的是 <strong>nginx:1.14.1</strong> 的镜像, 并且指定开放的端口为 <strong>80</strong></p>……
-                            </div>
-                            <p class="readmore"><a href="http://blog.k-8s.com/posts/Kubernetes-Note/Kubernetes-Pod/">阅读全文</a></p>
-                        </article>
-                    
 
                     
 
@@ -552,6 +531,10 @@ Containers:
 <ul class="widget-list">
     
     <li>
+        <a href="http://blog.k-8s.com/posts/Golang-Note/Golang-type-system/" title="Golang 类型系统">Golang 类型系统</a>
+    </li>
+    
+    <li>
         <a href="http://blog.k-8s.com/posts/Golang-Note/Golang-error-handling/" title="Golang 错误处理">Golang 错误处理</a>
     </li>
     
@@ -587,10 +570,6 @@ Containers:
         <a href="http://blog.k-8s.com/posts/Kubernetes-Note/Kubernetes-Pod-Scheduling/" title="Kubernetes Pod 调度">Kubernetes Pod 调度</a>
     </li>
     
-    <li>
-        <a href="http://blog.k-8s.com/posts/Kubernetes-Note/Kubernetes-Pod/" title="Kubernetes Pod 详解">Kubernetes Pod 详解</a>
-    </li>
-    
 </ul>
     </section>
 
@@ -601,7 +580,7 @@ Containers:
 <ul class="widget-list">
     
     <li>
-        <a href="http://blog.k-8s.com/categories/Golang/">Golang(6)</a>
+        <a href="http://blog.k-8s.com/categories/Golang/">Golang(7)</a>
     </li>
     
     <li>
