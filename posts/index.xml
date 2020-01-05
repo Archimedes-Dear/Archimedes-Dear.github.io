@@ -6,10 +6,30 @@
     <description>Recent content in Posts on Mr.耗子</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    <lastBuildDate>Sat, 12 Oct 2019 15:16:24 +0800</lastBuildDate>
+    <lastBuildDate>Sun, 13 Oct 2019 09:18:45 +0800</lastBuildDate>
     
 	<atom:link href="http://blog.k-8s.com/posts/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Golang 函数</title>
+      <link>http://blog.k-8s.com/posts/Golang-Note/Golang-function/</link>
+      <pubDate>Sun, 13 Oct 2019 09:18:45 +0800</pubDate>
+      
+      <guid>http://blog.k-8s.com/posts/Golang-Note/Golang-function/</guid>
+      <description>&lt;h3 id=&#34;函数&#34;&gt;函数&lt;/h3&gt;
+
+&lt;p&gt;函数的基本组成为:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;关键字 &lt;strong&gt;&lt;em&gt;func&lt;/em&gt;&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;函数名&lt;/li&gt;
+&lt;li&gt;参数列表&lt;/li&gt;
+&lt;li&gt;返回值&lt;/li&gt;
+&lt;li&gt;函数体&lt;/li&gt;
+&lt;li&gt;返回语句&lt;/li&gt;
+&lt;/ul&gt;</description>
+    </item>
     
     <item>
       <title>Golang 流程控制</title>
