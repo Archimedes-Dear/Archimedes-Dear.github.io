@@ -7,20 +7,20 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>Golang 错误处理 | Mr.耗子</title>
-    <meta property="og:title" content="Golang 错误处理 - Mr.耗子">
+    <title>Golang 接口 | Mr.耗子</title>
+    <meta property="og:title" content="Golang 接口 - Mr.耗子">
     <meta property="og:type" content="article">
         
-    <meta property="article:published_time" content="2019-10-13T20:17:18&#43;08:00">
+    <meta property="article:published_time" content="2019-10-15T10:24:05&#43;08:00">
         
         
-    <meta property="article:modified_time" content="2019-10-13T20:17:18&#43;08:00">
+    <meta property="article:modified_time" content="2019-10-15T10:24:05&#43;08:00">
         
     <meta name="Keywords" content="耗子,Mr.耗子,Docker,容器,k8s,kubernetes,golang,go,devops">
-    <meta name="description" content="Golang 错误处理">
+    <meta name="description" content="Golang 接口">
         
     <meta name="author" content="Mr.耗子">
-    <meta property="og:url" content="http://blog.k-8s.com/posts/Golang-Note/Golang-error-handling/">
+    <meta property="og:url" content="http://blog.k-8s.com/posts/Golang-Note/Golang-interface/">
     <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
 
     <link rel="stylesheet" href="/css/normalize.css">
@@ -72,10 +72,10 @@
                 <div class="res-cons">
                     <article class="post">
                         <header>
-                            <h1 class="post-title">Golang 错误处理</h1>
+                            <h1 class="post-title">Golang 接口</h1>
                         </header>
                         <date class="post-meta meta-date">
-                            2019年10月13日
+                            2019年10月15日
                         </date>
                         
                         <div class="post-meta">
@@ -91,133 +91,254 @@
                         </div>
                         
                         <div class="post-content">
-                            <h3 id="错误处理">错误处理</h3>
+                            <h3 id="接口">接口</h3>
 
-<h3 id="一-error-接口">一. error 接口</h3>
+<p>Go 语言中的接口不是其他语言中的接口所提供的接口概念</p>
 
-<p>Go 引入了一个关于错误处理的标准模式, 即 <strong><em>error</em></strong> 接口, 定义如下:</p>
+<p>在 Go 出现之前, 接口主要作为不通组件之间的契约存在, 对契约的实现是强制的, 必须声明你的确是实现了该接口</p>
 
-<pre><code class="language-go">type error interface {
-    Error() string
-}
+<p>在 Go 语言中的接口类型是一种抽象的类型. 它不会暴露出<code>它所代表的对象的内部值的结构</code>和<code>这个对象支持的基础操作的集合</code>, 它只会展示出他们自己的方法.</p>
 
-// 对于大多数函数, 如果要返回错误, 大致上可以定义为如下模式, 将 error 作为多返回结果的最后一个
-func Foo(param int) (n int, err error) {
-    ...
-}
+<p>也就是说, 当你看到一个接口类型的值时, 你不知道它是什么, 唯一知道的就是可以通过它的方法来做什么</p>
 
-// 调用时错误处理格式
-n, err := Foo(0)
-
-if err != nil {
-    // 错误处理
-} else {
-    // 使用返回值n
-}
-</code></pre>
-
-<p>error 接口使用示范:</p>
-
-<pre><code class="language-go">// err example
-package main
-
-import (
-	&quot;errors&quot;
-	&quot;fmt&quot;
-)
-
-func Add(x, y int) (result int, err error) {
-	if x &lt; 0 || y &lt; 0 {
-		err = errors.New(&quot;x, y need &gt; 0&quot;)
-	} else {
-		result = x + y
-	}
-	return result, err
-}
-
-func main() {
-	result, err := Add(10, -1)
-
-	if err != nil {
-		fmt.Println(err)
-	} else {
-		fmt.Println(&quot;x + y =&quot;, result)
-	}
-}
-</code></pre>
-
-<h3 id="二-defer">二. defer</h3>
-
-<p><strong><em>defer</em></strong> 语句会在函数结束候执行, 但需要注意的是, 如果有多层 <strong><em>defer</em></strong> 语句的执行顺序是最后一个 <strong><em>defer</em></strong> 语句将被最先执行</p>
+<p>接口举例:</p>
 
 <pre><code class="language-go">package main
 
 import &quot;fmt&quot;
 
+// ======= 接口的定义 =======
+// 接口仅定义方法, 是一堆方法的集合
+// 如下 文件接口 定义了 读取, 写入, 关闭三个方法, 但不包括具体实现
+type file interface {
+	read() string
+	write() string
+	close() string
+}
+
+// ======= 以下是接口的实现 =======
+// 定义一个类型, 如果实现了某个接口的所有方法, 那么就说该类型实现了该接口
+type myFile struct {
+	name string
+	size int64
+}
+
+// 接口方法的具体实现, 传入的是 myFile 类型的实例
+func (f myFile) read() string {
+	fmt.Println(&quot;read success, name is&quot;, f.name)
+	return &quot;read&quot;
+}
+
+func (f myFile) write() string {
+	fmt.Println(&quot;write success, name is&quot;, f.name, &quot;size is&quot;, f.size)
+	return &quot;write&quot;
+}
+
+func (f myFile) close() string {
+	fmt.Println(&quot;file close&quot;)
+	return &quot;close&quot;
+}
+
+
 func main() {
-	fmt.Println(&quot;Start...&quot;)
+	// 以上有了接口的定义, 接口的实现(类型和方法), 下面开始使用接口
+	// 初始化接口(定义一个变量为接口的实例
+	var file1 file
 
-    // defer 语句的内容将在 &quot;hello, world!&quot; 之后显示
-	defer fmt.Println(&quot;End... This is defer&quot;)
+    // 接口实例赋值, 此处赋值为 myFile 实例(需要 myFile 类型实现了接口的所有方法, 否则编译会出现 missing xxx method 的错误)
+    // 还有一种赋值方法是将一个接口赋值给另一个接口
+	file1 = myFile{&quot;test.txt&quot;, 20}
 
-	fmt.Println(&quot;Hello, World!&quot;)
+	// 然后就可以像面向对象一样使用 &quot;实例&quot;.&quot;方法&quot; 来操作实例了
+	file1.read()
+	file1.write()
+	file1.close()
 }
 </code></pre>
 
-<h3 id="三-panic-和-recover">三. panic() 和 recover()</h3>
+<h3 id="接口赋值">接口赋值</h3>
 
-<p>Go 语言引入了两个内置函数 <strong><em>panic()</em></strong> 和 <strong><em>recover()</em></strong> 以报告和处理运行时错误和程序中的错误场景</p>
+<p>Go 的接口赋值有如下两种方式:</p>
 
-<p>当一个函数执行过程中调用 <strong><em>panic()</em></strong> 函数时, 正常的函数执行流程将立即终止(<strong><em>defer</em></strong> 关键字依旧正常执行), 之后该函数返回到调用函数, 并逐层向上执行 <strong><em>panic</em></strong> 流程, 直至所属的 <strong><em>goroutine</em></strong> 中所有正在执行的函数被终止</p>
+<ul>
+<li>将对象实例赋值给接口</li>
+<li>将一个接口赋值给另一个接口</li>
+</ul>
 
-<p><strong><em>panic()</em></strong> 函数接受任意类型的数据:</p>
+<p>先看看如何将对象赋值给接口, 例如有如下类型和接口</p>
 
-<pre><code class="language-go">panic(404)
-panic(&quot;network broken&quot;)
-panic(Error(&quot;file not exists&quot;))
+<pre><code class="language-go">type file interface {
+	read() string
+}
+
+type myFile struct {
+	name string
+	size int64
+}
+
+func (f myFile) read() string {
+	fmt.Println(&quot;read success, name is&quot;, f.name)
+	return &quot;read&quot;
+}
 </code></pre>
 
-<p><strong><em>recover()</em></strong> 函数用于终止错误处理流程</p>
+<p>那么, 以下两种赋值方式哪种可以用呢?</p>
 
-<p>一般情况下, <strong><em>recover()</em></strong> 应该在一个使用 <strong><em>defer</em></strong> 关键字的函数中执行, 以有效截取错误处理流程</p>
+<pre><code class="language-go">var a1 file
+var f1 myFile
 
-<p>如果在没有发生异常的 goroutine 中明确调用恢复过程(使用 <strong><em>recover()</em></strong> 关键字), 会导致该 goroutine 所属的进程打印异常信息后直接退出</p>
+f1 = myFile{&quot;test.txt&quot;, 20}
 
-<p>例如如下代码中, 无论函数 g() 中触发了错误处理流程, 该匿名 <strong><em>defer</em></strong> 函数都将在函数退出时得到执行</p>
+var a1 = &amp;f1   ... (1)
+var a1 = f1    ... (2)
+</code></pre>
 
-<p>我们手动让函数 g() 中触发了错误处理流程, 可以观察到 <strong><em>recover()</em></strong> 函数执行使得该错误处理过程终止, 并且还会打印 <strong><em>panic()</em></strong> 传入的错误信息</p>
+<p>答案是语句(1) 和 (2) 都可以</p>
+
+<p>因为我们的 read() 方法具有指针接收器, 所以 Go 可以根据 <code>func (f myFile) read() string</code> 自动生成 <code>func (f *myFile) read string</code> 方法, 这样 *myFile 类型也有 read() 方法了</p>
+
+<p>但是, Go 无法根据 <code>func (f *myFile) read() string</code> 自动生成 <code>func(f myfile) read string</code> 方法, 因此 带有指针接收器的方法只能使用 (1) 的方式赋值, 而不带指针接收器的方法仅能用 (1) 的方式赋值</p>
+
+<p>如何将一个接口赋值给另一个接口呢?  答案是只要两个接口拥有相同的方法列表(次序可以不同), 那么他们就是等同的, 可以互相赋值</p>
+
+<pre><code class="language-go">// 例如在 one 包中有一个接口 ReadWrite
+package one
+
+type ReadWrite interface {
+	Read() string
+	Write() string
+}
+</code></pre>
+
+<pre><code class="language-go">// 在另一个包 two 中有另一个接口 IOStream
+type IOStream interface {
+	Write() string
+	Read() string
+}
+</code></pre>
+
+<p>这两个接口都定义了 Read(), Write() 方法, 只是次序相反. 但这两个接口在 Go 中并没有区别, 因为:</p>
+
+<ul>
+<li>任何实现了 one.ReadWrite 接口的类, 均实现了 two.IOStream</li>
+<li>任何 one.ReadWrite 接口对象可赋值给 two.IOStream, 反之亦然</li>
+</ul>
+
+<p>若 接口A 的方法列表是 接口B 的子集, 那么 接口B 可以赋值给 接口A</p>
+
+<pre><code class="language-go">// 假如我们有 Writer 接口
+type Writer interface {
+    Write() string
+}
+
+// 那么 one.ReadWrite 和 two.IOStream 接口实例可以赋值给 Write 接口
+var f1 two.IOStream = new(myFile)
+var f2 Writer = f1
+
+// 反之不成立
+var f1 Writer = new(myFile)
+var f2 two.IOStream = f1  // 编译不通过, 因为 f1 没有 Read() 方法
+</code></pre>
+
+<h3 id="接口查询">接口查询</h3>
+
+<p>如何判断以上 Write 接口是否实现了 file 接口呢? 可以通过接口查询语法:</p>
 
 <pre><code class="language-go">package main
 
-import (
-	&quot;fmt&quot;
-)
+import &quot;fmt&quot;
+
+// ======= file 接口
+type file interface {
+	Read() string
+	Write() string
+}
+
+// 实现了 file 接口的 myFile 类型
+type myFile struct {
+	name string
+	size int64
+}
+
+// 具体实现
+func (f *myFile) Read() string {
+	fmt.Println(&quot;read success, name is&quot;, f.name)
+	return &quot;read&quot;
+}
+
+func (f *myFile) Write() string {
+	fmt.Println(&quot;write success, name is&quot;, f.name)
+	return &quot;write&quot;
+}
+
+// Write 接口
+type Writer interface {
+	Write() string
+}
+
+// 实现了 Write 接口的 myFile2 类型
+type myFile2 struct {
+	name string
+	size int64
+}
+
+// 具体实现, 此处的 myFile2 类型没有实现 Read 方法, 也就没有实现 file 接口
+func (f *myFile2) Write() string {
+	fmt.Println(&quot;write success, name is&quot;, f.name)
+	return &quot;write&quot;
+}
 
 func main() {
-	f()
-	fmt.Println(&quot;Returned normally from f.&quot;)
-}
+	var f1 file
+	var m1 = myFile{&quot;test.txt&quot;, 20}
 
-func f() {
-	defer func() {
-		if r := recover(); r != nil {
-			fmt.Println(&quot;Recovered in f&quot;, r)
-			fmt.Println(&quot;Recovered in f&quot;, r)
-		}
-	}()
-	fmt.Println(&quot;Calling g.&quot;)
-	g()
-	fmt.Println(&quot;Returned normally from g.&quot;)
-}
+	f1 = &amp;m1
+	f1.Read()
 
-func g() {
-	panic(&quot;ERROR Info&quot;)
+	var f2 Writer
+	var m2 = myFile2{&quot;test2.txt&quot;, 30}
+
+	f2 = &amp;m2
+
+    // 通过以下 if 语句可查询 f2 实例是否实现了 file 接口, 从而执行特定代码
+	if f3, ok := f2.(file); ok {
+		fmt.Println(&quot;yes, 它实现了 file 接口&quot;)
+	} else {
+		fmt.Println(&quot;no, 它没有实现 file 接口&quot;)
+	}
 }
 </code></pre>
 
-<p>参考书籍:</p>
+<h3 id="接口组合">接口组合</h3>
 
-<p><a href="https://book.douban.com/subject/11577300/">Go语言编程</a></p>
+<p>接口组合便是用接口嵌套接口</p>
+
+<pre><code class="language-go">// 例如用 FileIO 接口包含 file 和 Writer 接口
+type FileIO interface {
+    file
+    Writer
+}
+</code></pre>
+
+<p>这样 FileIO 接口即能做 file 接口的事情, 又能做 Writer 接口能做的事情</p>
+
+<h3 id="any-类型">Any 类型</h3>
+
+<p>由于 Go 语言中的任何对象实例都满足空接口 <strong><em>interface{}</em></strong>, 所以 <strong><em>interface{}</em></strong> 看起来像是可以指向任何对象的 Any 类型</p>
+
+<pre><code class="language-go">// 任意赋值的 Any 类型
+var v1 interface{} = 1     // 将int类型赋值给interface{}
+var v2 interface{} = &quot;abc&quot; // 将string类型赋值给interface{}
+var v3 interface{} = &amp;v2   // 将*interface{}类型赋值给interface{}
+var v4 interface{} = struct{ X int }{1}
+var v5 interface{} = &amp;struct{ X int }{1}
+</code></pre>
+
+<p>当函数可以接受任意类型的对象实例时, 我们会将其声明为 <strong><em>interface{}</em></strong>, 例如 <strong><em>fmt</em></strong> 包中的 <strong><em>Printxxx系列</em></strong> 的函数</p>
+
+<pre><code class="language-go">func Printf(format string, a ...interface{}) (n int, err error)
+func Println(a ...interface{}) (n int, err error)
+</code></pre>
                         </div>
 
                         
@@ -226,15 +347,15 @@ func g() {
     <h2>See Also</h2>
     <ul class="listing">
         
+        <li><a href="/posts/Golang-Note/Golang-type-system/">Golang 类型系统</a></li>
+        
+        <li><a href="/posts/Golang-Note/Golang-error-handling/">Golang 错误处理</a></li>
+        
         <li><a href="/posts/Golang-Note/Golang-function/">Golang 函数</a></li>
         
         <li><a href="/posts/Golang-Note/Golang-process-control/">Golang 流程控制</a></li>
         
         <li><a href="/posts/Golang-Note/Golang-type-of-data/">Golang 数据类型</a></li>
-        
-        <li><a href="/posts/Golang-Note/Golang-variables-and-constants/">Golang 变量与常量</a></li>
-        
-        <li><a href="/posts/Golang-Note/Golang-install-and-env/">Golang 安装和环境配置</a></li>
         
     </ul>
 </div>

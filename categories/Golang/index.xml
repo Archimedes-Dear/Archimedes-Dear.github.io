@@ -6,10 +6,27 @@
     <description>Recent content in Golang on Mr.耗子</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    <lastBuildDate>Mon, 14 Oct 2019 10:03:41 +0800</lastBuildDate>
+    <lastBuildDate>Tue, 15 Oct 2019 10:24:05 +0800</lastBuildDate>
     
 	<atom:link href="http://blog.k-8s.com/categories/Golang/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Golang 接口</title>
+      <link>http://blog.k-8s.com/posts/Golang-Note/Golang-interface/</link>
+      <pubDate>Tue, 15 Oct 2019 10:24:05 +0800</pubDate>
+      
+      <guid>http://blog.k-8s.com/posts/Golang-Note/Golang-interface/</guid>
+      <description>&lt;h3 id=&#34;接口&#34;&gt;接口&lt;/h3&gt;
+
+&lt;p&gt;Go 语言中的接口不是其他语言中的接口所提供的接口概念&lt;/p&gt;
+
+&lt;p&gt;在 Go 出现之前, 接口主要作为不通组件之间的契约存在, 对契约的实现是强制的, 必须声明你的确是实现了该接口&lt;/p&gt;
+
+&lt;p&gt;在 Go 语言中的接口类型是一种抽象的类型. 它不会暴露出&lt;code&gt;它所代表的对象的内部值的结构&lt;/code&gt;和&lt;code&gt;这个对象支持的基础操作的集合&lt;/code&gt;, 它只会展示出他们自己的方法.&lt;/p&gt;
+
+&lt;p&gt;也就是说, 当你看到一个接口类型的值时, 你不知道它是什么, 唯一知道的就是可以通过它的方法来做什么&lt;/p&gt;</description>
+    </item>
     
     <item>
       <title>Golang 类型系统</title>

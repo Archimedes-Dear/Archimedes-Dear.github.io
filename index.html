@@ -68,6 +68,37 @@
                         <article class="post">
                             <header>
                                 <h1 class="post-title">
+                                    <a href="http://blog.k-8s.com/posts/Golang-Note/Golang-interface/" title="Golang 接口" >Golang 接口</a>
+                                </h1>
+                            </header>
+                            <date class="post-meta meta-date">
+                                2019年10月15日
+                            </date>
+                            
+                            <div class="post-meta">
+                                <span>|</span>
+                                
+                                <span class="meta-category"><a href="http://blog.k-8s.com/categories/Golang">Golang</a></span>
+                                
+                            </div>
+                            
+                            <div class="post-content">
+                                <h3 id="接口">接口</h3>
+
+<p>Go 语言中的接口不是其他语言中的接口所提供的接口概念</p>
+
+<p>在 Go 出现之前, 接口主要作为不通组件之间的契约存在, 对契约的实现是强制的, 必须声明你的确是实现了该接口</p>
+
+<p>在 Go 语言中的接口类型是一种抽象的类型. 它不会暴露出<code>它所代表的对象的内部值的结构</code>和<code>这个对象支持的基础操作的集合</code>, 它只会展示出他们自己的方法.</p>
+
+<p>也就是说, 当你看到一个接口类型的值时, 你不知道它是什么, 唯一知道的就是可以通过它的方法来做什么</p>……
+                            </div>
+                            <p class="readmore"><a href="http://blog.k-8s.com/posts/Golang-Note/Golang-interface/">阅读全文</a></p>
+                        </article>
+                    
+                        <article class="post">
+                            <header>
+                                <h1 class="post-title">
                                     <a href="http://blog.k-8s.com/posts/Golang-Note/Golang-type-system/" title="Golang 类型系统" >Golang 类型系统</a>
                                 </h1>
                             </header>
@@ -448,45 +479,6 @@ spec:
                             <p class="readmore"><a href="http://blog.k-8s.com/posts/Kubernetes-Note/Kubernetes-Volumes/">阅读全文</a></p>
                         </article>
                     
-                        <article class="post">
-                            <header>
-                                <h1 class="post-title">
-                                    <a href="http://blog.k-8s.com/posts/Kubernetes-Note/Kubernetes-Pod-Scheduling/" title="Kubernetes Pod 调度" >Kubernetes Pod 调度</a>
-                                </h1>
-                            </header>
-                            <date class="post-meta meta-date">
-                                2019年5月4日
-                            </date>
-                            
-                            <div class="post-meta">
-                                <span>|</span>
-                                
-                                <span class="meta-category"><a href="http://blog.k-8s.com/categories/Kubernetes">Kubernetes</a></span>
-                                
-                            </div>
-                            
-                            <div class="post-content">
-                                <p>通常来说, 不会直接创建一个 Pod, 这样管理起来会很不方便. 绝大多数情况下, 会通过 RS, Deployment, DaemonSet, Job 等来完成对一组 Pod 副本的管理工作.</p>
-
-<p>Pod 调度分一下几种:</p>
-
-<ul>
-<li>Deployment 或 RC: 全自动调度</li>
-<li>NodeSelector: 定向调度</li>
-<li>NodeAffinity: Node 亲和性调度</li>
-<li>PodAffinity: Pod 亲和与互斥调度</li>
-<li>Taints 和 Tolerations: (污点和容忍)</li>
-<li>Pod Priority Preemption: Pod 优先级调度</li>
-</ul>
-
-<p>由以上控制器产生的副本是归属于这些控制器的, 在 Kubernetes 1.9 版本之前, 删除控制器并不会删除 Pod, Kubernetes 1.9 版本以后, 这些 Pod 会被一并删除. 如果不希望这么做, 可以通过 kubectl 的 <strong><em><code>--cascade=false</code></em></strong> 来取消这一特性:</p>
-
-<pre><code class="language-shell">kubectl delete replicaset my-repset --cascade=false
-</code></pre>……
-                            </div>
-                            <p class="readmore"><a href="http://blog.k-8s.com/posts/Kubernetes-Note/Kubernetes-Pod-Scheduling/">阅读全文</a></p>
-                        </article>
-                    
 
                     
 
@@ -531,6 +523,10 @@ spec:
 <ul class="widget-list">
     
     <li>
+        <a href="http://blog.k-8s.com/posts/Golang-Note/Golang-interface/" title="Golang 接口">Golang 接口</a>
+    </li>
+    
+    <li>
         <a href="http://blog.k-8s.com/posts/Golang-Note/Golang-type-system/" title="Golang 类型系统">Golang 类型系统</a>
     </li>
     
@@ -566,10 +562,6 @@ spec:
         <a href="http://blog.k-8s.com/posts/Kubernetes-Note/Kubernetes-Volumes/" title="Kubernetes 存储">Kubernetes 存储</a>
     </li>
     
-    <li>
-        <a href="http://blog.k-8s.com/posts/Kubernetes-Note/Kubernetes-Pod-Scheduling/" title="Kubernetes Pod 调度">Kubernetes Pod 调度</a>
-    </li>
-    
 </ul>
     </section>
 
@@ -580,7 +572,7 @@ spec:
 <ul class="widget-list">
     
     <li>
-        <a href="http://blog.k-8s.com/categories/Golang/">Golang(7)</a>
+        <a href="http://blog.k-8s.com/categories/Golang/">Golang(8)</a>
     </li>
     
     <li>
