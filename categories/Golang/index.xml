@@ -6,7 +6,7 @@
     <description>Recent content in Golang on Mr.耗子</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    <lastBuildDate>Tue, 15 Oct 2019 10:24:05 +0800</lastBuildDate>
+    <lastBuildDate>Wed, 16 Oct 2019 20:16:15 +0800</lastBuildDate>
     
 	<atom:link href="http://blog.k-8s.com/categories/Golang/index.xml" rel="self" type="application/rss+xml" />
     
@@ -14,7 +14,7 @@
     <item>
       <title>Golang 并发编程</title>
       <link>http://blog.k-8s.com/posts/Golang-Note/Golang-concurrency/</link>
-      <pubDate>Tue, 15 Oct 2019 10:24:05 +0800</pubDate>
+      <pubDate>Wed, 16 Oct 2019 20:16:15 +0800</pubDate>
       
       <guid>http://blog.k-8s.com/posts/Golang-Note/Golang-concurrency/</guid>
       <description>&lt;h3 id=&#34;并发编程&#34;&gt;并发编程&lt;/h3&gt;
