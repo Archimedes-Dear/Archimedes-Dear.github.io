@@ -68,6 +68,44 @@
                         <article class="post">
                             <header>
                                 <h1 class="post-title">
+                                    <a href="http://blog.k-8s.com/posts/Kubernetes-Note/Kubernetes-Volumes/" title="Kubernetes 存储" >Kubernetes 存储</a>
+                                </h1>
+                            </header>
+                            <date class="post-meta meta-date">
+                                2019年5月7日
+                            </date>
+                            
+                            <div class="post-meta">
+                                <span>|</span>
+                                
+                                <span class="meta-category"><a href="http://blog.k-8s.com/categories/Kubernetes">Kubernetes</a></span>
+                                
+                            </div>
+                            
+                            <div class="post-content">
+                                <h3 id="volume">Volume</h3>
+
+<p>Volume 是一种 Pod 级别的存储卷, 用于解决当 Pod 异常退出后, 被kubelet拉起时保证之前存储的数据不丢失</p>
+
+<p>volume的生命周期与 Pod 相同, 且 Pod 中多个容器可以共享 Volume</p>
+
+<p>volume类型:</p>
+
+<ul>
+<li>k8s内置的类型 (详细参见文章 &ldquo;<a href="https://blog.k-8s.com/posts/Kubernetes-Note/Kubernetes-basic-concept/#volume">Kubernetes 基础概念和术语</a>&rdquo;)</li>
+<li>第三方: flexvolume/csi等网络存储 volume plugins</li>
+</ul>
+
+<h3 id="volume-的创建和使用">Volume 的创建和使用</h3>
+
+<p>Volume 不需要提前创建即可被 Pod 使用</p>……
+                            </div>
+                            <p class="readmore"><a href="http://blog.k-8s.com/posts/Kubernetes-Note/Kubernetes-Volumes/">阅读全文</a></p>
+                        </article>
+                    
+                        <article class="post">
+                            <header>
+                                <h1 class="post-title">
                                     <a href="http://blog.k-8s.com/posts/Kubernetes-Note/Kubernetes-Pod-Scheduling/" title="Kubernetes Pod 调度" >Kubernetes Pod 调度</a>
                                 </h1>
                             </header>
@@ -319,6 +357,10 @@ Containers:
 <ul class="widget-list">
     
     <li>
+        <a href="http://blog.k-8s.com/posts/Golang-Note/Golang-concurrency/" title="Golang 并发编程">Golang 并发编程</a>
+    </li>
+    
+    <li>
         <a href="http://blog.k-8s.com/posts/Golang-Note/Golang-interface/" title="Golang 接口">Golang 接口</a>
     </li>
     
@@ -354,10 +396,6 @@ Containers:
         <a href="http://blog.k-8s.com/posts/Kubernetes-Note/Kubernetes-Service/" title="Kubernetes Service">Kubernetes Service</a>
     </li>
     
-    <li>
-        <a href="http://blog.k-8s.com/posts/Kubernetes-Note/Kubernetes-Volumes/" title="Kubernetes 存储">Kubernetes 存储</a>
-    </li>
-    
 </ul>
     </section>
 
@@ -368,7 +406,7 @@ Containers:
 <ul class="widget-list">
     
     <li>
-        <a href="http://blog.k-8s.com/categories/Golang/">Golang(8)</a>
+        <a href="http://blog.k-8s.com/categories/Golang/">Golang(9)</a>
     </li>
     
     <li>

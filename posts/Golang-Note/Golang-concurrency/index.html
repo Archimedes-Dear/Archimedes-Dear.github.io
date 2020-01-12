@@ -1,0 +1,650 @@
+<!doctype html>
+<html lang="zh-cn">
+<head>
+
+    <meta charset="utf-8">
+    <meta name="generator" content="Hugo 0.54.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Golang 并发编程 | Mr.耗子</title>
+    <meta property="og:title" content="Golang 并发编程 - Mr.耗子">
+    <meta property="og:type" content="article">
+        
+    <meta property="article:published_time" content="2019-10-15T10:24:05&#43;08:00">
+        
+        
+    <meta property="article:modified_time" content="2019-10-15T10:24:05&#43;08:00">
+        
+    <meta name="Keywords" content="耗子,Mr.耗子,Docker,容器,k8s,kubernetes,golang,go,devops">
+    <meta name="description" content="Golang 并发编程">
+        
+    <meta name="author" content="Mr.耗子">
+    <meta property="og:url" content="http://blog.k-8s.com/posts/Golang-Note/Golang-concurrency/">
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+
+    <link rel="stylesheet" href="/css/normalize.css">
+    
+        <link rel="stylesheet" href="/css/prism.css">
+    
+    <link rel="stylesheet" href="/css/style.css">
+    <script type="text/javascript" src="//cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+
+    
+
+
+    
+    
+</head>
+
+<body>
+<header id="header" class="clearfix">
+    <div class="container">
+        <div class="col-group">
+            <div class="site-name ">
+                
+                    <a id="logo" href="http://blog.k-8s.com/">
+                        Mr.耗子
+                    </a>
+                
+                <p class="description">Linux Docker Kubernetes Golang Python</p>
+            </div>
+            <div>
+                <nav id="nav-menu" class="clearfix">
+                    <a class="" href="http://blog.k-8s.com/">首页</a>
+                    
+                    <a  href="http://blog.k-8s.com/archives/" title="归档">归档</a>
+                    
+                    <a  href="http://blog.k-8s.com/about/" title="关于">关于</a>
+                    
+                </nav>
+            </div>
+        </div>
+    </div>
+</header>
+
+
+<div id="body">
+    <div class="container">
+        <div class="col-group">
+
+            <div class="col-8" id="main">
+                <div class="res-cons">
+                    <article class="post">
+                        <header>
+                            <h1 class="post-title">Golang 并发编程</h1>
+                        </header>
+                        <date class="post-meta meta-date">
+                            2019年10月15日
+                        </date>
+                        
+                        <div class="post-meta">
+                            <span>|</span>
+                            
+                                <span class="meta-category"><a href="http://blog.k-8s.com/categories/Golang">Golang</a></span>
+                            
+                        </div>
+                        
+                        
+                        <div class="post-meta">
+                            <span id="busuanzi_container_page_pv">|<span id="busuanzi_value_page_pv"></span><span> 阅读</span></span>
+                        </div>
+                        
+                        <div class="post-content">
+                            <h3 id="并发编程">并发编程</h3>
+
+<p>并发实现模型有有以下几种主流模型:</p>
+
+<ul>
+<li><strong>多进程</strong>: 开销最大, 进程与进程间互不影响</li>
+<li><strong>多线程</strong>: 比多进程开销小, 高并发下效率有影响</li>
+<li><strong>基于回调的非阻塞/异步IO</strong>: 高并发服务器上, 多线程会很快耗尽服务器的内存和 CPU 资源. 使用异步 IO, 且尽可能的少用线程, 可以很好的降低开销</li>
+<li><strong>协程</strong>: 本质上是一种用户态下城, 寄存于线程中, 开销非常小, 不需要操作系统来进行抢占式调度. 缺点是需要编程语言支持, 若语言不支持, 需要用户自行实现调度器</li>
+</ul>
+
+<p><strong>&ldquo;共享内存系统&rdquo;</strong>: 线程类并发模式中, 线程间通信只能采用共享内存的方式, 为了保证内存的有效性, 我们会给共享内存加锁等来避免资源竞争</p>
+
+<p><strong>&ldquo;消息传递系统&rdquo;</strong>: 对线程共享状态的各种操作都被封装在线程之间传递的消息中. 由于在发送消息是需要对状态进行复制, 并且在消息传递边界上交出这个状态的所有权. 所以大多数消息传递的实现在性能上并不优越, 但线程中的状态管理工作会变得更为简单</p>
+
+<h3 id="协程">协程</h3>
+
+<p>进程内的协程 (也叫轻量级线程) 与传统的系统级线程和进程相比, 最大的优势在于协程可以轻松创建上百万个而不会导致系统资源衰竭, 而线程和进程通常最多也不能超过一万个</p>
+
+<p>Go 在语言级别支持协程, 叫 <strong><em>goroutine</em></strong>. Go 语言标准库提供的所有系统调用操作, 都会让出 CPU 给其他 goroutine. 这使得轻量级线程的切换管理不依赖于系统的线程和进程, 也不依赖于 CPU 的核心数量</p>
+
+<h3 id="goroutine">goroutine</h3>
+
+<p>使用 Go 语言的 <strong><em>goroutine</em></strong> 仅需要对函数前加上 <strong><em>go</em></strong> 关键字即可</p>
+
+<pre><code class="language-go">package main
+
+import &quot;fmt&quot;
+
+// 定义一个 Add 功能的函数
+func Add(x, y int) {
+	fmt.Printf(&quot;sum is %d&quot;, x + y)
+}
+
+func main() {
+	for i := 1; i &lt; 10; i++ {
+		go Add(i, i)  // 同时创建10个 goroutine 来计算, 当调用的函数返回时, 该 goroutine 就结束了
+	}
+}
+</code></pre>
+
+<p>需要注意的是, 在执行以上函数的时候, 控制台却并没有输出任何内容!!!</p>
+
+<p>这是因为 Go 程序从初始化 main package 并执行 main() 函数开始, 当 main() 函数返回时, 程序就退出了, 且程序并不等待其他 goroutine (非主 goroutine) 结束</p>
+
+<h3 id="并发通信">并发通信</h3>
+
+<p>而要让主函数等待所有 goroutine 退出后再返回, 就需要知道多个 goroutine 之间如何通信</p>
+
+<p>最常见的两种并发通信模型: 共享数据和消息</p>
+
+<ul>
+<li>共享数据是指多个并发单元分别保持对同一个数据的引用, 实现对该数据的共享. 被共享的
+数据可能有多种形式, 比如内存数据块, 磁盘文件, 网络数据等</li>
+<li>消息机制认为每个并发单元是自包含的, 独立的个体, 并且都有自己的变量, 但在不同并发
+单元间这些变量不共享. 每个并发单元的输入和输出只有一种，那就是消息</li>
+</ul>
+
+<p>Go 语言提供的消息机制被称为 <strong>channel</strong>, 提供了语言级的 goroutine 间的通信方式. 如果需要跨进程通信, 建议用分布式系统的方法来解决, 比如 Socket 或者 HTTP 等通信协议</p>
+
+<p><strong>channel 是类型相关的, 也就是说, 一个 channel 只能传递一种类型的值, 这种类型需要在声明 channel 时指定</strong></p>
+
+<p>回到上面 Add 的例子, 用 channel 来对其 goroutine 的运行状态做一个判断:</p>
+
+<pre><code class="language-go">package main
+
+import (
+	&quot;fmt&quot;
+)
+
+// 在执行该函数时对 ch 写入一个数字
+func Add(x, y int, ch chan int) {
+	fmt.Printf(&quot;sum is %d\n&quot;, x + y)
+	ch &lt;- 1
+}
+
+func main() {
+    // 初始化一个 channel 数组
+	chs := make([]chan int, 10)
+
+	for i := 0; i &lt; 10; i++ {
+		chs[i] = make(chan int)
+		go Add(i, i, chs[i])
+
+	}
+
+	for _, ch := range chs {
+		&lt;- ch
+	}
+}
+</code></pre>
+
+<p>在 channel 被写入数据时的操作是阻塞的, 所以 channel 提供了类似锁的功能, 进而保证了所有 goroutine 完成后主函数才会返回</p>
+
+<h4 id="基本语法">基本语法</h4>
+
+<pre><code class="language-go">// 声明一个 channel, 指定传递类型为 ElementType 的元素
+var chanName chan ElementType
+
+// 还可以声明一个 map, 元素是 bool 类型的 channel
+var m map[string] chan bool
+
+// 定义一个 channel 可以使用 make() 函数
+ch := make(chan int)
+
+// channel 写入
+ch &lt;- value
+
+// channel 的读取. 注意: 如果 channel 之前没有写入数据, 那么从 channel 中读取数据会导致程序阻塞, 知道 channel 写入数据为止
+value := &lt;- ch
+</code></pre>
+
+<h4 id="select">select</h4>
+
+<p>Go 的 <strong><em>select</em></strong> 关键字用于处理异步 IO 问题</p>
+
+<p>select 语法和 switch 非常类似, 但不同点在于 select 的 case 语句里必须是一个 IO 操作</p>
+
+<pre><code class="language-go">// select 举例
+select {
+case &lt;- ch1:
+    // 如果成功从 ch1 读取到数据, 则进入该 case 语句
+case ch2 &lt;- 1:
+    // 如果成功向 ch2 写入数据, 则进入该 case 语句
+default:
+    // 如果上面都没成功, 则进入 default 处理流程
+}
+</code></pre>
+
+<h4 id="缓冲机制">缓冲机制</h4>
+
+<p>以上创建的都是不带缓冲的 channel, 对于要持续传输大量数据的场景来说, 需要对 channel 加上缓冲, 达到消息队列的效果</p>
+
+<pre><code class="language-go">// 创建一个带缓冲的 channel, 缓冲大小为 1024
+ch := make(chan int, 1024)
+</code></pre>
+
+<p>带缓冲的 channel 有个好处, 即使没有读取方, 写入方也可以一直往 channel 里写入, 在缓冲区被填完之前都不会阻塞</p>
+
+<h4 id="超时机制">超时机制</h4>
+
+<p>若在向 channel 写数据时发现已满, 或者从 channe 读取数据时, 发现 channel 为空, 如果不处理这些问题, 可能会导致整个 goroutine 锁死</p>
+
+<p>Go 语言中没有直接提供超时机制, 但可以用 <strong><em>select</em></strong> 机制实现</p>
+
+<pre><code class="language-go">package main
+
+import (
+	&quot;fmt&quot;
+	&quot;time&quot;
+)
+
+func main() {
+	ch := make(chan int)  // 这里创建了 ch channel 后并没有往里面写入数据
+	timeout := make(chan bool, 1)
+
+	go func() {
+		time.Sleep(1 * time.Second)
+		timeout &lt;- true
+	} ()
+
+	select {  // select 没有从 ch 中读取到数据, 但是从 timeout 中读取到数据, 于是执行了对应的 case 语句
+	case &lt;- ch:
+		fmt.Println(&quot;从 ch 中读取到数据&quot;)
+	case &lt;- timeout:
+		fmt.Println(&quot;读取数据超时&quot;)
+	}
+}
+</code></pre>
+
+<h4 id="channel-的传递">channel 的传递</h4>
+
+<p>在 Go 语言中, channel 本身也是一个原生类型, 因此也可以通过 channel 传递 channel (可参考第一个 Add 的例子)</p>
+
+<p>这一特性可以被用于实现 *nix 上常见的管道(pipe)特性. 在处理数据时, 可以采用管道设计, 这样比较容器以增加插件的方式增加数据的处理流程</p>
+
+<p>例如以下声明一个基本的数据结构(这里是简单的 int 数据, 实际可能是一个数据块)</p>
+
+<pre><code class="language-go">type PipeData struct {
+    value int
+    handler func(int) int
+    next chan int
+}
+
+// 然后定义一个处理函数, 接着只需要将一系列 PipeData 数据传入该函数, 就可以达到流式传输的目的
+func handle(queue chan *PipeData) {
+    for data := range queue {
+        data.next &lt;- data.handler(data.value)
+    }
+}
+</code></pre>
+
+<h4 id="单向-channel">单向 channel</h4>
+
+<p>单向 channel 只能用于发送或接受数据. 但实际上单向 channel 只是对 channel 的一种限制, 否则一个 channel 只能读得话, 就没有丝毫意义了</p>
+
+<pre><code class="language-go">// 声明一个单向 channel
+var ch1 chan int  // 正常 channel
+var ch2 chan &lt;- float64  // 单向写入 channel
+var ch3 &lt;- chan int  // 单向读取 channel
+</code></pre>
+
+<p>如何初始化一个单向 channel 呢? 答案是&hellip;将一个<strong>双向 channel</strong> 转换成 <strong>单向 channel</strong></p>
+
+<pre><code class="language-go">ch1 := make(chan int)
+ch2 := chan &lt;- int(ch1)  // ch2 是一个单向写入 channel
+ch3 := &lt;- chan int(ch1)  // ch3 是一个单向读取 channel
+</code></pre>
+
+<p>单向 channel 的用法</p>
+
+<pre><code class="language-go">func Parse(ch &lt;- chan int) {
+    for value := range ch {
+        fmt.Println(&quot;Parsing value&quot;, value)
+    }
+}
+</code></pre>
+
+<p>这样, 除非这个函数的实现者用了类型转换, 否则这个函数就不会因为各种原因而对 ch 进行写的操作</p>
+
+<h4 id="关闭-channel">关闭 channel</h4>
+
+<p>关闭 channel 使用 Go 语言的 <strong><em>close()</em></strong> 函数即可</p>
+
+<pre><code class="language-go">chose(ch)
+
+// 判断一个 ch 是否被关闭, 如果 ok 的值是 false, 那么说明 ch 已经被关闭
+_, ok := &lt;- ch
+</code></pre>
+
+<pre><code class="language-go">// 关闭 channel 举例
+package main
+
+import &quot;fmt&quot;
+
+func main() {
+	ch := make(chan int)
+
+	close(ch)
+
+	_, ok := &lt;- ch
+
+	if ok {
+		fmt.Println(&quot;ch 没有被关闭&quot;)
+	} else {
+		fmt.Println(&quot;ch 已经被关闭&quot;)
+	}
+}
+</code></pre>
+
+<h3 id="多核并行化">多核并行化</h3>
+
+<p>多核并行化的好处是可以利用现代 CPU 中的多个核心, 将数据分片进行计算, 从而提高整体效率</p>
+
+<p>例如计算 N 个整形数的和, 可以将整形数分成 M 份, M 即 CPU 的的核心数, 最后将每个 CPU 核心的计算结果做一次累加, 可以得到所有数的和</p>
+
+<pre><code class="language-go">// 计算整形和
+package main
+
+import (
+	&quot;fmt&quot;
+	&quot;runtime&quot;
+)
+
+func DoTask(number int, ch chan int) {
+	sum := 0
+
+	for i := 0; i &lt;= number; i++ {
+		sum += i
+	}
+
+	fmt.Printf(&quot;协程计算结果为: %d\n&quot;, sum)
+	ch &lt;- sum
+}
+
+func main() {
+	num := 1000000  // 每个核心计算从 1 加到 100w 的和
+
+	cpus := runtime.NumCPU()  // 获取 CPU 最大核心数
+	// runtime.GOMAXPROCS(cpus)  // 设置运行时的 CPU 核心数
+
+	ch := make(chan int, cpus)
+
+	for i := 0; i &lt; cpus; i++ {
+		go DoTask(num, ch)
+	}
+
+	sum := 0
+	// 每获取到一个数据, 表示有一个协程执行完毕
+	for i := 0; i &lt; cpus; i++ {
+		routineSum := &lt;- ch
+		sum += routineSum
+	}
+
+	fmt.Printf(&quot;一共 %d 个核心, 总计算结果为: %d&quot;, cpus, sum)
+}
+</code></pre>
+
+<p>runtime.GOMAXPROCS(cpus) 这个在低版本 Go 语言中需要手动配置, 否则 goroutine 还是运行在一个 CPU 核心上,  但<strong>从 Go 1.5 版本开始, 会自动执行该语句, 最大效率利用 CPU</strong></p>
+
+<h3 id="让出时间片">让出时间片</h3>
+
+<p>Go 可以执行在 goroutine 中控制何时让出时间片给其他 goroutine, 这可以用 runtime 包中的 <strong><em>Gosched()</em></strong> 函数实现</p>
+
+<pre><code class="language-go">runtime.Gosched()
+</code></pre>
+
+<h3 id="同步">同步</h3>
+
+<p>Go 语言虽然倡导使用通信来共享数据, 但也提供了妥善的资源所方案</p>
+
+<h4 id="同步锁">同步锁</h4>
+
+<p>Go 语言的 sync 包提供两种锁类型: <strong><em>sync.Mutex</em></strong> 和 <strong><em>sync.RWMutex</em></strong></p>
+
+<p>sync.Mutex 是仅允许一个 goroutine 进行读写, sync.RWMutex 是单写多读模型</p>
+
+<pre><code class="language-go">// 锁的典型使用, 在使用 Lock() 或 RLock() 增加锁后, 记得要使用 Unlock() 或 RUnlock() 释放锁
+// 否则可能导致等待该锁的 goroutine 处于饥饿状态, 甚至可能导致死锁
+var lock sync.Mutex
+
+func foo() {
+    lock.Lock()
+    defer lock.Unlock()
+    ...
+}
+
+var lock2 sync.RWMutex
+
+func foo2() {
+    lock2.RLock()
+    lock2.RUnlock()
+    ...
+}
+</code></pre>
+
+<h4 id="全局唯一性操作">全局唯一性操作</h4>
+
+<p>对于类似全局初始化这种只需要运行一次的代码, Go 提供了一个 Once 类型保证全局唯一性操作</p>
+
+<pre><code class="language-go">package main
+
+import (
+	&quot;fmt&quot;
+	&quot;sync&quot;
+)
+
+func main() {
+	once := sync.Once{}
+	for i := 1; i &lt; 5; i++ {
+		once.Do(func() {
+			fmt.Println(&quot;once run&quot;)  // 这个函数仅第一执行时会运行
+		})
+
+		fmt.Println(&quot;run&quot;, i)
+	}
+}
+</code></pre>
+
+<p>参考书籍:</p>
+
+<p><a href="https://book.douban.com/subject/11577300/">Go语言编程</a></p>
+
+<p>参考链接:</p>
+
+<p><a href="https://xueyuanjun.com/post/19910">Go 基础教程-并发编程-利用多核 CPU 实现并行计算</a></p>
+                        </div>
+
+                        
+
+<div class="post-archive">
+    <h2>See Also</h2>
+    <ul class="listing">
+        
+        <li><a href="/posts/Golang-Note/Golang-interface/">Golang 接口</a></li>
+        
+        <li><a href="/posts/Golang-Note/Golang-type-system/">Golang 类型系统</a></li>
+        
+        <li><a href="/posts/Golang-Note/Golang-error-handling/">Golang 错误处理</a></li>
+        
+        <li><a href="/posts/Golang-Note/Golang-function/">Golang 函数</a></li>
+        
+        <li><a href="/posts/Golang-Note/Golang-process-control/">Golang 流程控制</a></li>
+        
+    </ul>
+</div>
+
+
+                        <div class="post-meta meta-tags">
+                            
+                            <ul class="clearfix">
+                                
+                                <li><a href="http://blog.k-8s.com/tags/Golang">Golang</a></li>
+                                
+                            </ul>
+                            
+                        </div>
+                    </article>
+                    
+    
+
+    
+    
+                </div>
+            </div>
+            <div id="secondary">
+    <section class="widget">
+        <form id="search" action="//www.google.com/search" method="get" accept-charset="utf-8" target="_blank" _lpchecked="1">
+      
+      <input type="text" name="q" maxlength="20" placeholder="Search">
+      <input type="hidden" name="sitesearch" value="http://blog.k-8s.com/">
+      <button type="submit" class="submit icon-search"></button>
+</form>
+    </section>
+    
+    <section class="widget">
+        <h3 class="widget-title">最近文章</h3>
+<ul class="widget-list">
+    
+    <li>
+        <a href="http://blog.k-8s.com/posts/Golang-Note/Golang-concurrency/" title="Golang 并发编程">Golang 并发编程</a>
+    </li>
+    
+    <li>
+        <a href="http://blog.k-8s.com/posts/Golang-Note/Golang-interface/" title="Golang 接口">Golang 接口</a>
+    </li>
+    
+    <li>
+        <a href="http://blog.k-8s.com/posts/Golang-Note/Golang-type-system/" title="Golang 类型系统">Golang 类型系统</a>
+    </li>
+    
+    <li>
+        <a href="http://blog.k-8s.com/posts/Golang-Note/Golang-error-handling/" title="Golang 错误处理">Golang 错误处理</a>
+    </li>
+    
+    <li>
+        <a href="http://blog.k-8s.com/posts/Golang-Note/Golang-function/" title="Golang 函数">Golang 函数</a>
+    </li>
+    
+    <li>
+        <a href="http://blog.k-8s.com/posts/Golang-Note/Golang-process-control/" title="Golang 流程控制">Golang 流程控制</a>
+    </li>
+    
+    <li>
+        <a href="http://blog.k-8s.com/posts/Golang-Note/Golang-type-of-data/" title="Golang 数据类型">Golang 数据类型</a>
+    </li>
+    
+    <li>
+        <a href="http://blog.k-8s.com/posts/Golang-Note/Golang-variables-and-constants/" title="Golang 变量与常量">Golang 变量与常量</a>
+    </li>
+    
+    <li>
+        <a href="http://blog.k-8s.com/posts/Golang-Note/Golang-install-and-env/" title="Golang 安装和环境配置">Golang 安装和环境配置</a>
+    </li>
+    
+    <li>
+        <a href="http://blog.k-8s.com/posts/Kubernetes-Note/Kubernetes-Service/" title="Kubernetes Service">Kubernetes Service</a>
+    </li>
+    
+</ul>
+    </section>
+
+    
+
+    <section class="widget">
+        <h3 class="widget-title">分类</h3>
+<ul class="widget-list">
+    
+    <li>
+        <a href="http://blog.k-8s.com/categories/Golang/">Golang(9)</a>
+    </li>
+    
+    <li>
+        <a href="http://blog.k-8s.com/categories/Kubernetes/">Kubernetes(6)</a>
+    </li>
+    
+    <li>
+        <a href="http://blog.k-8s.com/categories/hugo/">hugo(1)</a>
+    </li>
+    
+</ul>
+    </section>
+
+    <section class="widget">
+        <h3 class="widget-title">标签</h3>
+<div class="tagcloud">
+    
+    <a href="http://blog.k-8s.com/tags/Golang/">Golang</a>
+    
+    <a href="http://blog.k-8s.com/tags/Kubernetes/">Kubernetes</a>
+    
+    <a href="http://blog.k-8s.com/tags/hugo/">hugo</a>
+    
+</div>
+    </section>
+
+    
+<section class="widget">
+    <h3 class="widget-title">友情链接</h3>
+    <ul class="widget-list">
+        
+        <li>
+            <a target="_blank" href="http://www.jxhs.me" title="jame_xhs">jame_xhs</a>
+        </li>
+        
+    </ul>
+</section>
+
+
+    <section class="widget">
+        <h3 class="widget-title">其它</h3>
+        <ul class="widget-list">
+            <li><a href="http://blog.k-8s.com/index.xml">文章 RSS</a></li>
+        </ul>
+    </section>
+</div>
+        </div>
+    </div>
+</div>
+<footer id="footer">
+    <div class="container">
+        &copy; 2018 <a href="http://blog.k-8s.com/">Mr.耗子 By Mr.耗子</a>.
+        Powered by <a rel="nofollow noreferer noopener" href="https://gohugo.io" target="_blank">Hugo</a>.
+        <a href="https://www.flysnow.org/" target="_blank">Theme</a> based on <a href="https://github.com/rujews/maupassant-hugo" target="_blank">maupassant</a>.
+        
+    </div>
+</footer>
+
+
+    <script type="text/javascript">
+    
+    (function(){
+        $("pre code").parent().addClass("line-numbers")
+    }())
+
+    window.MathJax = {
+        tex2jax: {
+            inlineMath: [ ['$','$'] ],
+            processEscapes: true
+        }
+    };
+    </script>
+    <script type="text/javascript" src="/js/prism.js" async="true"></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
+
+<a id="rocket" href="#top"></a>
+<script type="text/javascript" src="/js/totop.js?v=0.0.0" async=""></script>
+
+
+
+<script type="text/javascript" src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" async></script>
+
+
+
+
+</body>
+</html>

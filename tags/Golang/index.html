@@ -78,6 +78,42 @@
                         <article class="post">
                             <header>
                                 <h1 class="post-title">
+                                    <a href="http://blog.k-8s.com/posts/Golang-Note/Golang-concurrency/">Golang 并发编程</a>
+                                </h1>
+                            </header>
+                            <date class="post-meta meta-date">
+                                2019年10月15日
+                            </date>
+                            
+                            <div class="post-meta meta-category">
+                                |
+                                
+                                    <a href="http://blog.k-8s.com/categories/Golang">Golang</a>
+                                
+                            </div>
+                            
+                            <div class="post-content">
+                                <h3 id="并发编程">并发编程</h3>
+
+<p>并发实现模型有有以下几种主流模型:</p>
+
+<ul>
+<li><strong>多进程</strong>: 开销最大, 进程与进程间互不影响</li>
+<li><strong>多线程</strong>: 比多进程开销小, 高并发下效率有影响</li>
+<li><strong>基于回调的非阻塞/异步IO</strong>: 高并发服务器上, 多线程会很快耗尽服务器的内存和 CPU 资源. 使用异步 IO, 且尽可能的少用线程, 可以很好的降低开销</li>
+<li><strong>协程</strong>: 本质上是一种用户态下城, 寄存于线程中, 开销非常小, 不需要操作系统来进行抢占式调度. 缺点是需要编程语言支持, 若语言不支持, 需要用户自行实现调度器</li>
+</ul>
+
+<p><strong>&ldquo;共享内存系统&rdquo;</strong>: 线程类并发模式中, 线程间通信只能采用共享内存的方式, 为了保证内存的有效性, 我们会给共享内存加锁等来避免资源竞争</p>
+
+<p><strong>&ldquo;消息传递系统&rdquo;</strong>: 对线程共享状态的各种操作都被封装在线程之间传递的消息中. 由于在发送消息是需要对状态进行复制, 并且在消息传递边界上交出这个状态的所有权. 所以大多数消息传递的实现在性能上并不优越, 但线程中的状态管理工作会变得更为简单</p>……
+                                <p class="readmore"><a href="http://blog.k-8s.com/posts/Golang-Note/Golang-concurrency/">阅读全文</a></p>
+                            </div>
+                        </article>
+                    
+                        <article class="post">
+                            <header>
+                                <h1 class="post-title">
                                     <a href="http://blog.k-8s.com/posts/Golang-Note/Golang-interface/">Golang 接口</a>
                                 </h1>
                             </header>
@@ -422,6 +458,10 @@ func main() {
 <ul class="widget-list">
     
     <li>
+        <a href="http://blog.k-8s.com/posts/Golang-Note/Golang-concurrency/" title="Golang 并发编程">Golang 并发编程</a>
+    </li>
+    
+    <li>
         <a href="http://blog.k-8s.com/posts/Golang-Note/Golang-interface/" title="Golang 接口">Golang 接口</a>
     </li>
     
@@ -457,10 +497,6 @@ func main() {
         <a href="http://blog.k-8s.com/posts/Kubernetes-Note/Kubernetes-Service/" title="Kubernetes Service">Kubernetes Service</a>
     </li>
     
-    <li>
-        <a href="http://blog.k-8s.com/posts/Kubernetes-Note/Kubernetes-Volumes/" title="Kubernetes 存储">Kubernetes 存储</a>
-    </li>
-    
 </ul>
     </section>
 
@@ -471,7 +507,7 @@ func main() {
 <ul class="widget-list">
     
     <li>
-        <a href="http://blog.k-8s.com/categories/Golang/">Golang(8)</a>
+        <a href="http://blog.k-8s.com/categories/Golang/">Golang(9)</a>
     </li>
     
     <li>
