@@ -68,6 +68,47 @@
                         <article class="post">
                             <header>
                                 <h1 class="post-title">
+                                    <a href="http://blog.k-8s.com/posts/Golang-Note/Golang-reflection/" title="Golang 反射" >Golang 反射</a>
+                                </h1>
+                            </header>
+                            <date class="post-meta meta-date">
+                                2019年10月20日
+                            </date>
+                            
+                            <div class="post-meta">
+                                <span>|</span>
+                                
+                                <span class="meta-category"><a href="http://blog.k-8s.com/categories/Golang">Golang</a></span>
+                                
+                            </div>
+                            
+                            <div class="post-content">
+                                <h3 id="反射">反射</h3>
+
+<p>反射是程序在运行时检查其变量和值并找到其类型的能力</p>
+
+<p>首先, 正常时候, 需要查看程序中某个变量的类型和值会这么写:</p>
+
+<pre><code class="language-go">package main
+
+import (  
+	&quot;fmt&quot;
+)
+
+func main() {  
+	i := 10
+	fmt.Printf(&quot;%d %T&quot;, i, i)
+}
+</code></pre>
+
+<p>这里的变量 i 在编译的时候, 类型就已经是已知的, 所以我们可以打印他的类型</p>……
+                            </div>
+                            <p class="readmore"><a href="http://blog.k-8s.com/posts/Golang-Note/Golang-reflection/">阅读全文</a></p>
+                        </article>
+                    
+                        <article class="post">
+                            <header>
+                                <h1 class="post-title">
                                     <a href="http://blog.k-8s.com/posts/Golang-Note/Golang-engineering-management/" title="Golang 工程管理" >Golang 工程管理</a>
                                 </h1>
                             </header>
@@ -412,55 +453,6 @@ if err != nil {
                             <p class="readmore"><a href="http://blog.k-8s.com/posts/Golang-Note/Golang-process-control/">阅读全文</a></p>
                         </article>
                     
-                        <article class="post">
-                            <header>
-                                <h1 class="post-title">
-                                    <a href="http://blog.k-8s.com/posts/Golang-Note/Golang-type-of-data/" title="Golang 数据类型" >Golang 数据类型</a>
-                                </h1>
-                            </header>
-                            <date class="post-meta meta-date">
-                                2019年10月12日
-                            </date>
-                            
-                            <div class="post-meta">
-                                <span>|</span>
-                                
-                                <span class="meta-category"><a href="http://blog.k-8s.com/categories/Golang">Golang</a></span>
-                                
-                            </div>
-                            
-                            <div class="post-content">
-                                <h3 id="数据类型">数据类型</h3>
-
-<p>Golang 中内置以下基础类型:</p>
-
-<ul>
-<li>布尔类型  bool</li>
-<li>整形  int uint int8 int16 byte uintptr</li>
-<li>浮点类型  float32 float64</li>
-<li>复数类型  complex64 complex128</li>
-<li>字符串  string</li>
-<li>字符类型  rune</li>
-<li>错误类型  error</li>
-</ul>
-
-<p>此外, Golang 也支持以下复合类型:</p>
-
-<ul>
-<li>指针  (pointer)</li>
-<li>数组  (array)</li>
-<li>切片  (slice)</li>
-<li>字典  (map)</li>
-<li>通道  (chan)</li>
-<li>结构体  (struct)</li>
-<li>接口  (interface)</li>
-</ul>
-
-<p>另外, 还有错误类型, 这里暂不过多介绍</p>……
-                            </div>
-                            <p class="readmore"><a href="http://blog.k-8s.com/posts/Golang-Note/Golang-type-of-data/">阅读全文</a></p>
-                        </article>
-                    
 
                     
 
@@ -509,6 +501,10 @@ if err != nil {
 <ul class="widget-list">
     
     <li>
+        <a href="http://blog.k-8s.com/posts/Golang-Note/Golang-reflection/" title="Golang 反射">Golang 反射</a>
+    </li>
+    
+    <li>
         <a href="http://blog.k-8s.com/posts/Golang-Note/Golang-engineering-management/" title="Golang 工程管理">Golang 工程管理</a>
     </li>
     
@@ -544,10 +540,6 @@ if err != nil {
         <a href="http://blog.k-8s.com/posts/Golang-Note/Golang-process-control/" title="Golang 流程控制">Golang 流程控制</a>
     </li>
     
-    <li>
-        <a href="http://blog.k-8s.com/posts/Golang-Note/Golang-type-of-data/" title="Golang 数据类型">Golang 数据类型</a>
-    </li>
-    
 </ul>
     </section>
 
@@ -558,7 +550,7 @@ if err != nil {
 <ul class="widget-list">
     
     <li>
-        <a href="http://blog.k-8s.com/categories/Golang/">Golang(12)</a>
+        <a href="http://blog.k-8s.com/categories/Golang/">Golang(13)</a>
     </li>
     
     <li>

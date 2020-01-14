@@ -7,20 +7,20 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>Golang 工程管理 | Mr.耗子</title>
-    <meta property="og:title" content="Golang 工程管理 - Mr.耗子">
+    <title>Golang 反射 | Mr.耗子</title>
+    <meta property="og:title" content="Golang 反射 - Mr.耗子">
     <meta property="og:type" content="article">
         
-    <meta property="article:published_time" content="2019-10-19T22:07:11&#43;08:00">
+    <meta property="article:published_time" content="2019-10-20T11:15:15&#43;08:00">
         
         
-    <meta property="article:modified_time" content="2019-10-19T22:07:11&#43;08:00">
+    <meta property="article:modified_time" content="2019-10-20T11:15:15&#43;08:00">
         
     <meta name="Keywords" content="耗子,Mr.耗子,Docker,容器,k8s,kubernetes,golang,go,devops">
-    <meta name="description" content="Golang 工程管理">
+    <meta name="description" content="Golang 反射">
         
     <meta name="author" content="Mr.耗子">
-    <meta property="og:url" content="http://blog.k-8s.com/posts/Golang-Note/Golang-engineering-management/">
+    <meta property="og:url" content="http://blog.k-8s.com/posts/Golang-Note/Golang-reflection/">
     <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
 
     <link rel="stylesheet" href="/css/normalize.css">
@@ -72,10 +72,10 @@
                 <div class="res-cons">
                     <article class="post">
                         <header>
-                            <h1 class="post-title">Golang 工程管理</h1>
+                            <h1 class="post-title">Golang 反射</h1>
                         </header>
                         <date class="post-meta meta-date">
-                            2019年10月19日
+                            2019年10月20日
                         </date>
                         
                         <div class="post-meta">
@@ -91,147 +91,261 @@
                         </div>
                         
                         <div class="post-content">
-                            <h3 id="工程管理">工程管理</h3>
+                            <h3 id="反射">反射</h3>
 
-<p>Go 中有许多工具可以更便捷的进行工程管理, 大致可分为以下几个方面:</p>
+<p>反射是程序在运行时检查其变量和值并找到其类型的能力</p>
 
-<ul>
-<li>代码风格</li>
-<li>文档风格和管理</li>
-<li>单元测试与性能测试方法</li>
-<li>项目工程结构</li>
-<li>跨平台开发</li>
-<li>打包分发</li>
-</ul>
+<p>首先, 正常时候, 需要查看程序中某个变量的类型和值会这么写:</p>
 
-<p>Go 语言自带的 go 命令工具十分强大, 可以完成以下几类工作:</p>
+<pre><code class="language-go">package main
 
-<ul>
-<li>代码格式化 (go fmt)</li>
-<li>代码质量分析和修复</li>
-<li>单元测试与性能测试 (go test,</li>
-<li>工程构建 (go build)</li>
-<li>代码文档的提取和展示 (go doc)</li>
-<li>依赖包的管理 (go get)</li>
-<li>执行其他的包含指令, 如 6g 等</li>
-</ul>
-
-<h4 id="go-的强制性编码规范">Go 的强制性编码规范</h4>
-
-<p><strong>命名</strong>:</p>
-
-<p>任何需要对外暴露的名字必须以大写字母开头, 不需要对外暴露的则应该以小写字母开头</p>
-
-<p>Go 明确表示拥护驼峰命名法而排斥下划线法</p>
-
-<p><strong>排列</strong>:</p>
-
-<p>Go 中约定左花括号不再另起一行</p>
-
-<p><strong>非强制性编码风格建议</strong>:</p>
-
-<p>Go 命令行工具提供了一个 fmt 工具, 可以帮助格式化代码风格</p>
-
-<p><strong>远程 import 支持</strong>:</p>
-
-<p>例如项目中有使用到远程项目包:</p>
-
-<pre><code class="language-go">import (
+import (  
 	&quot;fmt&quot;
-	&quot;github.com/myteam/md5sum&quot;
 )
+
+func main() {  
+	i := 10
+	fmt.Printf(&quot;%d %T&quot;, i, i)
+}
 </code></pre>
 
-<p>那么在编译前可加上 go get github.com/myteam/md5sum 即可. go 工具会自动获取远程项目包, 并存放在 src 目录 (如果用的是 GOPATH模式的话). 若是使用的 GoModule 模式, 则会存放在 pkg/mod 目录下</p>
+<p>这里的变量 i 在编译的时候, 类型就已经是已知的, 所以我们可以打印他的类型</p>
 
-<h4 id="工程组织">工程组织</h4>
+<p>但如果我们想让程序在运行时可以获得变量类型, 例如如下生成 SQL 查询语句的例子</p>
 
-<p>默认的 GOPATH 模式下, GOPATH 便可以认为是工程目录, 该目录下存在 bin, pkg, src 三个目录, 其中 bin 和 pkg 目录可自动创建</p>
+<pre><code class="language-go">// 生成 SQL 查询语句
+package main
 
-<p><strong>bin</strong>: 用于存放编译后生成的二进制文件</p>
+import (  
+	&quot;fmt&quot;
+)
 
-<p><strong>pkg</strong>: 存放编译后的包文件</p>
+type order struct {  
+	ordId int
+	customerId int
+}
 
-<p><strong>src</strong>: 存放项目源码</p>
+// 接受数据并生成对应的查询语句
+func createQuery(o order) string {
+	return fmt.Sprintf(&quot;insert into order values(%d, %d)&quot;, o.ordId, o.customerId)
+}
 
-<h4 id="文档管理">文档管理</h4>
-
-<p>go 工具中提供 go doc 可以便捷的查看函数中的注释和各种文档, 关于文档语法这里只简单介绍几点规则:</p>
-
-<ul>
-<li>注释需要津贴在对应的包声明和函数前, 不能有空行</li>
-<li>注释如果要新起一个段落, 应该用一个空白注释行隔开</li>
-<li>开发者可以直接在代码内容 <code>// BUG(author):</code>的方式记录该代码片段中的遗留问题</li>
-</ul>
-
-<p>还可用 godoc 命令启动一个简单的 http server, 提供美观的文档页面<code>godoc -http=:76 -path=&quot;.&quot;</code></p>
-
-<h4 id="跨平台开发">跨平台开发</h4>
-
-<p>Go 程序可以在一台电脑上编译生成不同平台的代码, 只需要修改 <strong>GOOS</strong> 和 <strong>GOARCH</strong> 环境变量为对应平台的即可:</p>
-
-<p><strong>Linux</strong>:</p>
-
-<ul>
-<li>GOARCH: 386, amd64, arm</li>
-<li>GOOS: linux</li>
-</ul>
-
-<p><strong>Windows</strong>:</p>
-
-<ul>
-<li>GOARCH: 386, amd64</li>
-<li>GOOS: windows</li>
-</ul>
-
-<p>FreeBSD:</p>
-
-<ul>
-<li>GOARCH: 386, amd64</li>
-<li>GOOS: freebsd</li>
-</ul>
-
-<p>MacOS:</p>
-
-<ul>
-<li>GOARCH: 386, amd64</li>
-<li>GOOS: darwin</li>
-</ul>
-
-<h4 id="单元测试">单元测试</h4>
-
-<p>Go 语言本身提供了一套轻量级测试框架, 符合规则的测试代码会在运行测试时自动识别并执行</p>
-
-<p>单元测试源文件命名规则为: **在需要测试的包下创建以 &ldquo;_test&rdquo; 结尾的 go 文件</p>
-
-<p>Go 的单元测试分为两类:</p>
-
-<ul>
-<li>以 <code>Test</code> 为函数名前缀并以 <code>*testing.T</code> 为单一参数的<strong>功能测试函数</strong></li>
-<li>以 Benchmark 为函数名前缀并以 <code>*testing.T</code> 为单一参数的<strong>性能测试函数</strong></li>
-</ul>
-
-<pre><code class="language-go">// 测试函数声明举例
-func TestAdd(t *testing.T)
-func BenchmarkAdd(b *testing.B)
+func main() {  
+	o := order{
+		ordId:      1234,
+		customerId: 567,
+	}
+	fmt.Println(createQuery(o))
+}
 </code></pre>
 
-<pre><code class="language-shell"># 执行功能测试 (在项目目录)
-go test .
+<p>接着将 createQuery() 函数泛化一下, 使他适用于任何结构</p>
 
-# 执行性能测试函数 (在项目目录)
-go test -bench .
+<pre><code class="language-go">func createQuery(q interface{}) string
 </code></pre>
 
-<h4 id="打包分发">打包分发</h4>
+<p>当 createQuery() 函数要接受两种不同的数据结构时</p>
 
-<p>就目前而言, 以二进制打包分发 Go 包不太现实, 因为任何一个版本号的不同都导致无法链接包</p>
+<pre><code class="language-go">type order struct {  
+	ordId      int
+	customerId int
+}
 
-<p>因此如果用 Go 开发了一个库, 那么最合适的方式是将源代码打包进行分发, 由使用者自行编译, 或者整体分发二进制可执行文也可避免无法链接的问题</p>
+type order struct {  
+	name string
+	id int
+    address string
+    salary int
+    country string
+}
+</code></pre>
 
-<p>参考书籍:</p>
+<p>由于 createQuery() 函数需要生成不同长度的查询语句, 需要在语句的 value 填充部分知道传递给它的 struct 的类型, 那么这里需要用到反射的知识</p>
 
-<p><a href="https://book.douban.com/subject/11577300/">Go语言编程</a></p>
+<p>在具体写之前, 需要了解一下 reflect 包中的几种类型和方法</p>
+
+<h4 id="反射类型和反射值">反射类型和反射值</h4>
+
+<p>interface{} 的具体类型由 <strong><em>reflect.Type</em></strong> 表示, 基础值由 <strong><em>reflect.Value</em></strong> 表示</p>
+
+<p>对应的两个函数为 <strong><em>reflect.TypeOF()</em></strong> 和 <strong><em>reflect.ValueOf()</em></strong></p>
+
+<p>还有一种更重要的类型称为 <strong><em>Kind()</em></strong></p>
+
+<pre><code class="language-go">// 反射类型和反射值举例
+package main
+
+import (
+	&quot;fmt&quot;
+	&quot;reflect&quot;
+)
+
+type order struct {
+	ordId      int
+	customerId int
+}
+
+func createQuery(q interface{}) {
+	t := reflect.TypeOf(q)  // 获取具体的实际类型
+	v := reflect.ValueOf(q)  // 获取具体的值
+    k := t.Kind()  // 获取类型的具体信息
+	fmt.Println(&quot;Type &quot;, t)
+	fmt.Println(&quot;Value &quot;, v)
+    fmt.Println(&quot;Kind &quot;, k)
+}
+
+func main() {
+	o := order{
+		ordId:      456,
+		customerId: 56,
+	}
+
+	createQuery(o)
+}
+</code></pre>
+
+<p><strong><em>NumField()</em></strong> 方法返回结构中的字段数, 而 <strong><em>Field(i int)</em></strong> 返回第 i 个字段的 <code>reflect.Value</code></p>
+
+<pre><code class="language-go">package main
+
+import (
+	&quot;fmt&quot;
+	&quot;reflect&quot;
+)
+
+type order struct {
+	ordId      int
+	customerId int
+}
+
+func createQuery(q interface{}) {
+	if reflect.ValueOf(q).Kind() == reflect.Struct {
+		v := reflect.ValueOf(q)
+		fmt.Println(&quot;Number of fields&quot;, v.NumField())
+
+		for i := 0; i &lt; v.NumField(); i++ {
+			fmt.Printf(&quot;Field:%d type:%T value:%v\n&quot;, i, v.Field(i), v.Field(i))
+		}
+	}
+
+}
+
+func main() {
+	o := order{
+		ordId:      456,
+		customerId: 56,
+	}
+	
+	createQuery(o)
+}
+</code></pre>
+
+<p>Int() 和 String() 方法分别将 reflect.Value 提取为 int64 和 string</p>
+
+<pre><code class="language-go">package main
+
+import (
+	&quot;fmt&quot;
+	&quot;reflect&quot;
+)
+
+func main() {
+	a := 56
+	x := reflect.ValueOf(a).Int()
+	fmt.Printf(&quot;type:%T value:%v\n&quot;, x, x)
+
+	b := &quot;Naveen&quot;
+	y := reflect.ValueOf(b).String()
+	fmt.Printf(&quot;type:%T value:%v\n&quot;, y, y)
+}
+</code></pre>
+
+<p>结合以上方法, 我们可以实现对 createQuery() 函数的一个泛化:</p>
+
+<pre><code class="language-go">package main
+
+import (
+	&quot;fmt&quot;
+	&quot;reflect&quot;
+)
+
+type order struct {
+	ordId      int
+	customerId int
+}
+
+type employee struct {
+	name    string
+	id      int
+	address string
+	salary  int
+	country string
+}
+
+func createQuery(q interface{}) {
+	if reflect.ValueOf(q).Kind() == reflect.Struct {
+		t := reflect.TypeOf(q).Name()  // 获取数据的类型名称 order 和 employee
+		query := fmt.Sprintf(&quot;insert into %s values(&quot;, t)
+		v := reflect.ValueOf(q)
+		
+		for i := 0; i &lt; v.NumField(); i++ {
+			switch v.Field(i).Kind() {
+			case reflect.Int:
+				if i == 0 {
+					query = fmt.Sprintf(&quot;%s%d&quot;, query, v.Field(i).Int())
+				} else {
+					query = fmt.Sprintf(&quot;%s, %d&quot;, query, v.Field(i).Int())
+				}
+			case reflect.String:
+				if i == 0 {
+					query = fmt.Sprintf(&quot;%s\&quot;%s\&quot;&quot;, query, v.Field(i).String())
+				} else {
+					query = fmt.Sprintf(&quot;%s, \&quot;%s\&quot;&quot;, query, v.Field(i).String())
+				}
+			default:
+				fmt.Println(&quot;Unsupported type&quot;)
+				return
+			}
+		}
+
+		fmt.Println(&quot;query is &quot;, query)
+
+		query = fmt.Sprintf(&quot;%s)&quot;, query)
+		fmt.Println(query)
+
+		return
+
+	}
+
+	fmt.Println(&quot;unsupported type&quot;)
+}
+
+func main() {
+	o := order{
+		ordId:      456,
+		customerId: 56,
+	}
+
+	createQuery(o)
+
+	e := employee{
+		name:    &quot;Naveen&quot;,
+		id:      565,
+		address: &quot;Coimbatore&quot;,
+		salary:  90000,
+		country: &quot;India&quot;,
+	}
+
+	createQuery(e)
+
+	i := 90
+	createQuery(i)
+}
+</code></pre>
+
+<p>参考链接:</p>
+
+<p><a href="https://golangbot.com/reflection/">Reflection in Golang</a></p>
                         </div>
 
                         
@@ -240,6 +354,8 @@ go test -bench .
     <h2>See Also</h2>
     <ul class="listing">
         
+        <li><a href="/posts/Golang-Note/Golang-engineering-management/">Golang 工程管理</a></li>
+        
         <li><a href="/posts/Golang-Note/Golang-secure-programming/">Golang 安全编程</a></li>
         
         <li><a href="/posts/Golang-Note/Golang-network-programming/">Golang 网络编程</a></li>
@@ -247,8 +363,6 @@ go test -bench .
         <li><a href="/posts/Golang-Note/Golang-concurrency/">Golang 并发编程</a></li>
         
         <li><a href="/posts/Golang-Note/Golang-interface/">Golang 接口</a></li>
-        
-        <li><a href="/posts/Golang-Note/Golang-type-system/">Golang 类型系统</a></li>
         
     </ul>
 </div>

@@ -6,10 +6,37 @@
     <description>Recent content in Golang on Mr.耗子</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    <lastBuildDate>Sat, 19 Oct 2019 22:07:11 +0800</lastBuildDate>
+    <lastBuildDate>Sun, 20 Oct 2019 11:15:15 +0800</lastBuildDate>
     
 	<atom:link href="http://blog.k-8s.com/tags/Golang/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Golang 反射</title>
+      <link>http://blog.k-8s.com/posts/Golang-Note/Golang-reflection/</link>
+      <pubDate>Sun, 20 Oct 2019 11:15:15 +0800</pubDate>
+      
+      <guid>http://blog.k-8s.com/posts/Golang-Note/Golang-reflection/</guid>
+      <description>&lt;h3 id=&#34;反射&#34;&gt;反射&lt;/h3&gt;
+
+&lt;p&gt;反射是程序在运行时检查其变量和值并找到其类型的能力&lt;/p&gt;
+
+&lt;p&gt;首先, 正常时候, 需要查看程序中某个变量的类型和值会这么写:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-go&#34;&gt;package main
+
+import (  
+	&amp;quot;fmt&amp;quot;
+)
+
+func main() {  
+	i := 10
+	fmt.Printf(&amp;quot;%d %T&amp;quot;, i, i)
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;这里的变量 i 在编译的时候, 类型就已经是已知的, 所以我们可以打印他的类型&lt;/p&gt;</description>
+    </item>
     
     <item>
       <title>Golang 工程管理</title>
