@@ -3,6 +3,11 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
+    <loc>http://blog.k-8s.com/posts/Golang-Note/Golang-engineering-management/</loc>
+    <lastmod>2019-10-19T22:07:11+08:00</lastmod>
+  </url>
+  
+  <url>
     <loc>http://blog.k-8s.com/posts/Golang-Note/Golang-secure-programming/</loc>
     <lastmod>2019-10-19T10:23:13+08:00</lastmod>
   </url>
@@ -104,13 +109,13 @@
   
   <url>
     <loc>http://blog.k-8s.com/tags/Golang/</loc>
-    <lastmod>2019-10-19T10:23:13+08:00</lastmod>
+    <lastmod>2019-10-19T22:07:11+08:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
     <loc>http://blog.k-8s.com/categories/Golang/</loc>
-    <lastmod>2019-10-19T10:23:13+08:00</lastmod>
+    <lastmod>2019-10-19T22:07:11+08:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -128,19 +133,19 @@
   
   <url>
     <loc>http://blog.k-8s.com/</loc>
-    <lastmod>2019-10-19T10:23:13+08:00</lastmod>
+    <lastmod>2019-10-19T22:07:11+08:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
     <loc>http://blog.k-8s.com/posts/</loc>
-    <lastmod>2019-10-19T10:23:13+08:00</lastmod>
+    <lastmod>2019-10-19T22:07:11+08:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
     <loc>http://blog.k-8s.com/tags/</loc>
-    <lastmod>2019-10-19T10:23:13+08:00</lastmod>
+    <lastmod>2019-10-19T22:07:11+08:00</lastmod>
     <priority>0</priority>
   </url>
   

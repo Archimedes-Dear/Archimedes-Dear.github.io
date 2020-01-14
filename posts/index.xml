@@ -6,10 +6,42 @@
     <description>Recent content in Posts on Mr.耗子</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    <lastBuildDate>Sat, 19 Oct 2019 10:23:13 +0800</lastBuildDate>
+    <lastBuildDate>Sat, 19 Oct 2019 22:07:11 +0800</lastBuildDate>
     
 	<atom:link href="http://blog.k-8s.com/posts/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Golang 工程管理</title>
+      <link>http://blog.k-8s.com/posts/Golang-Note/Golang-engineering-management/</link>
+      <pubDate>Sat, 19 Oct 2019 22:07:11 +0800</pubDate>
+      
+      <guid>http://blog.k-8s.com/posts/Golang-Note/Golang-engineering-management/</guid>
+      <description>&lt;h3 id=&#34;工程管理&#34;&gt;工程管理&lt;/h3&gt;
+
+&lt;p&gt;Go 中有许多工具可以更便捷的进行工程管理, 大致可分为以下几个方面:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;代码风格&lt;/li&gt;
+&lt;li&gt;文档风格和管理&lt;/li&gt;
+&lt;li&gt;单元测试与性能测试方法&lt;/li&gt;
+&lt;li&gt;项目工程结构&lt;/li&gt;
+&lt;li&gt;跨平台开发&lt;/li&gt;
+&lt;li&gt;打包分发&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Go 语言自带的 go 命令工具十分强大, 可以完成以下几类工作:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;代码格式化 (go fmt)&lt;/li&gt;
+&lt;li&gt;代码质量分析和修复&lt;/li&gt;
+&lt;li&gt;单元测试与性能测试 (go test,&lt;/li&gt;
+&lt;li&gt;工程构建 (go build)&lt;/li&gt;
+&lt;li&gt;代码文档的提取和展示 (go doc)&lt;/li&gt;
+&lt;li&gt;依赖包的管理 (go get)&lt;/li&gt;
+&lt;li&gt;执行其他的包含指令, 如 6g 等&lt;/li&gt;
+&lt;/ul&gt;</description>
+    </item>
     
     <item>
       <title>Golang 安全编程</title>
