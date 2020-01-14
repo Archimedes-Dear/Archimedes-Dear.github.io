@@ -68,6 +68,59 @@
                         <article class="post">
                             <header>
                                 <h1 class="post-title">
+                                    <a href="http://blog.k-8s.com/posts/Kubernetes-Note/Kubernetes-Service/" title="Kubernetes Service" >Kubernetes Service</a>
+                                </h1>
+                            </header>
+                            <date class="post-meta meta-date">
+                                2019年5月9日
+                            </date>
+                            
+                            <div class="post-meta">
+                                <span>|</span>
+                                
+                                <span class="meta-category"><a href="http://blog.k-8s.com/categories/Kubernetes">Kubernetes</a></span>
+                                
+                            </div>
+                            
+                            <div class="post-content">
+                                <h3 id="service-的作用">Service 的作用</h3>
+
+<p>Service 可以为一组具有相同功能的容器应用提供统一的入口和负载均衡</p>
+
+<h3 id="创建和使用-service">创建和使用 Service</h3>
+
+<p>先创建 2 个 nginx 应用容器</p>
+
+<pre><code class="language-yaml"># deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+spec:
+  selector:
+    matchLabels:
+      app: nginx
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.7.9
+        ports:
+        - containerPort: 80
+</code></pre>
+
+<p>再编写对应的 svcNginx.yaml</p>……
+                            </div>
+                            <p class="readmore"><a href="http://blog.k-8s.com/posts/Kubernetes-Note/Kubernetes-Service/">阅读全文</a></p>
+                        </article>
+                    
+                        <article class="post">
+                            <header>
+                                <h1 class="post-title">
                                     <a href="http://blog.k-8s.com/posts/Kubernetes-Note/Kubernetes-Volumes/" title="Kubernetes 存储" >Kubernetes 存储</a>
                                 </h1>
                             </header>
@@ -357,6 +410,10 @@ Containers:
 <ul class="widget-list">
     
     <li>
+        <a href="http://blog.k-8s.com/posts/Golang-Note/Golang-network-programming/" title="Golang 网络编程">Golang 网络编程</a>
+    </li>
+    
+    <li>
         <a href="http://blog.k-8s.com/posts/Golang-Note/Golang-concurrency/" title="Golang 并发编程">Golang 并发编程</a>
     </li>
     
@@ -392,10 +449,6 @@ Containers:
         <a href="http://blog.k-8s.com/posts/Golang-Note/Golang-install-and-env/" title="Golang 安装和环境配置">Golang 安装和环境配置</a>
     </li>
     
-    <li>
-        <a href="http://blog.k-8s.com/posts/Kubernetes-Note/Kubernetes-Service/" title="Kubernetes Service">Kubernetes Service</a>
-    </li>
-    
 </ul>
     </section>
 
@@ -406,7 +459,7 @@ Containers:
 <ul class="widget-list">
     
     <li>
-        <a href="http://blog.k-8s.com/categories/Golang/">Golang(9)</a>
+        <a href="http://blog.k-8s.com/categories/Golang/">Golang(10)</a>
     </li>
     
     <li>

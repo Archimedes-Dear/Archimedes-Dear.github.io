@@ -1,0 +1,711 @@
+<!doctype html>
+<html lang="zh-cn">
+<head>
+
+    <meta charset="utf-8">
+    <meta name="generator" content="Hugo 0.54.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Golang 网络编程 | Mr.耗子</title>
+    <meta property="og:title" content="Golang 网络编程 - Mr.耗子">
+    <meta property="og:type" content="article">
+        
+    <meta property="article:published_time" content="2019-10-18T13:32:35&#43;08:00">
+        
+        
+    <meta property="article:modified_time" content="2019-10-18T13:32:35&#43;08:00">
+        
+    <meta name="Keywords" content="耗子,Mr.耗子,Docker,容器,k8s,kubernetes,golang,go,devops">
+    <meta name="description" content="Golang 网络编程">
+        
+    <meta name="author" content="Mr.耗子">
+    <meta property="og:url" content="http://blog.k-8s.com/posts/Golang-Note/Golang-network-programming/">
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+
+    <link rel="stylesheet" href="/css/normalize.css">
+    
+        <link rel="stylesheet" href="/css/prism.css">
+    
+    <link rel="stylesheet" href="/css/style.css">
+    <script type="text/javascript" src="//cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+
+    
+
+
+    
+    
+</head>
+
+<body>
+<header id="header" class="clearfix">
+    <div class="container">
+        <div class="col-group">
+            <div class="site-name ">
+                
+                    <a id="logo" href="http://blog.k-8s.com/">
+                        Mr.耗子
+                    </a>
+                
+                <p class="description">Linux Docker Kubernetes Golang Python</p>
+            </div>
+            <div>
+                <nav id="nav-menu" class="clearfix">
+                    <a class="" href="http://blog.k-8s.com/">首页</a>
+                    
+                    <a  href="http://blog.k-8s.com/archives/" title="归档">归档</a>
+                    
+                    <a  href="http://blog.k-8s.com/about/" title="关于">关于</a>
+                    
+                </nav>
+            </div>
+        </div>
+    </div>
+</header>
+
+
+<div id="body">
+    <div class="container">
+        <div class="col-group">
+
+            <div class="col-8" id="main">
+                <div class="res-cons">
+                    <article class="post">
+                        <header>
+                            <h1 class="post-title">Golang 网络编程</h1>
+                        </header>
+                        <date class="post-meta meta-date">
+                            2019年10月18日
+                        </date>
+                        
+                        <div class="post-meta">
+                            <span>|</span>
+                            
+                                <span class="meta-category"><a href="http://blog.k-8s.com/categories/Golang">Golang</a></span>
+                            
+                        </div>
+                        
+                        
+                        <div class="post-meta">
+                            <span id="busuanzi_container_page_pv">|<span id="busuanzi_value_page_pv"></span><span> 阅读</span></span>
+                        </div>
+                        
+                        <div class="post-content">
+                            <p>Go 语言标准库提供 net 包, 支持基于 IP 层, TCP/UDP 层及更高层面 (如 HTTP, FTP, SMTP) 的网络操作</p>
+
+<h3 id="socket-编程">Socket 编程</h3>
+
+<p>传统的 Socket 编程方式大致会有以下几个步骤:</p>
+
+<ol>
+<li>建立 Socket: 使用 socket() 函数</li>
+<li>绑定 Socket: 使用 bind() 函数</li>
+<li>监听: 使用 listen() 函数, 或者连接: 使用 connect() 函数</li>
+<li>接受连接: 使用 accept() 函数</li>
+<li>接受: 使用 receive() 函数, 或者发送: 使用 send() 函数</li>
+</ol>
+
+<p>而 Go 标准库对对此过程进行了抽象和封装, 无论我们期望使用协议建立什么形式的连接, 都只需要调用 net.Dial() 即可</p>
+
+<h4 id="dial-函数">Dial() 函数</h4>
+
+<p>Dial() 函数原型如下: <code>func Dial(net, addr string) (Conn, error)</code></p>
+
+<p>其中 net 是网络协议的名字, addr 是 IP 地址或域名, 端口号以 &ldquo;:&rdquo; 形式跟在 IP 或域名后, 端口号可选. 如果连接成功, 返回连接对象, 否则返回 error</p>
+
+<pre><code class="language-go">// 常见的连接方式
+// TCP
+conn, err := net.Dial(&quot;tcp&quot;, &quot;192.168.1.1:8080&quot;)
+
+// UDP
+conn, err := net.Dial(&quot;udp&quot;, &quot;192.168.1.1:53&quot;)
+
+// ICMP
+conn, err := net.Dial(&quot;ip4:icmp&quot;, &quot;www.baidu.com&quot;)
+</code></pre>
+
+<p>目前 Dial() 函数支持如下几种网络协议: &ldquo;tcp&rdquo;, &ldquo;tcp4&rdquo;, &ldquo;tcp6&rdquo;, &ldquo;udp&rdquo;, &ldquo;udp4&rdquo;, &ldquo;udp6&rdquo;, &ldquo;ip&rdquo;, &ldquo;ip4&rdquo;, &ldquo;ip6&rdquo;</p>
+
+<p>成功建立连接后, 可以进行数据的发送和接受. 发送数据时用 conn 的 Write() 方法, 接受数据时使用 Read() 方法</p>
+
+<p>实际上, Dial() 函数是对 DialTCP(), DialUDP(), DialIP(), DialUnix() 函数的封装:</p>
+
+<pre><code class="language-go">func DialTCP(net string, laddr, raddr *TCPAddr) (c *TCPConn, err error)
+func DialUDP(net string, laddr, raddr *UDPAddr) (c *UDPConn, err error) 
+func DialIP(netProto string, laddr, raddr *IPAddr) (*IPConn, error)
+func DialUnix(net string, laddr, raddr *UnixAddr) (c *UnixConn, err error)
+</code></pre>
+
+<h3 id="http-编程">HTTP 编程</h3>
+
+<p>Go 语言标准库内建提供了 net/http 包, 涵盖了 HTTP 客户端和服务端的具体实现.</p>
+
+<h4 id="http-客户端">HTTP 客户端</h4>
+
+<p>Go 内置的 net/http 包提供了简洁的 HTTP 客户端实现, 使得无需借助第三方网络通信库 (比如 libcurl) 就可以直接请求数据</p>
+
+<h5 id="http-get-方法">http.Get() 方法</h5>
+
+<p>要请求一个资源, 只需要调用 <strong><em>http.Get()</em></strong> 方法即可</p>
+
+<pre><code class="language-go">package main
+
+import (
+	&quot;fmt&quot;
+	&quot;io&quot;
+	&quot;net/http&quot;
+	&quot;os&quot;
+)
+
+func main() {
+	r, err := http.Get(&quot;http://www.baidu.com&quot;)
+
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	defer r.Body.Close()  // 请求完关闭连接
+
+	io.Copy(os.Stdout, r.Body)  // 将请求结果输出到控制台
+}
+</code></pre>
+
+<h5 id="http-post-方法">http.Post() 方法</h5>
+
+<p>http.Post() 需要依次传递以下三个参数:</p>
+
+<ul>
+<li>请求目标的 URL</li>
+<li>将要 POST 数据的资源类型 (MIMEType)</li>
+<li>数据的比特流 ([]byte)</li>
+</ul>
+
+<pre><code class="language-go">// 上传一张图片
+r, err := http.Post(&quot;http://images.example.com/upload&quot;, &quot;image/jpeg&quot;, &amp;imageDataBuf)
+</code></pre>
+
+<h5 id="http-postform-方法">http.PostForm() 方法</h5>
+
+<pre><code class="language-go">// 提交表单
+r, err := http.PostForm(&quot;http//www.example.com/login&quot;, url.Values{&quot;username&quot;: {&quot;admin&quot;}, &quot;password&quot;: {&quot;admin&quot;}})
+</code></pre>
+
+<h5 id="http-head-方法">http.Head() 方法</h5>
+
+<p>Head() 方法只请求目标 URL 的头部信息</p>
+
+<pre><code class="language-go">// 请求头部信息
+r, err := http.Head(&quot;http://www.example.com&quot;)
+</code></pre>
+
+<h5 id="http-do-方法">http.Do() 方法</h5>
+
+<p>如果发起的 HTTP 请求需要更多的定制信息, 如自定义 Header 字段, 传递 Cookie 等, 可以用 <strong><em>Do()</em></strong> 方法实现</p>
+
+<pre><code class="language-go">// 构建请求头
+req, err := http.NewRequest(&quot;GET&quot;, &quot;http://www.example.com&quot;, nil)
+req.Header.Add(&quot;User-Agent&quot;, &quot;Custom User-Agent&quot;)
+
+// 生成客户端实例
+client := &amp;http.Client{ ... }
+
+// 发起请求
+r, err := client.Do(req)
+</code></pre>
+
+<h4 id="http-服务端">HTTP 服务端</h4>
+
+<h5 id="处理-http-请求">处理 HTTP 请求</h5>
+
+<p>使用 net/http 包提供的 http.ListenAndServe() 方法, 可以在指定的地址监听, 开启一个 HTTP 服务端</p>
+
+<pre><code class="language-go">// 指定 addr 地址进行监听, 调用服务端处理程序 handler 来处理传入的连接请求
+func ListenAndServe(addr string, hendler Handler) error 
+
+// 若 handler 为空, 默认调用 http.DefaultServeMux 进行处理, 而服务端编写的业务逻辑处理程序 http.Handle() 或 http.HandleFunc() 默认注入 http.DefaultServeMux 中
+http.Handle(&quot;/foo&quot;, fooHandler)
+http.HandleFunc(&quot;/bar&quot;, func(w http.ResponseWriter, r *http.Request) {
+    fmt.Fprintf(w, &quot;hello, %q&quot;, html.EscapeString(r.URL.Path))
+})
+log.Fatal(http.ListenAndServe(&quot;:8080&quot;, nil))
+</code></pre>
+
+<p>如果想更多的控制服务端的行为:</p>
+
+<pre><code class="language-go">// 自定义 http.Server
+s := &amp;http.Server{
+    Addr: &quot;:8080&quot;,
+    Handler: myHandler,
+    ReadTimeout: 10 * time.Second,
+    WriteTimeout: 10 * time.Second,
+    MaxHeaderBytes: 1 &lt;&lt; 20,
+}
+log.Fatal(s.ListenAndServe())
+</code></pre>
+
+<h5 id="处理-https-请求">处理 HTTPS 请求</h5>
+
+<p>使用 net/http 的 http.ListenAndServeTLS() 方法, 用于处理 HTTPS 连接请求</p>
+
+<pre><code class="language-go">// certFile 对应 SSL 证书文件存放路径, keyFile 对应证书私钥存放路径.
+func ListenAndServeTLS(addr, certFile, keyFile string, handler Handler) error
+</code></pre>
+
+<p>开启 SSL 监听:</p>
+
+<pre><code class="language-go">http.Handle(&quot;/foo&quot;, fooHandler)
+http.HandleFunc(&quot;/bar&quot;, func(w http.ResponseWriter, r *http.Request) {
+    fmt.Fprintf(w, &quot;Hello, %q&quot;, html.EscapeString(r.URL.Path))
+})
+log.Fatal(http.ListenAndServeTLS(&quot;:10443&quot;, &quot;cert.pem&quot;, &quot;key.pem&quot;, nil))
+
+// 或者是
+ss := &amp;http.Server{
+    Addr: &quot;:10443&quot;,
+    Handler: myHandler,
+    ReadTimeout: 10 * time.Second,
+    WriteTimeout: 10 * time.Second,
+    MaxHeaderBytes: 1 &lt;&lt; 20,
+}
+log.Fatal(ss.ListenAndServeTLS(&quot;cert.pem&quot;, &quot;key.pem&quot;))
+</code></pre>
+
+<h3 id="json-处理">JSON 处理</h3>
+
+<p>Go 语言内建 encoding/json 包用于支持 JSON 的处理</p>
+
+<pre><code class="language-go">// json 编码, 解码, 未知 json 解码
+package main
+
+import (
+	&quot;encoding/json&quot;
+	&quot;fmt&quot;
+)
+
+type Book struct {
+	Title string
+	Authors []string
+	Publisher string
+	IsPublished bool
+	Price float64
+}
+
+func main() {
+	gobook := Book{
+		&quot;Go 语言编程&quot;,
+		[]string{&quot;XuShiwei&quot;, &quot;HughLv&quot;, &quot;Pandaman&quot;},
+		&quot;ituring.com.cn&quot;,
+		true,
+		9.99,
+	}
+
+	fmt.Println(gobook)
+
+    // 将数据结构转成 JSON 格式化后的 []byte 类型
+    // 若转化前数据结构前出现指针, 那么会转化指针所指向的值, 如果指针指向的是零值, 那么转化后为 null
+	b, err := json.Marshal(gobook)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	fmt.Println(b)  // 打印出 []byte类型
+
+    // 将 []byte 类型的 json 转换成结构体
+    // 需要先声明一个某结构体的变量, 然后用 json.Unmarshal() 方法解码
+	var book Book
+	err = json.Unmarshal(b, &amp;book)
+	if err != nil {
+		fmt.Println(err)
+	}
+    
+    fmt.Println(book)
+
+    // 若 json 结构未知, 无法对应到结构体, 可新建一个空接口, 接受所有类型的值
+    // 最终 r 是一个键值对的 map[string]interface{} 结构
+	var r interface{}
+	err = json.Unmarshal(b, &amp;r)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	fmt.Println(r)
+}
+</code></pre>
+
+<p>Go 语言中, 编码成 JSON 后的数据类型映射如下:</p>
+
+<ul>
+<li>布尔值转换成布尔值</li>
+<li>浮点和整型会转换成常规数字</li>
+<li>字符串以 UTF-8 编码转化输出为 Unicode 字符集的字符串</li>
+<li>数组和切片会转化为 JSON 里的数组, 但 []byte 类型会转化为 Base64 编码后的字符串, slice 类型的零值会被转换为 null</li>
+<li>结构体会转化为 JSON 对象, 并且只有结构体里面<strong>以大写字母开头的可导出的</strong>字段才会被转化输出, 这些可导出的字段会作为 JSON 对象的字符串索引</li>
+<li>转化一个 map 类型的数据结构时, 该数据的类型必须是 map[string]T (T可以是 encoding/json 包支持的任意数据类型)</li>
+</ul>
+
+<p><strong><em>json.Unmarshal()</em></strong> 函数会根据一个约定俗称的顺序查找目标结构中的字段, 如果找到即发生匹配</p>
+
+<p>假如有一个名为 &ldquo;Foo&rdquo; 的索引, 那么会按照如下顺序进行匹配:</p>
+
+<ol>
+<li>一个包含 Foo 标签的字段</li>
+<li>一个名为 Foo 的字段</li>
+<li>一个名为Foo或者Foo或者除了首字母其他字母不区分大小写的名为Foo的字段</li>
+</ol>
+
+<p>当 JSON 中的字段在 Go 目标类型中不存在, 则会丢弃该字段</p>
+
+<p>当需要解码未知结构的 JSON 数据时, 只需要将数据解码输出到一个空接口即可. JSON 中的元素类型将做如下转换:</p>
+
+<ul>
+<li>布尔值转换成 bool 类型</li>
+<li>数值转换成 float64 类型</li>
+<li>字符串转换成 string 类型</li>
+<li>数组转换成 []interface{} 类型</li>
+<li>对象转换成 map[string]interface{} 类型</li>
+<li>null 值会转换为 nil</li>
+</ul>
+
+<pre><code class="language-go">// 访问解码后的数据结构, 需要先判断目标结构是否为预期的数据类型
+package main
+
+import (
+	&quot;encoding/json&quot;
+	&quot;fmt&quot;
+)
+
+type Book struct {
+	Title string
+	Authors []string
+	Publisher string
+	IsPublished bool
+	Price float64
+}
+
+func main() {
+	gobook := Book{
+		&quot;Go 语言编程&quot;,
+		[]string{&quot;XuShiwei&quot;, &quot;HughLv&quot;, &quot;Pandaman&quot;},
+		&quot;ituring.com.cn&quot;,
+		true,
+		9.99,
+	}
+
+	fmt.Println(gobook)
+
+    // 编码
+	b, err := json.Marshal(gobook)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+    // 解码
+	var r interface{}
+	err = json.Unmarshal(b, &amp;r)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+    // 访问
+    // 判断是否为预期的数据类型
+	mybook, ok := r.(map[string]interface{})
+
+    // 虽然访问方式有些繁琐, 但却是一种安全的方式
+	if ok {
+		for k, v := range mybook {
+			switch v2 := v.(type) {
+			case string:
+				fmt.Println(k, &quot;is string&quot;, v2)
+			case int:
+				fmt.Println(k, &quot;is int&quot;, v2)
+			case bool:
+				fmt.Println(k, &quot;is bool&quot;, v2)
+			case []interface{}:
+				fmt.Println(k, &quot;is an array:&quot;)
+				for i, iv := range v2 {
+					fmt.Println(i, iv)
+				}
+			default:
+				fmt.Println(k, &quot;is another type not handle yet&quot;)
+			}
+		}
+	}
+
+}
+</code></pre>
+
+<h4 id="json-的流式读写">JSON 的流式读写</h4>
+
+<p>Go 内置的 encoding/json 包还提供 Decoder 和 Encoder 两个类型, 用于支持 JSON 数据的流式读写, 并提供 <strong><em>NewDecoder()</em></strong> 和 <strong><em>NewEncoder()</em></strong> 两个函数来便于具体实现:</p>
+
+<pre><code class="language-go">func NewDecoder(r io.Reader) *Decoder
+func NewEncoder(w io.Writer) *Encoder
+</code></pre>
+
+<pre><code class="language-go">// 从标准输入流中读取 json 数据, 然后将其解码, 但只保留 Title 字段, 再写入到标准输出流中
+package main
+
+import (
+	&quot;encoding/json&quot;
+	&quot;log&quot;
+	&quot;os&quot;
+)
+
+func main() {
+	dec := json.NewDecoder(os.Stdin)
+	enc := json.NewEncoder(os.Stdout)
+
+	for {
+		var v map[string]interface{}
+		if err := dec.Decode(&amp;v); err != nil {
+			log.Println(err)
+			return
+		}
+
+		for k := range v {
+			if k != &quot;Title&quot; {
+				v[k] = nil
+			}
+		}
+
+		if err := enc.Encode(&amp;v); err != nil {
+			log.Println(err)
+		}
+	}
+}
+
+// 控制台输入举例
+{&quot;Title&quot;: &quot;hello&quot;, &quot;foo&quot;: 123, &quot;test&quot;: {&quot;aaa&quot;: &quot;bbb&quot;}}
+
+// 输出结果
+{&quot;Title&quot;:&quot;hello&quot;,&quot;foo&quot;:null,&quot;test&quot;:null}
+</code></pre>
+
+<h3 id="网站开发">网站开发</h3>
+
+<p>用 net/http 包可以快速的创建一个最简单的网站程序</p>
+
+<pre><code class="language-go">// 简单的网站 hello, world
+package main
+
+import (
+	&quot;io&quot;
+	&quot;log&quot;
+	&quot;net/http&quot;
+)
+
+// hello 方法中传入两个参数, 是个是 http.ResponseWriter 写入地址, 一个是 http.Request 请求的指针
+func hello(w http.ResponseWriter, r *http.Request) {
+	io.WriteString(w, &quot;Hello, world&quot;)
+}
+
+func main() {
+    // HandleFunc 用于解析 URL 的路由并提供对应的处理函数
+	http.HandleFunc(&quot;/hello&quot;, hello)
+	err := http.ListenAndServe(&quot;:8000&quot;, nil)
+	if err != nil {
+		log.Fatal(&quot;ListenAndServe: &quot;, err.Error())
+	}
+}
+</code></pre>
+
+<p>将以上代码运行后, 即可在浏览器中访问 <a href="http://localhost:8000/hello">http://localhost:8000/hello</a> 看到我们写的 &ldquo;Hello, world&rdquo;</p>
+
+<p>这里使用了 io 包而不是 fmt 来输出字符串, 可以使得源文件编译成可执行文件后, 体积要小很多, 运行起来更节省资源</p>
+
+<p><strong><em>http.ResponseWriter</em></strong> 用于包装处理 HTTP 服务端信息, 我们将字符串写入类型为 <strong><em>http.ResponseWriter</em></strong> 的 w 实例中, 即可将该字符串发送到 HTTP 客户端</p>
+
+<p>参考书籍:</p>
+
+<p><a href="https://book.douban.com/subject/11577300/">Go语言编程</a></p>
+                        </div>
+
+                        
+
+<div class="post-archive">
+    <h2>See Also</h2>
+    <ul class="listing">
+        
+        <li><a href="/posts/Golang-Note/Golang-concurrency/">Golang 并发编程</a></li>
+        
+        <li><a href="/posts/Golang-Note/Golang-interface/">Golang 接口</a></li>
+        
+        <li><a href="/posts/Golang-Note/Golang-type-system/">Golang 类型系统</a></li>
+        
+        <li><a href="/posts/Golang-Note/Golang-error-handling/">Golang 错误处理</a></li>
+        
+        <li><a href="/posts/Golang-Note/Golang-function/">Golang 函数</a></li>
+        
+    </ul>
+</div>
+
+
+                        <div class="post-meta meta-tags">
+                            
+                            <ul class="clearfix">
+                                
+                                <li><a href="http://blog.k-8s.com/tags/Golang">Golang</a></li>
+                                
+                            </ul>
+                            
+                        </div>
+                    </article>
+                    
+    
+
+    
+    
+                </div>
+            </div>
+            <div id="secondary">
+    <section class="widget">
+        <form id="search" action="//www.google.com/search" method="get" accept-charset="utf-8" target="_blank" _lpchecked="1">
+      
+      <input type="text" name="q" maxlength="20" placeholder="Search">
+      <input type="hidden" name="sitesearch" value="http://blog.k-8s.com/">
+      <button type="submit" class="submit icon-search"></button>
+</form>
+    </section>
+    
+    <section class="widget">
+        <h3 class="widget-title">最近文章</h3>
+<ul class="widget-list">
+    
+    <li>
+        <a href="http://blog.k-8s.com/posts/Golang-Note/Golang-network-programming/" title="Golang 网络编程">Golang 网络编程</a>
+    </li>
+    
+    <li>
+        <a href="http://blog.k-8s.com/posts/Golang-Note/Golang-concurrency/" title="Golang 并发编程">Golang 并发编程</a>
+    </li>
+    
+    <li>
+        <a href="http://blog.k-8s.com/posts/Golang-Note/Golang-interface/" title="Golang 接口">Golang 接口</a>
+    </li>
+    
+    <li>
+        <a href="http://blog.k-8s.com/posts/Golang-Note/Golang-type-system/" title="Golang 类型系统">Golang 类型系统</a>
+    </li>
+    
+    <li>
+        <a href="http://blog.k-8s.com/posts/Golang-Note/Golang-error-handling/" title="Golang 错误处理">Golang 错误处理</a>
+    </li>
+    
+    <li>
+        <a href="http://blog.k-8s.com/posts/Golang-Note/Golang-function/" title="Golang 函数">Golang 函数</a>
+    </li>
+    
+    <li>
+        <a href="http://blog.k-8s.com/posts/Golang-Note/Golang-process-control/" title="Golang 流程控制">Golang 流程控制</a>
+    </li>
+    
+    <li>
+        <a href="http://blog.k-8s.com/posts/Golang-Note/Golang-type-of-data/" title="Golang 数据类型">Golang 数据类型</a>
+    </li>
+    
+    <li>
+        <a href="http://blog.k-8s.com/posts/Golang-Note/Golang-variables-and-constants/" title="Golang 变量与常量">Golang 变量与常量</a>
+    </li>
+    
+    <li>
+        <a href="http://blog.k-8s.com/posts/Golang-Note/Golang-install-and-env/" title="Golang 安装和环境配置">Golang 安装和环境配置</a>
+    </li>
+    
+</ul>
+    </section>
+
+    
+
+    <section class="widget">
+        <h3 class="widget-title">分类</h3>
+<ul class="widget-list">
+    
+    <li>
+        <a href="http://blog.k-8s.com/categories/Golang/">Golang(10)</a>
+    </li>
+    
+    <li>
+        <a href="http://blog.k-8s.com/categories/Kubernetes/">Kubernetes(6)</a>
+    </li>
+    
+    <li>
+        <a href="http://blog.k-8s.com/categories/hugo/">hugo(1)</a>
+    </li>
+    
+</ul>
+    </section>
+
+    <section class="widget">
+        <h3 class="widget-title">标签</h3>
+<div class="tagcloud">
+    
+    <a href="http://blog.k-8s.com/tags/Golang/">Golang</a>
+    
+    <a href="http://blog.k-8s.com/tags/Kubernetes/">Kubernetes</a>
+    
+    <a href="http://blog.k-8s.com/tags/hugo/">hugo</a>
+    
+</div>
+    </section>
+
+    
+<section class="widget">
+    <h3 class="widget-title">友情链接</h3>
+    <ul class="widget-list">
+        
+        <li>
+            <a target="_blank" href="http://www.jxhs.me" title="jame_xhs">jame_xhs</a>
+        </li>
+        
+    </ul>
+</section>
+
+
+    <section class="widget">
+        <h3 class="widget-title">其它</h3>
+        <ul class="widget-list">
+            <li><a href="http://blog.k-8s.com/index.xml">文章 RSS</a></li>
+        </ul>
+    </section>
+</div>
+        </div>
+    </div>
+</div>
+<footer id="footer">
+    <div class="container">
+        &copy; 2018 <a href="http://blog.k-8s.com/">Mr.耗子 By Mr.耗子</a>.
+        Powered by <a rel="nofollow noreferer noopener" href="https://gohugo.io" target="_blank">Hugo</a>.
+        <a href="https://www.flysnow.org/" target="_blank">Theme</a> based on <a href="https://github.com/rujews/maupassant-hugo" target="_blank">maupassant</a>.
+        
+    </div>
+</footer>
+
+
+    <script type="text/javascript">
+    
+    (function(){
+        $("pre code").parent().addClass("line-numbers")
+    }())
+
+    window.MathJax = {
+        tex2jax: {
+            inlineMath: [ ['$','$'] ],
+            processEscapes: true
+        }
+    };
+    </script>
+    <script type="text/javascript" src="/js/prism.js" async="true"></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
+
+<a id="rocket" href="#top"></a>
+<script type="text/javascript" src="/js/totop.js?v=0.0.0" async=""></script>
+
+
+
+<script type="text/javascript" src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" async></script>
+
+
+
+
+</body>
+</html>

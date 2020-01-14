@@ -6,10 +6,33 @@
     <description>Recent content on Mr.耗子</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    <lastBuildDate>Wed, 16 Oct 2019 20:16:15 +0800</lastBuildDate>
+    <lastBuildDate>Fri, 18 Oct 2019 13:32:35 +0800</lastBuildDate>
     
 	<atom:link href="http://blog.k-8s.com/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Golang 网络编程</title>
+      <link>http://blog.k-8s.com/posts/Golang-Note/Golang-network-programming/</link>
+      <pubDate>Fri, 18 Oct 2019 13:32:35 +0800</pubDate>
+      
+      <guid>http://blog.k-8s.com/posts/Golang-Note/Golang-network-programming/</guid>
+      <description>&lt;p&gt;Go 语言标准库提供 net 包, 支持基于 IP 层, TCP/UDP 层及更高层面 (如 HTTP, FTP, SMTP) 的网络操作&lt;/p&gt;
+
+&lt;h3 id=&#34;socket-编程&#34;&gt;Socket 编程&lt;/h3&gt;
+
+&lt;p&gt;传统的 Socket 编程方式大致会有以下几个步骤:&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;建立 Socket: 使用 socket() 函数&lt;/li&gt;
+&lt;li&gt;绑定 Socket: 使用 bind() 函数&lt;/li&gt;
+&lt;li&gt;监听: 使用 listen() 函数, 或者连接: 使用 connect() 函数&lt;/li&gt;
+&lt;li&gt;接受连接: 使用 accept() 函数&lt;/li&gt;
+&lt;li&gt;接受: 使用 receive() 函数, 或者发送: 使用 send() 函数&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;而 Go 标准库对对此过程进行了抽象和封装, 无论我们期望使用协议建立什么形式的连接, 都只需要调用 net.Dial() 即可&lt;/p&gt;</description>
+    </item>
     
     <item>
       <title>Golang 并发编程</title>

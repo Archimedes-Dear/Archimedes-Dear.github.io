@@ -68,6 +68,43 @@
                         <article class="post">
                             <header>
                                 <h1 class="post-title">
+                                    <a href="http://blog.k-8s.com/posts/Golang-Note/Golang-network-programming/" title="Golang 网络编程" >Golang 网络编程</a>
+                                </h1>
+                            </header>
+                            <date class="post-meta meta-date">
+                                2019年10月18日
+                            </date>
+                            
+                            <div class="post-meta">
+                                <span>|</span>
+                                
+                                <span class="meta-category"><a href="http://blog.k-8s.com/categories/Golang">Golang</a></span>
+                                
+                            </div>
+                            
+                            <div class="post-content">
+                                <p>Go 语言标准库提供 net 包, 支持基于 IP 层, TCP/UDP 层及更高层面 (如 HTTP, FTP, SMTP) 的网络操作</p>
+
+<h3 id="socket-编程">Socket 编程</h3>
+
+<p>传统的 Socket 编程方式大致会有以下几个步骤:</p>
+
+<ol>
+<li>建立 Socket: 使用 socket() 函数</li>
+<li>绑定 Socket: 使用 bind() 函数</li>
+<li>监听: 使用 listen() 函数, 或者连接: 使用 connect() 函数</li>
+<li>接受连接: 使用 accept() 函数</li>
+<li>接受: 使用 receive() 函数, 或者发送: 使用 send() 函数</li>
+</ol>
+
+<p>而 Go 标准库对对此过程进行了抽象和封装, 无论我们期望使用协议建立什么形式的连接, 都只需要调用 net.Dial() 即可</p>……
+                            </div>
+                            <p class="readmore"><a href="http://blog.k-8s.com/posts/Golang-Note/Golang-network-programming/">阅读全文</a></p>
+                        </article>
+                    
+                        <article class="post">
+                            <header>
+                                <h1 class="post-title">
                                     <a href="http://blog.k-8s.com/posts/Golang-Note/Golang-concurrency/" title="Golang 并发编程" >Golang 并发编程</a>
                                 </h1>
                             </header>
@@ -424,59 +461,6 @@ func main() {
                             <p class="readmore"><a href="http://blog.k-8s.com/posts/Golang-Note/Golang-install-and-env/">阅读全文</a></p>
                         </article>
                     
-                        <article class="post">
-                            <header>
-                                <h1 class="post-title">
-                                    <a href="http://blog.k-8s.com/posts/Kubernetes-Note/Kubernetes-Service/" title="Kubernetes Service" >Kubernetes Service</a>
-                                </h1>
-                            </header>
-                            <date class="post-meta meta-date">
-                                2019年5月9日
-                            </date>
-                            
-                            <div class="post-meta">
-                                <span>|</span>
-                                
-                                <span class="meta-category"><a href="http://blog.k-8s.com/categories/Kubernetes">Kubernetes</a></span>
-                                
-                            </div>
-                            
-                            <div class="post-content">
-                                <h3 id="service-的作用">Service 的作用</h3>
-
-<p>Service 可以为一组具有相同功能的容器应用提供统一的入口和负载均衡</p>
-
-<h3 id="创建和使用-service">创建和使用 Service</h3>
-
-<p>先创建 2 个 nginx 应用容器</p>
-
-<pre><code class="language-yaml"># deployment.yaml
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: nginx-deployment
-spec:
-  selector:
-    matchLabels:
-      app: nginx
-  replicas: 2
-  template:
-    metadata:
-      labels:
-        app: nginx
-    spec:
-      containers:
-      - name: nginx
-        image: nginx:1.7.9
-        ports:
-        - containerPort: 80
-</code></pre>
-
-<p>再编写对应的 svcNginx.yaml</p>……
-                            </div>
-                            <p class="readmore"><a href="http://blog.k-8s.com/posts/Kubernetes-Note/Kubernetes-Service/">阅读全文</a></p>
-                        </article>
-                    
 
                     
 
@@ -521,6 +505,10 @@ spec:
 <ul class="widget-list">
     
     <li>
+        <a href="http://blog.k-8s.com/posts/Golang-Note/Golang-network-programming/" title="Golang 网络编程">Golang 网络编程</a>
+    </li>
+    
+    <li>
         <a href="http://blog.k-8s.com/posts/Golang-Note/Golang-concurrency/" title="Golang 并发编程">Golang 并发编程</a>
     </li>
     
@@ -556,10 +544,6 @@ spec:
         <a href="http://blog.k-8s.com/posts/Golang-Note/Golang-install-and-env/" title="Golang 安装和环境配置">Golang 安装和环境配置</a>
     </li>
     
-    <li>
-        <a href="http://blog.k-8s.com/posts/Kubernetes-Note/Kubernetes-Service/" title="Kubernetes Service">Kubernetes Service</a>
-    </li>
-    
 </ul>
     </section>
 
@@ -570,7 +554,7 @@ spec:
 <ul class="widget-list">
     
     <li>
-        <a href="http://blog.k-8s.com/categories/Golang/">Golang(9)</a>
+        <a href="http://blog.k-8s.com/categories/Golang/">Golang(10)</a>
     </li>
     
     <li>
