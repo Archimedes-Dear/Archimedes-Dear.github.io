@@ -68,6 +68,62 @@
                         <article class="post">
                             <header>
                                 <h1 class="post-title">
+                                    <a href="http://blog.k-8s.com/posts/Golang-Note/Golang-standard-library-ioutil/" title="Golang 标准库 io/ioutil" >Golang 标准库 io/ioutil</a>
+                                </h1>
+                            </header>
+                            <date class="post-meta meta-date">
+                                2021年1月2日
+                            </date>
+                            
+                            <div class="post-meta">
+                                <span>|</span>
+                                
+                                <span class="meta-category"><a href="http://blog.k-8s.com/categories/Golang">Golang</a></span>
+                                
+                            </div>
+                            
+                            <div class="post-content">
+                                <h3 id="io-ioutil-包">io/ioutil 包</h3>
+
+<p>软件包 ioutil 实现了一些 I/O 实用程序功能</p>
+
+<h4 id="readall">ReadAll</h4>
+
+<p><strong>函数原型:</strong></p>
+
+<p><code>func ReadAll(r io.Reader) ([]byte, error)</code></p>
+
+<p>ReadAll 从 r 读取, 直到出现错误或 EOF, 然后返回读取的数据</p>
+
+<p>成功调用将返回 err == nil, 而不是 err == EOF. 因为 ReadAll 被定义为从 src 读取, 直到 EOF, 因此不会将读取的 EOF 视为要报告的错误</p>
+
+<pre><code class="language-go">package main
+
+import (
+	&quot;fmt&quot;
+	&quot;io/ioutil&quot;
+	&quot;log&quot;
+	&quot;strings&quot;
+)
+
+func main() {
+	r := strings.NewReader(&quot;Go is a general-purpose language designed with systems programming in mind.&quot;)
+
+	b, err := ioutil.ReadAll(r)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Printf(&quot;%s&quot;, b)
+}
+</code></pre>……
+                            </div>
+                            <p class="readmore"><a href="http://blog.k-8s.com/posts/Golang-Note/Golang-standard-library-ioutil/">阅读全文</a></p>
+                        </article>
+                    
+                        <article class="post">
+                            <header>
+                                <h1 class="post-title">
                                     <a href="http://blog.k-8s.com/posts/Linux-Note/NetworkManager-Service/" title="NetworkManager 服务" >NetworkManager 服务</a>
                                 </h1>
                             </header>
@@ -406,40 +462,6 @@ if err != nil {
                             <p class="readmore"><a href="http://blog.k-8s.com/posts/Golang-Note/Golang-error-handling/">阅读全文</a></p>
                         </article>
                     
-                        <article class="post">
-                            <header>
-                                <h1 class="post-title">
-                                    <a href="http://blog.k-8s.com/posts/Golang-Note/Golang-function/" title="Golang 函数" >Golang 函数</a>
-                                </h1>
-                            </header>
-                            <date class="post-meta meta-date">
-                                2019年10月13日
-                            </date>
-                            
-                            <div class="post-meta">
-                                <span>|</span>
-                                
-                                <span class="meta-category"><a href="http://blog.k-8s.com/categories/Golang">Golang</a></span>
-                                
-                            </div>
-                            
-                            <div class="post-content">
-                                <h3 id="函数">函数</h3>
-
-<p>函数的基本组成为:</p>
-
-<ul>
-<li>关键字 <strong><em>func</em></strong></li>
-<li>函数名</li>
-<li>参数列表</li>
-<li>返回值</li>
-<li>函数体</li>
-<li>返回语句</li>
-</ul>……
-                            </div>
-                            <p class="readmore"><a href="http://blog.k-8s.com/posts/Golang-Note/Golang-function/">阅读全文</a></p>
-                        </article>
-                    
 
                     
 
@@ -488,6 +510,10 @@ if err != nil {
 <ul class="widget-list">
     
     <li>
+        <a href="http://blog.k-8s.com/posts/Golang-Note/Golang-standard-library-ioutil/" title="Golang 标准库 io/ioutil">Golang 标准库 io/ioutil</a>
+    </li>
+    
+    <li>
         <a href="http://blog.k-8s.com/posts/Linux-Note/NetworkManager-Service/" title="NetworkManager 服务">NetworkManager 服务</a>
     </li>
     
@@ -523,10 +549,6 @@ if err != nil {
         <a href="http://blog.k-8s.com/posts/Golang-Note/Golang-error-handling/" title="Golang 错误处理">Golang 错误处理</a>
     </li>
     
-    <li>
-        <a href="http://blog.k-8s.com/posts/Golang-Note/Golang-function/" title="Golang 函数">Golang 函数</a>
-    </li>
-    
 </ul>
     </section>
 
@@ -537,7 +559,7 @@ if err != nil {
 <ul class="widget-list">
     
     <li>
-        <a href="http://blog.k-8s.com/categories/Golang/">Golang(13)</a>
+        <a href="http://blog.k-8s.com/categories/Golang/">Golang(14)</a>
     </li>
     
     <li>

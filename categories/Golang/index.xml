@@ -6,10 +6,52 @@
     <description>Recent content in Golang on Mr.耗子</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    <lastBuildDate>Sun, 20 Oct 2019 11:15:15 +0800</lastBuildDate>
+    <lastBuildDate>Sat, 02 Jan 2021 10:30:00 +0800</lastBuildDate>
     
 	<atom:link href="http://blog.k-8s.com/categories/Golang/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Golang 标准库 io/ioutil</title>
+      <link>http://blog.k-8s.com/posts/Golang-Note/Golang-standard-library-ioutil/</link>
+      <pubDate>Sat, 02 Jan 2021 10:30:00 +0800</pubDate>
+      
+      <guid>http://blog.k-8s.com/posts/Golang-Note/Golang-standard-library-ioutil/</guid>
+      <description>&lt;h3 id=&#34;io-ioutil-包&#34;&gt;io/ioutil 包&lt;/h3&gt;
+
+&lt;p&gt;软件包 ioutil 实现了一些 I/O 实用程序功能&lt;/p&gt;
+
+&lt;h4 id=&#34;readall&#34;&gt;ReadAll&lt;/h4&gt;
+
+&lt;p&gt;&lt;strong&gt;函数原型:&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;func ReadAll(r io.Reader) ([]byte, error)&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;ReadAll 从 r 读取, 直到出现错误或 EOF, 然后返回读取的数据&lt;/p&gt;
+
+&lt;p&gt;成功调用将返回 err == nil, 而不是 err == EOF. 因为 ReadAll 被定义为从 src 读取, 直到 EOF, 因此不会将读取的 EOF 视为要报告的错误&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-go&#34;&gt;package main
+
+import (
+	&amp;quot;fmt&amp;quot;
+	&amp;quot;io/ioutil&amp;quot;
+	&amp;quot;log&amp;quot;
+	&amp;quot;strings&amp;quot;
+)
+
+func main() {
+	r := strings.NewReader(&amp;quot;Go is a general-purpose language designed with systems programming in mind.&amp;quot;)
+
+	b, err := ioutil.ReadAll(r)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Printf(&amp;quot;%s&amp;quot;, b)
+}
+&lt;/code&gt;&lt;/pre&gt;</description>
+    </item>
     
     <item>
       <title>Golang 反射</title>

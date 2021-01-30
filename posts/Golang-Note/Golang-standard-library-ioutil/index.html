@@ -7,20 +7,20 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>Golang 安装和环境配置 | Mr.耗子</title>
-    <meta property="og:title" content="Golang 安装和环境配置 - Mr.耗子">
+    <title>Golang 标准库 io/ioutil | Mr.耗子</title>
+    <meta property="og:title" content="Golang 标准库 io/ioutil - Mr.耗子">
     <meta property="og:type" content="article">
         
-    <meta property="article:published_time" content="2019-10-08T09:30:42&#43;08:00">
+    <meta property="article:published_time" content="2021-01-02T10:30:00&#43;08:00">
         
         
-    <meta property="article:modified_time" content="2019-10-08T09:30:42&#43;08:00">
+    <meta property="article:modified_time" content="2021-01-02T10:30:00&#43;08:00">
         
     <meta name="Keywords" content="耗子,Mr.耗子,Docker,容器,k8s,kubernetes,golang,go,devops">
-    <meta name="description" content="Golang 安装和环境配置">
+    <meta name="description" content="Golang 标准库 io/ioutil">
         
     <meta name="author" content="Mr.耗子">
-    <meta property="og:url" content="http://blog.k-8s.com/posts/Golang-Note/Golang-install-and-env/">
+    <meta property="og:url" content="http://blog.k-8s.com/posts/Golang-Note/Golang-standard-library-ioutil/">
     <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
 
     <link rel="stylesheet" href="/css/normalize.css">
@@ -72,10 +72,10 @@
                 <div class="res-cons">
                     <article class="post">
                         <header>
-                            <h1 class="post-title">Golang 安装和环境配置</h1>
+                            <h1 class="post-title">Golang 标准库 io/ioutil</h1>
                         </header>
                         <date class="post-meta meta-date">
-                            2019年10月8日
+                            2021年1月2日
                         </date>
                         
                         <div class="post-meta">
@@ -91,44 +91,265 @@
                         </div>
                         
                         <div class="post-content">
-                            <h3 id="安装">安装</h3>
+                            <h3 id="io-ioutil-包">io/ioutil 包</h3>
 
-<p><strong>Golang 配置方式分为两种</strong>:</p>
+<p>软件包 ioutil 实现了一些 I/O 实用程序功能</p>
 
-<ul>
-<li>Go Modules包管理模式</li>
-<li>原始GOPATH模式</li>
-</ul>
+<h4 id="readall">ReadAll</h4>
 
-<p><strong>前提</strong>:</p>
+<p><strong>函数原型:</strong></p>
 
-<ol>
-<li>Golang <a href="https://golang.org">官网</a></li>
-<li>Golang <a href="https://golang.google.cn">国内官网</a></li>
-<li>GoModules配置 <a href="https://segmentfault.com/a/1190000018690961">思否</a> <a href="https://www.jishuwen.com/d/2n6e">技术文</a></li>
-</ol>
+<p><code>func ReadAll(r io.Reader) ([]byte, error)</code></p>
 
-<h3 id="一-包管理模式">一. 包管理模式</h3>
+<p>ReadAll 从 r 读取, 直到出现错误或 EOF, 然后返回读取的数据</p>
 
-<p>该模式从1.12版本开始支持, 需要在环境变量中设置 <strong>GO111MODULE=auto</strong> 或 <strong>GO111MODULE=on</strong></p>
+<p>成功调用将返回 err == nil, 而不是 err == EOF. 因为 ReadAll 被定义为从 src 读取, 直到 EOF, 因此不会将读取的 EOF 视为要报告的错误</p>
 
-<p>若要开启国内代理加速的话, 需要配置环境变量 <strong>GOPROXY=<a href="https://goproxy.cn">https://goproxy.cn</a></strong> 该加速由七牛云提供, 另一个加速地址为 <a href="https://goproxy.io">https://goproxy.io</a></p>
+<pre><code class="language-go">package main
 
-<p>然后从官网下载 Golang-1.12.x 版本(或更高版本), 进行安装. 然后配置GOPATH, GOROOT环境变量, 分别指向项目包路径和 Golang 安装路径即可.</p>
+import (
+	&quot;fmt&quot;
+	&quot;io/ioutil&quot;
+	&quot;log&quot;
+	&quot;strings&quot;
+)
 
-<h3 id="二-gopath模式">二. GOPATH模式</h3>
+func main() {
+	r := strings.NewReader(&quot;Go is a general-purpose language designed with systems programming in mind.&quot;)
 
-<p>从官网下载 Golang-1.12.x 版本(或更高版本), 进行安装. 然后配置GOPATH, GOROOT环境变量, 分别指向项目路径和 Golang 安装路径即可.</p>
+	b, err := ioutil.ReadAll(r)
+	if err != nil {
+		log.Fatal(err)
+	}
 
-<p>其中, GOPATH为项目路径, 里面分为3个子文件夹, 分别是:</p>
+	fmt.Printf(&quot;%s&quot;, b)
+}
+</code></pre>
 
-<ul>
-<li>bin  存放 go install 生成的程序</li>
-<li>pkg  存放编译后的依赖库</li>
-<li>src  存放项目源码</li>
-</ul>
+<h4 id="readdir">ReadDir</h4>
 
-<p>两种安装模式推荐第一种安装模式, 使用 GOPATH 的模式当有多个项目和依赖时, 使用起来不方便</p>
+<p><strong>函数原型:</strong></p>
+
+<p><code>func ReadDir(dirname string) ([]os.FileInfo, error)</code></p>
+
+<p>ReadDir 读取以目录名命名的目录, 并返回按文件名排序的目录条目列表</p>
+
+<pre><code class="language-go">package main
+
+import (
+	&quot;fmt&quot;
+	&quot;io/ioutil&quot;
+	&quot;log&quot;
+)
+
+func main() {
+	files, err := ioutil.ReadDir(&quot;.&quot;)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	for _, file := range files {
+		fmt.Println(file.Name())
+	}
+}
+</code></pre>
+
+<h4 id="readfile">ReadFile</h4>
+
+<p><strong>函数原型:</strong></p>
+
+<p><code>func ReadFile(filename string) ([]byte, error)</code></p>
+
+<p>ReadFile 读取以文件名命名的文件, 并返回内容</p>
+
+<p>成功调用将返回 err == nil, 而不是 err == EOF. 因为 ReadFile 读取整个文件, 因此不会将 Read 中的 EOF 视为要报告的错误</p>
+
+<pre><code class="language-go">package main
+
+import (
+	&quot;fmt&quot;
+	&quot;io/ioutil&quot;
+	&quot;log&quot;
+)
+
+func main() {
+	content, err := ioutil.ReadFile(&quot;testdata/hello&quot;)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Printf(&quot;File contents: %s&quot;, content)
+}
+</code></pre>
+
+<h4 id="tempdir">TempDir</h4>
+
+<p><strong>函数原型:</strong></p>
+
+<p><code>func TempDir(dir pattern string) (name string, err error)</code></p>
+
+<p>TempDir 在 目录 dir 中创建一个新的临时目录</p>
+
+<p>目录名称是通过采用 pattern 并在末尾应用随机字符串来生成的. 如果 pattern 包含 &ldquo;*&rdquo;, 则随机字符串会替换最后的 &ldquo;*&ldquo;</p>
+
+<p>TempDir 返回新目录的名称. 如果 dir 是空字符串, 则 TempDir 使用默认目录存储临时文件 (参见 os.TempDir)</p>
+
+<p>同时调用 TempDir 的多个程序将不会选择同一目录. 不再需要该目录时, 调用方有责任删除它</p>
+
+<pre><code class="language-go">package main
+
+import (
+	&quot;io/ioutil&quot;
+	&quot;log&quot;
+	&quot;os&quot;
+	&quot;path/filepath&quot;
+)
+
+func main() {
+	content := []byte(&quot;temporary file's content&quot;)
+	dir, err := ioutil.TempDir(&quot;&quot;, &quot;example&quot;)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	defer os.RemoveAll(dir) // clean up
+
+	tmpfn := filepath.Join(dir, &quot;tmpfile&quot;)
+	if err := ioutil.WriteFile(tmpfn, content, 0666); err != nil {
+		log.Fatal(err)
+	}
+}
+</code></pre>
+
+<p>带后缀的示例</p>
+
+<pre><code class="language-go">package main
+
+import (
+	&quot;io/ioutil&quot;
+	&quot;log&quot;
+	&quot;os&quot;
+	&quot;path/filepath&quot;
+)
+
+func main() {
+	parentDir := os.TempDir()
+	logsDir, err := ioutil.TempDir(parentDir, &quot;*-logs&quot;)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer os.RemoveAll(logsDir) // clean up
+
+	// Logs can be cleaned out earlier if needed by searching
+	// for all directories whose suffix ends in *-logs.
+	globPattern := filepath.Join(parentDir, &quot;*-logs&quot;)
+	matches, err := filepath.Glob(globPattern)
+	if err != nil {
+		log.Fatalf(&quot;Failed to match %q: %v&quot;, globPattern, err)
+	}
+
+	for _, match := range matches {
+		if err := os.RemoveAll(match); err != nil {
+			log.Printf(&quot;Failed to remove %q: %v&quot;, match, err)
+		}
+	}
+}
+</code></pre>
+
+<h4 id="tempfile">TempFile</h4>
+
+<p><strong>函数原型:</strong></p>
+
+<p><code>func TempFile(dir string, pattern string) (f *os.File, err error)</code></p>
+
+<p>TempFile 在目录 dir 中创建一个新的临时文件, 打开该文件进行读取和写入, 并返回生成的 <code>*os.File</code></p>
+
+<p>通过采用 pattern 并在末尾添加随机字符串来生成文件名. 如果 pattern 包含 &ldquo;*&rdquo;, 则随机字符串将替换最后的 &ldquo;*&ldquo;</p>
+
+<p>如果 dir 是空字符串, 则 TempFile 使用默认目录存储临时文件 (参见 os.TempDir)</p>
+
+<p>同时调用 TempFile 的多个程序将不会选择同一文件.</p>
+
+<p>调用者可以使用 <code>f.Name()</code> 查找文件的路径名. 不再需要该文件时, 调用方有责任删除它</p>
+
+<pre><code class="language-go">package main
+
+import (
+	&quot;io/ioutil&quot;
+	&quot;log&quot;
+	&quot;os&quot;
+)
+
+func main() {
+	content := []byte(&quot;temporary file's content&quot;)
+	tmpfile, err := ioutil.TempFile(&quot;&quot;, &quot;example&quot;)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	defer os.Remove(tmpfile.Name()) // clean up
+
+	if _, err := tmpfile.Write(content); err != nil {
+		log.Fatal(err)
+	}
+	if err := tmpfile.Close(); err != nil {
+		log.Fatal(err)
+	}
+}
+</code></pre>
+
+<p>带后缀的示例</p>
+
+<pre><code class="language-go">package main
+
+import (
+	&quot;io/ioutil&quot;
+	&quot;log&quot;
+	&quot;os&quot;
+)
+
+func main() {
+	content := []byte(&quot;temporary file's content&quot;)
+	tmpfile, err := ioutil.TempFile(&quot;&quot;, &quot;example.*.txt&quot;)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	defer os.Remove(tmpfile.Name()) // clean up
+
+	if _, err := tmpfile.Write(content); err != nil {
+		tmpfile.Close()
+		log.Fatal(err)
+	}
+	if err := tmpfile.Close(); err != nil {
+		log.Fatal(err)
+	}
+}
+</code></pre>
+
+<h4 id="writefile">WriteFile</h4>
+
+<p><strong>函数原型:</strong></p>
+
+<p><code>func WriteFile(filename string, data []byte, perm of.FileMode) error</code></p>
+
+<p>WriteFile 将数据写入以文件名命名的文件, 如果该文件不存在, 则 WriteFile 使用权限 perm (在 umask 之前) 创建该文件; 否则 WriteFile 在写入之前将其截断, 而不更改权限</p>
+
+<pre><code class="language-go">package main
+
+import (
+	&quot;io/ioutil&quot;
+	&quot;log&quot;
+)
+
+func main() {
+	message := []byte(&quot;Hello, Gophers!&quot;)
+	err := ioutil.WriteFile(&quot;testdata/hello&quot;, message, 0644)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+</code></pre>
                         </div>
 
                         
@@ -137,15 +358,15 @@
     <h2>See Also</h2>
     <ul class="listing">
         
-        <li><a href="/posts/Kubernetes-Note/Kubernetes-Service/">Kubernetes Service</a></li>
+        <li><a href="/posts/Golang-Note/Golang-reflection/">Golang 反射</a></li>
         
-        <li><a href="/posts/Kubernetes-Note/Kubernetes-Volumes/">Kubernetes 存储</a></li>
+        <li><a href="/posts/Golang-Note/Golang-engineering-management/">Golang 工程管理</a></li>
         
-        <li><a href="/posts/Kubernetes-Note/Kubernetes-Pod-Scheduling/">Kubernetes Pod 调度</a></li>
+        <li><a href="/posts/Golang-Note/Golang-secure-programming/">Golang 安全编程</a></li>
         
-        <li><a href="/posts/Kubernetes-Note/Kubernetes-Pod/">Kubernetes Pod 详解</a></li>
+        <li><a href="/posts/Golang-Note/Golang-network-programming/">Golang 网络编程</a></li>
         
-        <li><a href="/posts/Kubernetes-Note/Kubernetes-basic-concept/">Kubernetes 基本概念和术语</a></li>
+        <li><a href="/posts/Golang-Note/Golang-concurrency/">Golang 并发编程</a></li>
         
     </ul>
 </div>
