@@ -6,10 +6,27 @@
     <description>Recent content in Posts on Mr.耗子</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    <lastBuildDate>Sun, 20 Oct 2019 11:15:15 +0800</lastBuildDate>
+    <lastBuildDate>Wed, 01 Jul 2020 10:00:00 +0800</lastBuildDate>
     
 	<atom:link href="http://blog.k-8s.com/posts/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>NetworkManager 服务</title>
+      <link>http://blog.k-8s.com/posts/Linux-Note/NetworkManager-Service/</link>
+      <pubDate>Wed, 01 Jul 2020 10:00:00 +0800</pubDate>
+      
+      <guid>http://blog.k-8s.com/posts/Linux-Note/NetworkManager-Service/</guid>
+      <description>&lt;h3 id=&#34;networkmanager&#34;&gt;NetworkManager&lt;/h3&gt;
+
+&lt;p&gt;NetworkManager 服务是 RedHat 2004 年启动的项目, 旨在让 Linux 用户更轻松的处理现代网络需求, 又起是无线网络, 能自动发现网卡并配置 IP 地址.&lt;/p&gt;
+
+&lt;p&gt;在 CentOS &lt;sup&gt;6&lt;/sup&gt;&amp;frasl;&lt;sub&gt;7&lt;/sub&gt; 中改服务即出现, 但配置起来比 network 复杂, 一般情况用的还是 network 服务.&lt;/p&gt;
+
+&lt;p&gt;与 NetworkManager 相比, 两者功能有重合的部分, NetworkManager 可以创建与管理 network 服务配置文件, 通常不建议两个服务一起开启.&lt;/p&gt;
+
+&lt;p&gt;在 CentOS 8/RHEL 8 中, 默认不带传统 network 服务, RedHat 将在下一个大版本中将 network 服务废除.&lt;/p&gt;</description>
+    </item>
     
     <item>
       <title>Golang 反射</title>

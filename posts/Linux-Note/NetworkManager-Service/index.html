@@ -1,0 +1,514 @@
+<!doctype html>
+<html lang="zh-cn">
+<head>
+
+    <meta charset="utf-8">
+    <meta name="generator" content="Hugo 0.54.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>NetworkManager 服务 | Mr.耗子</title>
+    <meta property="og:title" content="NetworkManager 服务 - Mr.耗子">
+    <meta property="og:type" content="article">
+        
+    <meta property="article:published_time" content="2020-07-01T10:00:00&#43;08:00">
+        
+        
+    <meta property="article:modified_time" content="2020-07-01T10:00:00&#43;08:00">
+        
+    <meta name="Keywords" content="耗子,Mr.耗子,Docker,容器,k8s,kubernetes,golang,go,devops">
+    <meta name="description" content="NetworkManager 服务">
+        
+    <meta name="author" content="Mr.耗子">
+    <meta property="og:url" content="http://blog.k-8s.com/posts/Linux-Note/NetworkManager-Service/">
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+
+    <link rel="stylesheet" href="/css/normalize.css">
+    
+        <link rel="stylesheet" href="/css/prism.css">
+    
+    <link rel="stylesheet" href="/css/style.css">
+    <script type="text/javascript" src="//cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+
+    
+
+
+    
+    
+</head>
+
+<body>
+<header id="header" class="clearfix">
+    <div class="container">
+        <div class="col-group">
+            <div class="site-name ">
+                
+                    <a id="logo" href="http://blog.k-8s.com/">
+                        Mr.耗子
+                    </a>
+                
+                <p class="description">Linux Docker Kubernetes Golang Python</p>
+            </div>
+            <div>
+                <nav id="nav-menu" class="clearfix">
+                    <a class="" href="http://blog.k-8s.com/">首页</a>
+                    
+                    <a  href="http://blog.k-8s.com/archives/" title="归档">归档</a>
+                    
+                    <a  href="http://blog.k-8s.com/about/" title="关于">关于</a>
+                    
+                </nav>
+            </div>
+        </div>
+    </div>
+</header>
+
+
+<div id="body">
+    <div class="container">
+        <div class="col-group">
+
+            <div class="col-8" id="main">
+                <div class="res-cons">
+                    <article class="post">
+                        <header>
+                            <h1 class="post-title">NetworkManager 服务</h1>
+                        </header>
+                        <date class="post-meta meta-date">
+                            2020年7月1日
+                        </date>
+                        
+                        <div class="post-meta">
+                            <span>|</span>
+                            
+                                <span class="meta-category"><a href="http://blog.k-8s.com/categories/Linux">Linux</a></span>
+                            
+                        </div>
+                        
+                        
+                        <div class="post-meta">
+                            <span id="busuanzi_container_page_pv">|<span id="busuanzi_value_page_pv"></span><span> 阅读</span></span>
+                        </div>
+                        
+                        <div class="post-content">
+                            <h3 id="networkmanager">NetworkManager</h3>
+
+<p>NetworkManager 服务是 RedHat 2004 年启动的项目, 旨在让 Linux 用户更轻松的处理现代网络需求, 又起是无线网络, 能自动发现网卡并配置 IP 地址.</p>
+
+<p>在 CentOS <sup>6</sup>&frasl;<sub>7</sub> 中改服务即出现, 但配置起来比 network 复杂, 一般情况用的还是 network 服务.</p>
+
+<p>与 NetworkManager 相比, 两者功能有重合的部分, NetworkManager 可以创建与管理 network 服务配置文件, 通常不建议两个服务一起开启.</p>
+
+<p>在 CentOS 8/RHEL 8 中, 默认不带传统 network 服务, RedHat 将在下一个大版本中将 network 服务废除.</p>
+
+<p>NM 能管理各种网络:</p>
+
+<ul>
+<li>有线网卡, 无线网卡</li>
+<li>动态ip, 静态ip</li>
+<li>以太网, 非以太网</li>
+<li>物理网卡, 虚拟网卡</li>
+</ul>
+
+<p>使用方法:</p>
+
+<ul>
+<li><strong>nmcli</strong>: 命令行工具</li>
+<li><strong>nmtui</strong>: 终端文本图形化工具</li>
+<li><strong>Freedesktop applet</strong>: GNOME 上自带的网络管理工具</li>
+<li><strong>cockpit</strong>: RedHat 自带的 web 图形工具</li>
+</ul>
+
+<h3 id="nmcli-工具详解">nmcli 工具详解</h3>
+
+<p>nmcli 常用命令:</p>
+
+<ul>
+<li>nmcli connnection (缩写 nmcli conn[c])</li>
+<li>nmcli device (缩写 nmcil d)</li>
+</ul>
+
+<p>NM 里有两个维度: <strong>连接(conn)</strong> 和 <strong>设备(device)</strong>, 这是多对一的关系. 想给某个网卡配ip, 首先 NM 要纳管这个网卡(nmcli d 看到的就是纳管的). 一个设备可以配置多个连接, 同一时刻一个设备只能由一个连接活跃.</p>
+
+<p>device 有 4 种常见状态:</p>
+
+<ul>
+<li>connected: 已被NM纳管, 并且当前有活跃的connection</li>
+<li>disconnected: 已被NM纳管, 但是当前没有活跃的connection</li>
+<li>unmanaged: 未被NM纳管</li>
+<li>unavailable: 不可用, NM无法纳管, 通常出现于网卡link为down的时候(比如ip link set ethX down)</li>
+</ul>
+
+<p>nmcli 常用命令一览:</p>
+
+<pre><code class="language-shell"># 查看 ip (类似于 ifconfig, ip addr)
+nmcli
+
+# 创建 connection，配置静态 ip（等同于配置ifcfg，其中BOOTPROTO=none，并ifup启动)
+# con-name 等效为 ifcfg 配置中的 NAME, 无需和网卡名称相同, 一个设备可以创建多个 con-name
+# ifname 必须为 nmcli d 中看到的名字, 表示网卡名
+# type 网卡类型, 可通过 nmcli c add type -h 查看
+# ipv4.method 默认为 auto(dhcp), 如果添加静态 ip 时不指定, 就会导致 BOOTPROTO=dhcp, 引发冲突
+nmcli c add type ethernet con-name ethX ifname ethX ipv4.addr 192.168.1.100/24 ipv4.gateway 192.168.1.1 ipv4.method manual
+
+# 创建 connection, 配置动态 ip
+nmcli c add type ethernet con-name ethX ifname ethX ipv4.method auto
+
+# 修改 ip (非交互式)
+nmcli c modify ethX ipv4.addr '192.168.1.200/24'
+nmcli c up ethX  # 修改后启用配置
+
+# 修改 ip (交互式)
+nmcli c edit ethX
+nmcli&gt; goto ipv4.addresses
+nmcli ipv4.addresses&gt; change
+Edit 'addresses' value: 192.168.1.200/24
+Do you also want to set 'ipv4.method' to 'manual'? [yes]: yes
+nmcli ipv4&gt; save
+nmcli ipv4&gt; activate
+nmcli ipv4&gt; quit
+
+# 启用 connection
+nmcli c up ethX
+
+# 停止 connection
+nmcli c down
+
+# 删除 connection
+nmcli c delete ethX
+
+# 查看 connection 列表
+# 第一列是connection名字，简称con-name（注意con-name不是网卡名）
+# 第二列是connection的UUID
+# 最后一列才是网卡名（标准说法叫device名），可通过nmcil d查看device
+nmcli c show
+
+# 查看 connection 详细信息
+nmcli c show ethX
+
+# 重载所有 ifcfg 或 route 到 connection (不会立即生效)
+nmcli c reload
+
+# 重载指定 ifcfg 或 route 到 connection (不会立即生效)
+nmcli c load /etc/sysconfig/network-scripts/ifcfg-ethX
+nmcli c load /etc/sysconfig/network-scripts/route-ethX
+
+# 立即生效 connection, 有 3 种方法
+nmcli c up ethX
+nmcli d reapply ethX
+nmcli d connect ethX
+
+# 查看 device 列表
+nmcli d
+
+# 查看所有 device 详细信息
+nmcli d show
+
+# 查看指定 device 的详细信息
+nmcli d show ethX
+
+# 激活网卡
+# 由 NM 对指定网卡进行管理, 同时刷新该网卡对应的活跃 connection (如果之前有修改过 connection 配置); 如果有 connection 但是都处于非活跃状态, 则自动选择一个 connection 并将其活跃; 如果没有 connection, 则自动生成一个并将其 active
+nmcli d connect ethX
+
+# 取消激活网卡
+# 让 NM 暂时不管理指定网卡, 此操作不会变更实际网卡的 link 状态, 只会使对应的 connection 变成非活跃. 若重启系统则又会自动connect. 另外, 如果手工将该网卡的 connection 全部删掉, 该网卡状态也会自动变为disconnected
+nmcli d disconnect ethX
+
+# 查看 NM 纳管状态
+nmcli n
+
+# 开启 NM 纳管
+nmcli n on
+
+# 关闭 NM 纳管 (谨慎执行)
+nmcli n off
+
+# 监听事件
+nmcli m
+
+# 查看 NM 本身状态
+nmcli
+
+# 检测 NM 是否在线可用
+nm-online
+
+# 对 connection 做操作时需要指定标识, 标识可以是 con-name, UUID, 如果存在 ifcfg 文件则也可以用 ifcfg 的完整路径, 即 /etc/sysconfig/network-scripts/ifcfg-ethX
+nmcli c show ethX
+nmcli c show cae3f1ef-e79a-46c3-8e0c-946b91a65e11
+nmcli c show /etc/sysconfig/network-scripts/ifcfg-ethX
+
+# 专门用于刷新 connection, 前提是网卡的 device 处于 connected 状态, 否则会报错
+nmcli d reapply ethX
+
+# 可以设置是否自动连接和是否自动管理
+nmcli d set ethX autoconnect yes|no managed yes|no
+</code></pre>
+
+<h3 id="nmcli-general-常规选项">nmcli general 常规选项</h3>
+
+<pre><code class="language-shell"># 查看状态
+nmcli general status
+
+# 获取主机名
+nmcli general hostname
+
+# 配置主机名
+nmcli general hostname test-host
+
+# 显示当前用户对网络管理器的可允许的操作权限
+nmcli general permissons
+</code></pre>
+
+<h3 id="nmcli-networking-网络控制">nmcli networking 网络控制</h3>
+
+<pre><code class="language-shell"># 禁用所有接口(待查证, 原文是on)
+nmcli networking off
+
+# 开启所有接口
+nmcli networking on
+
+# 获取网络状态
+# 可添加参数:
+#   none: 主机为连接到任何网络
+#   portal: 无法到达完整的互联网
+#   limited: 主机已连接到网络, 但无法访问互联网
+#   full: 已连接到网络, 并具有完全访问
+#   unknown: 无法找到连接状态
+nmcli networking connectivity {none|protal|limited|full|unknown}
+</code></pre>
+
+<h3 id="nmcli-radio-无线网络控制">nmcli radio 无线网络控制</h3>
+
+<pre><code class="language-shell"># 显示无线状态
+nmcli radio all
+
+# 关闭 wifi 和 wwan
+nmcli r all off
+
+# 单独开启 wifi
+nmcli r wifi on
+</code></pre>
+
+<h3 id="tips">Tips</h3>
+
+<ol>
+<li><p>nmcli 命令支持 tab 补全, 但是需要 <code>yum install bash-completion</code></p></li>
+
+<li><p>如果希望 NM 不要纳管网卡, 只有一个办法, 就是自己写 ifcfg 配置, 内容加上 <code>NM_CONTROLLED=no</code> 这样该 device 的状态就会始终保持 unmanaged</p></li>
+
+<li><p>NM 只能对 link 状态为 up 的网卡进行操作, 如果手动 <code>ip link set ethX down</code> 那么 NM 就无法对该网卡做任何操作 (即使 nmcli d connect 也没有用)</p></li>
+
+<li><p>可以通过 <code>yum install network-scripts</code> 来安装传统的 network.service, 不过 redhat 说了, 在下一个 rhel 的大版本里将彻底废除, 因此不建议使用 network.service</p></li>
+
+<li><p>手工创建新的 ifcfg 或者在 ifcfg 里修改配置, NM 不会自动读取, 需要手工执行 <code>nmcli reload</code> 或者 <code>nmcli c load /etc/sysconfig/network-scripts/ifcfg-ethX</code></p></li>
+
+<li><p>不手工配置 ifcfg, 使用默认的 dhcp 情况下, 网卡的增减是不会自动生成 ifcfg, 此时 <code>nmcli c</code> 看到的 <code>con-name</code> 将类似 &ldquo;System ethX&rdquo; 或者 &ldquo;Wired connection 1&rdquo;</p></li>
+
+<li><p>默认会从 dhcp 里获取 dns 信息, 并修改 <code>/etc/resolv.conf</code>, 如果不想让 NM 管理 <code>/etc/resolv.conf</code>, 则只需在 <code>/etc/NetworkManager/NetworkManager.conf</code> 里的 main 里增加 <code>dns=none</code> 即可</p></li>
+
+<li><p>如果想让 NM 不要自动管理新网卡 (比如不要给新网卡获取 ip 地址), 则只需在 <code>/etc/NetworkManager/NetworkManager.conf</code> 里的 main 里增加<code>no-auto-default=*</code> 即可, 改完后通过 <code>systemctl restart NetworkManager</code> 或者重启系统来生效.</p></li>
+</ol>
+
+<p>参考链接:</p>
+
+<p><a href="https://cloud.tencent.com/developer/article/1468106">基于RHEL8/CentOS8的网络IP配置详解</a></p>
+
+<p><a href="https://www.cnblogs.com/liuhedong/p/10695969.html">nmcli 工具详解</a></p>
+                        </div>
+
+                        
+
+<div class="post-archive">
+    <h2>See Also</h2>
+    <ul class="listing">
+        
+        <li><a href="/posts/Golang-Note/Golang-reflection/">Golang 反射</a></li>
+        
+        <li><a href="/posts/Golang-Note/Golang-engineering-management/">Golang 工程管理</a></li>
+        
+        <li><a href="/posts/Golang-Note/Golang-secure-programming/">Golang 安全编程</a></li>
+        
+        <li><a href="/posts/Golang-Note/Golang-network-programming/">Golang 网络编程</a></li>
+        
+        <li><a href="/posts/Golang-Note/Golang-concurrency/">Golang 并发编程</a></li>
+        
+    </ul>
+</div>
+
+
+                        <div class="post-meta meta-tags">
+                            
+                            <ul class="clearfix">
+                                
+                                <li><a href="http://blog.k-8s.com/tags/Linux">Linux</a></li>
+                                
+                            </ul>
+                            
+                        </div>
+                    </article>
+                    
+    
+
+    
+    
+                </div>
+            </div>
+            <div id="secondary">
+    <section class="widget">
+        <form id="search" action="//www.google.com/search" method="get" accept-charset="utf-8" target="_blank" _lpchecked="1">
+      
+      <input type="text" name="q" maxlength="20" placeholder="Search">
+      <input type="hidden" name="sitesearch" value="http://blog.k-8s.com/">
+      <button type="submit" class="submit icon-search"></button>
+</form>
+    </section>
+    
+    <section class="widget">
+        <h3 class="widget-title">最近文章</h3>
+<ul class="widget-list">
+    
+    <li>
+        <a href="http://blog.k-8s.com/posts/Linux-Note/NetworkManager-Service/" title="NetworkManager 服务">NetworkManager 服务</a>
+    </li>
+    
+    <li>
+        <a href="http://blog.k-8s.com/posts/Golang-Note/Golang-reflection/" title="Golang 反射">Golang 反射</a>
+    </li>
+    
+    <li>
+        <a href="http://blog.k-8s.com/posts/Golang-Note/Golang-engineering-management/" title="Golang 工程管理">Golang 工程管理</a>
+    </li>
+    
+    <li>
+        <a href="http://blog.k-8s.com/posts/Golang-Note/Golang-secure-programming/" title="Golang 安全编程">Golang 安全编程</a>
+    </li>
+    
+    <li>
+        <a href="http://blog.k-8s.com/posts/Golang-Note/Golang-network-programming/" title="Golang 网络编程">Golang 网络编程</a>
+    </li>
+    
+    <li>
+        <a href="http://blog.k-8s.com/posts/Golang-Note/Golang-concurrency/" title="Golang 并发编程">Golang 并发编程</a>
+    </li>
+    
+    <li>
+        <a href="http://blog.k-8s.com/posts/Golang-Note/Golang-interface/" title="Golang 接口">Golang 接口</a>
+    </li>
+    
+    <li>
+        <a href="http://blog.k-8s.com/posts/Golang-Note/Golang-type-system/" title="Golang 类型系统">Golang 类型系统</a>
+    </li>
+    
+    <li>
+        <a href="http://blog.k-8s.com/posts/Golang-Note/Golang-error-handling/" title="Golang 错误处理">Golang 错误处理</a>
+    </li>
+    
+    <li>
+        <a href="http://blog.k-8s.com/posts/Golang-Note/Golang-function/" title="Golang 函数">Golang 函数</a>
+    </li>
+    
+</ul>
+    </section>
+
+    
+
+    <section class="widget">
+        <h3 class="widget-title">分类</h3>
+<ul class="widget-list">
+    
+    <li>
+        <a href="http://blog.k-8s.com/categories/Golang/">Golang(13)</a>
+    </li>
+    
+    <li>
+        <a href="http://blog.k-8s.com/categories/Kubernetes/">Kubernetes(6)</a>
+    </li>
+    
+    <li>
+        <a href="http://blog.k-8s.com/categories/Linux/">Linux(1)</a>
+    </li>
+    
+    <li>
+        <a href="http://blog.k-8s.com/categories/hugo/">hugo(1)</a>
+    </li>
+    
+</ul>
+    </section>
+
+    <section class="widget">
+        <h3 class="widget-title">标签</h3>
+<div class="tagcloud">
+    
+    <a href="http://blog.k-8s.com/tags/Golang/">Golang</a>
+    
+    <a href="http://blog.k-8s.com/tags/Kubernetes/">Kubernetes</a>
+    
+    <a href="http://blog.k-8s.com/tags/Linux/">Linux</a>
+    
+    <a href="http://blog.k-8s.com/tags/hugo/">hugo</a>
+    
+</div>
+    </section>
+
+    
+<section class="widget">
+    <h3 class="widget-title">友情链接</h3>
+    <ul class="widget-list">
+        
+        <li>
+            <a target="_blank" href="http://www.jxhs.me" title="jame_xhs">jame_xhs</a>
+        </li>
+        
+    </ul>
+</section>
+
+
+    <section class="widget">
+        <h3 class="widget-title">其它</h3>
+        <ul class="widget-list">
+            <li><a href="http://blog.k-8s.com/index.xml">文章 RSS</a></li>
+        </ul>
+    </section>
+</div>
+        </div>
+    </div>
+</div>
+<footer id="footer">
+    <div class="container">
+        &copy; 2018 <a href="http://blog.k-8s.com/">Mr.耗子 By Mr.耗子</a>.
+        Powered by <a rel="nofollow noreferer noopener" href="https://gohugo.io" target="_blank">Hugo</a>.
+        <a href="https://www.flysnow.org/" target="_blank">Theme</a> based on <a href="https://github.com/rujews/maupassant-hugo" target="_blank">maupassant</a>.
+        
+    </div>
+</footer>
+
+
+    <script type="text/javascript">
+    
+    (function(){
+        $("pre code").parent().addClass("line-numbers")
+    }())
+
+    window.MathJax = {
+        tex2jax: {
+            inlineMath: [ ['$','$'] ],
+            processEscapes: true
+        }
+    };
+    </script>
+    <script type="text/javascript" src="/js/prism.js" async="true"></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
+
+<a id="rocket" href="#top"></a>
+<script type="text/javascript" src="/js/totop.js?v=0.0.0" async=""></script>
+
+
+
+<script type="text/javascript" src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" async></script>
+
+
+
+
+</body>
+</html>

@@ -68,6 +68,37 @@
                         <article class="post">
                             <header>
                                 <h1 class="post-title">
+                                    <a href="http://blog.k-8s.com/posts/Linux-Note/NetworkManager-Service/" title="NetworkManager 服务" >NetworkManager 服务</a>
+                                </h1>
+                            </header>
+                            <date class="post-meta meta-date">
+                                2020年7月1日
+                            </date>
+                            
+                            <div class="post-meta">
+                                <span>|</span>
+                                
+                                <span class="meta-category"><a href="http://blog.k-8s.com/categories/Linux">Linux</a></span>
+                                
+                            </div>
+                            
+                            <div class="post-content">
+                                <h3 id="networkmanager">NetworkManager</h3>
+
+<p>NetworkManager 服务是 RedHat 2004 年启动的项目, 旨在让 Linux 用户更轻松的处理现代网络需求, 又起是无线网络, 能自动发现网卡并配置 IP 地址.</p>
+
+<p>在 CentOS <sup>6</sup>&frasl;<sub>7</sub> 中改服务即出现, 但配置起来比 network 复杂, 一般情况用的还是 network 服务.</p>
+
+<p>与 NetworkManager 相比, 两者功能有重合的部分, NetworkManager 可以创建与管理 network 服务配置文件, 通常不建议两个服务一起开启.</p>
+
+<p>在 CentOS 8/RHEL 8 中, 默认不带传统 network 服务, RedHat 将在下一个大版本中将 network 服务废除.</p>……
+                            </div>
+                            <p class="readmore"><a href="http://blog.k-8s.com/posts/Linux-Note/NetworkManager-Service/">阅读全文</a></p>
+                        </article>
+                    
+                        <article class="post">
+                            <header>
+                                <h1 class="post-title">
                                     <a href="http://blog.k-8s.com/posts/Golang-Note/Golang-reflection/" title="Golang 反射" >Golang 反射</a>
                                 </h1>
                             </header>
@@ -409,50 +440,6 @@ if err != nil {
                             <p class="readmore"><a href="http://blog.k-8s.com/posts/Golang-Note/Golang-function/">阅读全文</a></p>
                         </article>
                     
-                        <article class="post">
-                            <header>
-                                <h1 class="post-title">
-                                    <a href="http://blog.k-8s.com/posts/Golang-Note/Golang-process-control/" title="Golang 流程控制" >Golang 流程控制</a>
-                                </h1>
-                            </header>
-                            <date class="post-meta meta-date">
-                                2019年10月12日
-                            </date>
-                            
-                            <div class="post-meta">
-                                <span>|</span>
-                                
-                                <span class="meta-category"><a href="http://blog.k-8s.com/categories/Golang">Golang</a></span>
-                                
-                            </div>
-                            
-                            <div class="post-content">
-                                <h3 id="流程控制">流程控制</h3>
-
-<p>流程控制语句, 用于设定计算执行的次序, 简历程序的逻辑结构</p>
-
-<p>流程控制语句一般起以下三个作用:</p>
-
-<ul>
-<li>选择</li>
-<li>循环</li>
-<li>跳转</li>
-</ul>
-
-<p>Go 语言中支持如下几种流程控制语句:</p>
-
-<ul>
-<li>条件语句: <strong><em>if</em></strong>, <strong><em>else</em></strong> 和 <strong><em>else if</em></strong></li>
-<li>选择语句: <strong><em>switch</em></strong>, <strong><em>case</em></strong> 和 <strong><em>select</em></strong></li>
-<li>循环语句: <strong><em>for</em></strong> 和 <strong><em>range</em></strong></li>
-<li>跳转语句: <strong><em>goto</em></strong></li>
-</ul>
-
-<p>为了能在具体的场景中满足更丰富的控制需求, Go 语言还增加了如下关键字: break, continue 和 fallthrough</p>……
-                            </div>
-                            <p class="readmore"><a href="http://blog.k-8s.com/posts/Golang-Note/Golang-process-control/">阅读全文</a></p>
-                        </article>
-                    
 
                     
 
@@ -501,6 +488,10 @@ if err != nil {
 <ul class="widget-list">
     
     <li>
+        <a href="http://blog.k-8s.com/posts/Linux-Note/NetworkManager-Service/" title="NetworkManager 服务">NetworkManager 服务</a>
+    </li>
+    
+    <li>
         <a href="http://blog.k-8s.com/posts/Golang-Note/Golang-reflection/" title="Golang 反射">Golang 反射</a>
     </li>
     
@@ -536,10 +527,6 @@ if err != nil {
         <a href="http://blog.k-8s.com/posts/Golang-Note/Golang-function/" title="Golang 函数">Golang 函数</a>
     </li>
     
-    <li>
-        <a href="http://blog.k-8s.com/posts/Golang-Note/Golang-process-control/" title="Golang 流程控制">Golang 流程控制</a>
-    </li>
-    
 </ul>
     </section>
 
@@ -558,6 +545,10 @@ if err != nil {
     </li>
     
     <li>
+        <a href="http://blog.k-8s.com/categories/Linux/">Linux(1)</a>
+    </li>
+    
+    <li>
         <a href="http://blog.k-8s.com/categories/hugo/">hugo(1)</a>
     </li>
     
@@ -571,6 +562,8 @@ if err != nil {
     <a href="http://blog.k-8s.com/tags/Golang/">Golang</a>
     
     <a href="http://blog.k-8s.com/tags/Kubernetes/">Kubernetes</a>
+    
+    <a href="http://blog.k-8s.com/tags/Linux/">Linux</a>
     
     <a href="http://blog.k-8s.com/tags/hugo/">hugo</a>
     

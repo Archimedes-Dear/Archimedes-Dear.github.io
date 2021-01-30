@@ -7,22 +7,22 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>hugo | Mr.耗子</title>
-    <meta property="og:title" content="hugo - Mr.耗子">
+    <title>Linux | Mr.耗子</title>
+    <meta property="og:title" content="Linux - Mr.耗子">
     <meta property="og:type" content="article">
         
         
     <meta name="Keywords" content="耗子,Mr.耗子,Docker,容器,k8s,kubernetes,golang,go,devops">
-    <meta name="description" content="hugo">
+    <meta name="description" content="Linux">
         
     <meta name="author" content="Mr.耗子">
-    <meta property="og:url" content="http://blog.k-8s.com/tags/hugo/">
+    <meta property="og:url" content="http://blog.k-8s.com/tags/Linux/">
     <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
 
     <link rel="stylesheet" href="/css/normalize.css">
     
     <link rel="stylesheet" href="/css/style.css">
-    <link rel="alternate" type="application/rss+xml+xml" href="http://blog.k-8s.com/tags/hugo/index.xml" title="Mr.耗子" />
+    <link rel="alternate" type="application/rss+xml+xml" href="http://blog.k-8s.com/tags/Linux/index.xml" title="Mr.耗子" />
     <script type="text/javascript" src="//cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
 
     
@@ -69,7 +69,7 @@
                     
                     <h3 class="archive-title">
                         包含标签
-                        <span class="keyword">hugo</span>
+                        <span class="keyword">Linux</span>
                         的文章
                     </h3>
                     
@@ -78,25 +78,31 @@
                         <article class="post">
                             <header>
                                 <h1 class="post-title">
-                                    <a href="http://blog.k-8s.com/posts/Hugo-build-a-person-blog/">Hugo搭建个人博客</a>
+                                    <a href="http://blog.k-8s.com/posts/Linux-Note/NetworkManager-Service/">NetworkManager 服务</a>
                                 </h1>
                             </header>
                             <date class="post-meta meta-date">
-                                2019年3月11日
+                                2020年7月1日
                             </date>
                             
                             <div class="post-meta meta-category">
                                 |
                                 
-                                    <a href="http://blog.k-8s.com/categories/hugo">hugo</a>
+                                    <a href="http://blog.k-8s.com/categories/Linux">Linux</a>
                                 
                             </div>
                             
                             <div class="post-content">
-                                <h3 id="0x01-前言">0x01 前言</h3>
+                                <h3 id="networkmanager">NetworkManager</h3>
 
-<p>作为技术圈的一名初生小白, 在技术的道路上不可避免的要踩一些坑. 在采坑这个事情上, 有的人踩完就过去了, 不带走一片云彩, 不留下一点经验. 作为小白我呢, 在这里建议大家, 踩完坑一定要记得拿出&rdquo;小本本&rdquo;记录一下, 然后给记录的文字取一个显眼的大标题, 最后把记录放在坑边最显眼的地方, 给后来的采坑的人一个提醒, 也给自己涨点记性, 同样的坑不要老踩, 这样才能前进的更快 ^_^</p>……
-                                <p class="readmore"><a href="http://blog.k-8s.com/posts/Hugo-build-a-person-blog/">阅读全文</a></p>
+<p>NetworkManager 服务是 RedHat 2004 年启动的项目, 旨在让 Linux 用户更轻松的处理现代网络需求, 又起是无线网络, 能自动发现网卡并配置 IP 地址.</p>
+
+<p>在 CentOS <sup>6</sup>&frasl;<sub>7</sub> 中改服务即出现, 但配置起来比 network 复杂, 一般情况用的还是 network 服务.</p>
+
+<p>与 NetworkManager 相比, 两者功能有重合的部分, NetworkManager 可以创建与管理 network 服务配置文件, 通常不建议两个服务一起开启.</p>
+
+<p>在 CentOS 8/RHEL 8 中, 默认不带传统 network 服务, RedHat 将在下一个大版本中将 network 服务废除.</p>……
+                                <p class="readmore"><a href="http://blog.k-8s.com/posts/Linux-Note/NetworkManager-Service/">阅读全文</a></p>
                             </div>
                         </article>
                     
