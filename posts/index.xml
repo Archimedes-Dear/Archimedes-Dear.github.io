@@ -6,15 +6,50 @@
     <description>Recent content in Posts on Mr.耗子</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    <lastBuildDate>Sat, 02 Jan 2021 10:30:00 +0800</lastBuildDate>
+    <lastBuildDate>Fri, 01 May 2020 11:30:00 +0800</lastBuildDate>
     
 	<atom:link href="http://blog.k-8s.com/posts/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
+      <title>Golang 读写文件</title>
+      <link>http://blog.k-8s.com/posts/Golang-Note/Golang-read-write-file/</link>
+      <pubDate>Fri, 01 May 2020 11:30:00 +0800</pubDate>
+      
+      <guid>http://blog.k-8s.com/posts/Golang-Note/Golang-read-write-file/</guid>
+      <description>&lt;h3 id=&#34;ioutil-readall-读取文件&#34;&gt;ioutil.ReadAll 读取文件&lt;/h3&gt;
+
+&lt;p&gt;废话不多说, 先看一段读取文件的代码:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-go&#34;&gt;package main
+
+import (
+	&amp;quot;fmt&amp;quot;
+	&amp;quot;io/ioutil&amp;quot;
+	&amp;quot;log&amp;quot;
+	&amp;quot;os&amp;quot;
+)
+
+func main() {
+	f, err := os.Open(&amp;quot;./config.txt&amp;quot;)  // 打开文件, 返回一个 *File 指针
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	defer f.Close()
+
+	c, err := ioutil.ReadAll(f)  // 一次读取所有内容
+	fmt.Println(string(c))
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;以上代码简单的读取了一个文件的所有内容.  可以从代码中看出, &lt;code&gt;os.Open()&lt;/code&gt; 函数打开了了一个文件, 然后我们用 &lt;code&gt;ioutil.ReadAll()&lt;/code&gt; 读取该文件内容, 最后用 &lt;code&gt;defer f.close()&lt;/code&gt; 关闭该文件(&lt;strong&gt;一定要记得关闭文件!!!&lt;/strong&gt;)&lt;/p&gt;</description>
+    </item>
+    
+    <item>
       <title>Golang 标准库 io/ioutil</title>
       <link>http://blog.k-8s.com/posts/Golang-Note/Golang-standard-library-ioutil/</link>
-      <pubDate>Sat, 02 Jan 2021 10:30:00 +0800</pubDate>
+      <pubDate>Wed, 15 Jan 2020 10:30:00 +0800</pubDate>
       
       <guid>http://blog.k-8s.com/posts/Golang-Note/Golang-standard-library-ioutil/</guid>
       <description>&lt;h3 id=&#34;io-ioutil-包&#34;&gt;io/ioutil 包&lt;/h3&gt;
@@ -51,23 +86,6 @@ func main() {
 	fmt.Printf(&amp;quot;%s&amp;quot;, b)
 }
 &lt;/code&gt;&lt;/pre&gt;</description>
-    </item>
-    
-    <item>
-      <title>NetworkManager 服务</title>
-      <link>http://blog.k-8s.com/posts/Linux-Note/NetworkManager-Service/</link>
-      <pubDate>Wed, 01 Jul 2020 10:00:00 +0800</pubDate>
-      
-      <guid>http://blog.k-8s.com/posts/Linux-Note/NetworkManager-Service/</guid>
-      <description>&lt;h3 id=&#34;networkmanager&#34;&gt;NetworkManager&lt;/h3&gt;
-
-&lt;p&gt;NetworkManager 服务是 RedHat 2004 年启动的项目, 旨在让 Linux 用户更轻松的处理现代网络需求, 又起是无线网络, 能自动发现网卡并配置 IP 地址.&lt;/p&gt;
-
-&lt;p&gt;在 CentOS &lt;sup&gt;6&lt;/sup&gt;&amp;frasl;&lt;sub&gt;7&lt;/sub&gt; 中改服务即出现, 但配置起来比 network 复杂, 一般情况用的还是 network 服务.&lt;/p&gt;
-
-&lt;p&gt;与 NetworkManager 相比, 两者功能有重合的部分, NetworkManager 可以创建与管理 network 服务配置文件, 通常不建议两个服务一起开启.&lt;/p&gt;
-
-&lt;p&gt;在 CentOS 8/RHEL 8 中, 默认不带传统 network 服务, RedHat 将在下一个大版本中将 network 服务废除.&lt;/p&gt;</description>
     </item>
     
     <item>

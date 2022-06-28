@@ -68,11 +68,60 @@
                         <article class="post">
                             <header>
                                 <h1 class="post-title">
+                                    <a href="http://blog.k-8s.com/posts/Golang-Note/Golang-read-write-file/" title="Golang 读写文件" >Golang 读写文件</a>
+                                </h1>
+                            </header>
+                            <date class="post-meta meta-date">
+                                2020年5月1日
+                            </date>
+                            
+                            <div class="post-meta">
+                                <span>|</span>
+                                
+                                <span class="meta-category"><a href="http://blog.k-8s.com/categories/Golang">Golang</a></span>
+                                
+                            </div>
+                            
+                            <div class="post-content">
+                                <h3 id="ioutil-readall-读取文件">ioutil.ReadAll 读取文件</h3>
+
+<p>废话不多说, 先看一段读取文件的代码:</p>
+
+<pre><code class="language-go">package main
+
+import (
+	&quot;fmt&quot;
+	&quot;io/ioutil&quot;
+	&quot;log&quot;
+	&quot;os&quot;
+)
+
+func main() {
+	f, err := os.Open(&quot;./config.txt&quot;)  // 打开文件, 返回一个 *File 指针
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	defer f.Close()
+
+	c, err := ioutil.ReadAll(f)  // 一次读取所有内容
+	fmt.Println(string(c))
+}
+</code></pre>
+
+<p>以上代码简单的读取了一个文件的所有内容.  可以从代码中看出, <code>os.Open()</code> 函数打开了了一个文件, 然后我们用 <code>ioutil.ReadAll()</code> 读取该文件内容, 最后用 <code>defer f.close()</code> 关闭该文件(<strong>一定要记得关闭文件!!!</strong>)</p>……
+                            </div>
+                            <p class="readmore"><a href="http://blog.k-8s.com/posts/Golang-Note/Golang-read-write-file/">阅读全文</a></p>
+                        </article>
+                    
+                        <article class="post">
+                            <header>
+                                <h1 class="post-title">
                                     <a href="http://blog.k-8s.com/posts/Golang-Note/Golang-standard-library-ioutil/" title="Golang 标准库 io/ioutil" >Golang 标准库 io/ioutil</a>
                                 </h1>
                             </header>
                             <date class="post-meta meta-date">
-                                2021年1月2日
+                                2020年1月15日
                             </date>
                             
                             <div class="post-meta">
@@ -119,37 +168,6 @@ func main() {
 </code></pre>……
                             </div>
                             <p class="readmore"><a href="http://blog.k-8s.com/posts/Golang-Note/Golang-standard-library-ioutil/">阅读全文</a></p>
-                        </article>
-                    
-                        <article class="post">
-                            <header>
-                                <h1 class="post-title">
-                                    <a href="http://blog.k-8s.com/posts/Linux-Note/NetworkManager-Service/" title="NetworkManager 服务" >NetworkManager 服务</a>
-                                </h1>
-                            </header>
-                            <date class="post-meta meta-date">
-                                2020年7月1日
-                            </date>
-                            
-                            <div class="post-meta">
-                                <span>|</span>
-                                
-                                <span class="meta-category"><a href="http://blog.k-8s.com/categories/Linux">Linux</a></span>
-                                
-                            </div>
-                            
-                            <div class="post-content">
-                                <h3 id="networkmanager">NetworkManager</h3>
-
-<p>NetworkManager 服务是 RedHat 2004 年启动的项目, 旨在让 Linux 用户更轻松的处理现代网络需求, 又起是无线网络, 能自动发现网卡并配置 IP 地址.</p>
-
-<p>在 CentOS <sup>6</sup>&frasl;<sub>7</sub> 中改服务即出现, 但配置起来比 network 复杂, 一般情况用的还是 network 服务.</p>
-
-<p>与 NetworkManager 相比, 两者功能有重合的部分, NetworkManager 可以创建与管理 network 服务配置文件, 通常不建议两个服务一起开启.</p>
-
-<p>在 CentOS 8/RHEL 8 中, 默认不带传统 network 服务, RedHat 将在下一个大版本中将 network 服务废除.</p>……
-                            </div>
-                            <p class="readmore"><a href="http://blog.k-8s.com/posts/Linux-Note/NetworkManager-Service/">阅读全文</a></p>
                         </article>
                     
                         <article class="post">
@@ -510,11 +528,11 @@ if err != nil {
 <ul class="widget-list">
     
     <li>
-        <a href="http://blog.k-8s.com/posts/Golang-Note/Golang-standard-library-ioutil/" title="Golang 标准库 io/ioutil">Golang 标准库 io/ioutil</a>
+        <a href="http://blog.k-8s.com/posts/Golang-Note/Golang-read-write-file/" title="Golang 读写文件">Golang 读写文件</a>
     </li>
     
     <li>
-        <a href="http://blog.k-8s.com/posts/Linux-Note/NetworkManager-Service/" title="NetworkManager 服务">NetworkManager 服务</a>
+        <a href="http://blog.k-8s.com/posts/Golang-Note/Golang-standard-library-ioutil/" title="Golang 标准库 io/ioutil">Golang 标准库 io/ioutil</a>
     </li>
     
     <li>
@@ -559,15 +577,11 @@ if err != nil {
 <ul class="widget-list">
     
     <li>
-        <a href="http://blog.k-8s.com/categories/Golang/">Golang(14)</a>
+        <a href="http://blog.k-8s.com/categories/Golang/">Golang(15)</a>
     </li>
     
     <li>
         <a href="http://blog.k-8s.com/categories/Kubernetes/">Kubernetes(6)</a>
-    </li>
-    
-    <li>
-        <a href="http://blog.k-8s.com/categories/Linux/">Linux(1)</a>
     </li>
     
     <li>
@@ -584,8 +598,6 @@ if err != nil {
     <a href="http://blog.k-8s.com/tags/Golang/">Golang</a>
     
     <a href="http://blog.k-8s.com/tags/Kubernetes/">Kubernetes</a>
-    
-    <a href="http://blog.k-8s.com/tags/Linux/">Linux</a>
     
     <a href="http://blog.k-8s.com/tags/hugo/">hugo</a>
     

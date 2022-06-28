@@ -78,11 +78,60 @@
                         <article class="post">
                             <header>
                                 <h1 class="post-title">
+                                    <a href="http://blog.k-8s.com/posts/Golang-Note/Golang-read-write-file/">Golang 读写文件</a>
+                                </h1>
+                            </header>
+                            <date class="post-meta meta-date">
+                                2020年5月1日
+                            </date>
+                            
+                            <div class="post-meta meta-category">
+                                |
+                                
+                                    <a href="http://blog.k-8s.com/categories/Golang">Golang</a>
+                                
+                            </div>
+                            
+                            <div class="post-content">
+                                <h3 id="ioutil-readall-读取文件">ioutil.ReadAll 读取文件</h3>
+
+<p>废话不多说, 先看一段读取文件的代码:</p>
+
+<pre><code class="language-go">package main
+
+import (
+	&quot;fmt&quot;
+	&quot;io/ioutil&quot;
+	&quot;log&quot;
+	&quot;os&quot;
+)
+
+func main() {
+	f, err := os.Open(&quot;./config.txt&quot;)  // 打开文件, 返回一个 *File 指针
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	defer f.Close()
+
+	c, err := ioutil.ReadAll(f)  // 一次读取所有内容
+	fmt.Println(string(c))
+}
+</code></pre>
+
+<p>以上代码简单的读取了一个文件的所有内容.  可以从代码中看出, <code>os.Open()</code> 函数打开了了一个文件, 然后我们用 <code>ioutil.ReadAll()</code> 读取该文件内容, 最后用 <code>defer f.close()</code> 关闭该文件(<strong>一定要记得关闭文件!!!</strong>)</p>……
+                                <p class="readmore"><a href="http://blog.k-8s.com/posts/Golang-Note/Golang-read-write-file/">阅读全文</a></p>
+                            </div>
+                        </article>
+                    
+                        <article class="post">
+                            <header>
+                                <h1 class="post-title">
                                     <a href="http://blog.k-8s.com/posts/Golang-Note/Golang-standard-library-ioutil/">Golang 标准库 io/ioutil</a>
                                 </h1>
                             </header>
                             <date class="post-meta meta-date">
-                                2021年1月2日
+                                2020年1月15日
                             </date>
                             
                             <div class="post-meta meta-category">
@@ -441,40 +490,6 @@ if err != nil {
                             </div>
                         </article>
                     
-                        <article class="post">
-                            <header>
-                                <h1 class="post-title">
-                                    <a href="http://blog.k-8s.com/posts/Golang-Note/Golang-function/">Golang 函数</a>
-                                </h1>
-                            </header>
-                            <date class="post-meta meta-date">
-                                2019年10月13日
-                            </date>
-                            
-                            <div class="post-meta meta-category">
-                                |
-                                
-                                    <a href="http://blog.k-8s.com/categories/Golang">Golang</a>
-                                
-                            </div>
-                            
-                            <div class="post-content">
-                                <h3 id="函数">函数</h3>
-
-<p>函数的基本组成为:</p>
-
-<ul>
-<li>关键字 <strong><em>func</em></strong></li>
-<li>函数名</li>
-<li>参数列表</li>
-<li>返回值</li>
-<li>函数体</li>
-<li>返回语句</li>
-</ul>……
-                                <p class="readmore"><a href="http://blog.k-8s.com/posts/Golang-Note/Golang-function/">阅读全文</a></p>
-                            </div>
-                        </article>
-                    
 
                     
 
@@ -519,11 +534,11 @@ if err != nil {
 <ul class="widget-list">
     
     <li>
-        <a href="http://blog.k-8s.com/posts/Golang-Note/Golang-standard-library-ioutil/" title="Golang 标准库 io/ioutil">Golang 标准库 io/ioutil</a>
+        <a href="http://blog.k-8s.com/posts/Golang-Note/Golang-read-write-file/" title="Golang 读写文件">Golang 读写文件</a>
     </li>
     
     <li>
-        <a href="http://blog.k-8s.com/posts/Linux-Note/NetworkManager-Service/" title="NetworkManager 服务">NetworkManager 服务</a>
+        <a href="http://blog.k-8s.com/posts/Golang-Note/Golang-standard-library-ioutil/" title="Golang 标准库 io/ioutil">Golang 标准库 io/ioutil</a>
     </li>
     
     <li>
@@ -568,15 +583,11 @@ if err != nil {
 <ul class="widget-list">
     
     <li>
-        <a href="http://blog.k-8s.com/categories/Golang/">Golang(14)</a>
+        <a href="http://blog.k-8s.com/categories/Golang/">Golang(15)</a>
     </li>
     
     <li>
         <a href="http://blog.k-8s.com/categories/Kubernetes/">Kubernetes(6)</a>
-    </li>
-    
-    <li>
-        <a href="http://blog.k-8s.com/categories/Linux/">Linux(1)</a>
     </li>
     
     <li>
@@ -593,8 +604,6 @@ if err != nil {
     <a href="http://blog.k-8s.com/tags/Golang/">Golang</a>
     
     <a href="http://blog.k-8s.com/tags/Kubernetes/">Kubernetes</a>
-    
-    <a href="http://blog.k-8s.com/tags/Linux/">Linux</a>
     
     <a href="http://blog.k-8s.com/tags/hugo/">hugo</a>
     
